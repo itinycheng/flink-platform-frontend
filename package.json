@@ -18,6 +18,8 @@
     "@antv/x6-vue-shape": "1.2.10",
     "@vue/composition-api": "^1.0.5",
     "axios": "0.18.1",
+    "butterfly-dag": "^4.1.23",
+    "codemirror": "^5.60.0",
     "core-js": "3.6.5",
     "element-ui": "2.15.1",
     "js-cookie": "2.2.0",

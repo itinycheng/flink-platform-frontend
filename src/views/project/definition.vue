@@ -13,7 +13,7 @@
 
       <router-link to="/project/create-flow">
         <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-edit">
-          Edit
+          Create
         </el-button>
       </router-link>
     </div>

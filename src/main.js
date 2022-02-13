@@ -11,6 +11,7 @@ import '@/styles/index.scss' // global css
 import App from './App'
 import store from './store'
 import router from './router'
+import VueAxiosPlugin from 'vue-axios-plugin'
 
 import '@/icons' // icon
 import '@/permission' // permission control
@@ -32,6 +33,17 @@ if (process.env.NODE_ENV === 'production') {
 Vue.use(ElementUI, { locale })
 // 如果想要中文版 element-ui，按如下方式声明
 // Vue.use(ElementUI)
+
+Vue.use(VueAxiosPlugin, {
+  // 请求拦截处理
+  reqHandleFunc: config => {
+    config.baseURL = process.env.VUE_APP_BASE_API
+    return config
+  },
+  reqErrorFunc: error => Promise.reject(error),
+  resHandleFunc: response => response,
+  resErrorFunc: error => Promise.reject(error)
+})
 
 Vue.config.productionTip = false
 

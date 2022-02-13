@@ -132,7 +132,7 @@ const nodeStatusList = [
 ]
 
 export default {
-  name: 'JobFlow',
+  name: 'ProjectCreateDetail',
   components: { MenuBar, Drawer, DialogCondition, FormModel },
   data() {
     return {

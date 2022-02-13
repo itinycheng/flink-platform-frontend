@@ -58,27 +58,27 @@ export const constantRoutes = [
   {
     path: '/project',
     component: Layout,
-    redirect: '/project/definition',
+    redirect: '/project/list',
     name: 'Project',
     meta: { title: 'Project', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'definition',
-        name: 'Definition',
-        component: () => import('@/views/project/definition'),
+        path: 'list',
+        name: 'List',
+        component: () => import('@/views/project/list'),
         meta: { title: 'Definition', icon: 'tree' }
+      },
+      {
+        path: 'create/:id',
+        name: 'Create Project',
+        component: () => import('@/views/project/create-detail'),
+        hidden: true
       },
       {
         path: 'process',
         name: 'Process Instance',
         component: () => import('@/views/project/process'),
         meta: { title: 'Process', icon: 'tree' }
-      },
-      {
-        path: 'create-flow',
-        name: 'Create Job Flow',
-        component: () => import('@/views/project/create-flow'),
-        meta: { title: 'Create Flow', icon: 'tree' }
       }
     ]
   },

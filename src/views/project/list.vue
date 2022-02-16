@@ -28,7 +28,7 @@
       >
         Search
       </el-button>
-      <el-button type="primary" icon="el-icon-edit" @click.stop="createDialog">
+      <el-button type="primary" icon="el-icon-edit" @click.stop="handleCreate">
         Create
       </el-button>
     </div>
@@ -147,26 +147,26 @@
 </template>
 
 <script>
-import { fetchFlowList, fetchStatusList } from "@/api/job-flow";
-import waves from "@/directive/waves";
-import { parseTime } from "@/utils";
-import Pagination from "@/components/Pagination";
-import ProjectCreateDialog from "./create-dialog.vue";
+import { fetchFlowList, fetchStatusList } from '@/api/job-flow'
+import waves from '@/directive/waves'
+import { parseTime } from '@/utils'
+import Pagination from '@/components/Pagination'
+import ProjectCreateDialog from './create-dialog.vue'
 
 export default {
-  name: "ProjectList",
+  name: 'ProjectList',
   components: { Pagination, ProjectCreateDialog },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        OFFLINE: "info",
-        ONLINE: "",
-        SCHEDULING: "success",
-        DELETE: "danger",
-      };
-      return statusMap[status];
-    },
+        OFFLINE: 'info',
+        ONLINE: '',
+        SCHEDULING: 'success',
+        DELETE: 'danger'
+      }
+      return statusMap[status]
+    }
   },
   data() {
     return {
@@ -181,150 +181,137 @@ export default {
         status: undefined,
         title: undefined,
         type: undefined,
-        sort: "+id",
+        sort: '+id'
       },
       temp: {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        type: "",
-        status: "published",
+        title: '',
+        type: '',
+        status: 'published'
       },
       dialogFormVisible: false,
-      dialogStatus: "",
+      dialogStatus: '',
       textMap: {
-        update: "Edit",
-        create: "Create",
+        update: 'Edit',
+        create: 'Create'
       },
       dialogPvVisible: false,
       pvData: [],
       rules: {
         type: [
-          { required: true, message: "type is required", trigger: "change" },
+          { required: true, message: 'type is required', trigger: 'change' }
         ],
         timestamp: [
           {
-            type: "date",
+            type: 'date',
             required: true,
-            message: "timestamp is required",
-            trigger: "change",
-          },
+            message: 'timestamp is required',
+            trigger: 'change'
+          }
         ],
         title: [
-          { required: true, message: "title is required", trigger: "blur" },
-        ],
-      },
-    };
+          { required: true, message: 'title is required', trigger: 'blur' }
+        ]
+      }
+    }
   },
 
   created() {
-    this.getStatus();
-    this.getList();
+    this.getStatus()
+    this.getList()
   },
 
   methods: {
     getStatus() {
-      var data = { className: "JobFlowStatus" };
+      var data = { className: 'JobFlowStatus' }
       fetchStatusList(data).then((response) => {
-        this.listStatus = response.data;
-      });
+        this.listStatus = response.data
+      })
     },
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       fetchFlowList(this.listQuery).then((response) => {
-        this.list = response.data.records;
-        this.total = response.data.total;
+        this.list = response.data.records
+        this.total = response.data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1.5 * 1000);
-      });
+          this.listLoading = false
+        }, 1.5 * 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
-    },
-    createDialog() {
-      this.$refs.createDialog.visible = true;
+      this.listQuery.page = 1
+      this.getList()
     },
     handleModifyStatus(row, status) {
       this.$message({
-        message: "操作Success",
-        type: "success",
-      });
-      row.status = status;
+        message: '操作Success',
+        type: 'success'
+      })
+      row.status = status
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
     resetTemp() {
       this.temp = {
         id: undefined,
         importance: 1,
-        remark: "",
+        remark: '',
         timestamp: new Date(),
-        title: "",
-        status: "published",
-        type: "",
-      };
+        title: '',
+        status: 'published',
+        type: ''
+      }
     },
     handleCreate() {
-      this.resetTemp();
-      this.dialogStatus = "create";
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+      this.$refs.createDialog.init()
     },
     handleUpdate(row) {
-      this.temp = Object.assign({}, row); // copy obj
-      this.temp.timestamp = new Date(this.temp.timestamp);
-      this.dialogStatus = "update";
-      this.dialogFormVisible = true;
-      this.$nextTick(() => {
-        this.$refs["dataForm"].clearValidate();
-      });
+      const rowData = Object.assign({}, row) // copy obj
+      this.$refs.createDialog.init(rowData)
     },
     handleDelete(row, index) {
       this.$notify({
-        title: "Success",
-        message: "Delete Successfully",
-        type: "success",
-        duration: 2000,
-      });
-      this.list.splice(index, 1);
+        title: 'Success',
+        message: 'Delete Successfully',
+        type: 'success',
+        duration: 2000
+      })
+      this.list.splice(index, 1)
     },
     formatJson(filterVal) {
       return this.list.map((v) =>
         filterVal.map((j) => {
-          if (j === "timestamp") {
-            return parseTime(v[j]);
+          if (j === 'timestamp') {
+            return parseTime(v[j])
           } else {
-            return v[j];
+            return v[j]
           }
         })
-      );
+      )
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>
 
 <style scoped>

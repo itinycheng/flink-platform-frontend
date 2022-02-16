@@ -16,33 +16,18 @@ export function fetchFlowList(query) {
   })
 }
 
-export function fetchArticle(id) {
+export async function getFlow(id) {
   return request({
-    url: '/vue-element-admin/article/detail',
-    method: 'get',
-    params: { id }
+    url: `/jobFlow/get/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
   })
 }
 
-export function fetchPv(pv) {
+export async function updateFlow(data) {
   return request({
-    url: '/vue-element-admin/article/pv',
-    method: 'get',
-    params: { pv }
-  })
-}
-
-export function createArticle(data) {
-  return request({
-    url: '/vue-element-admin/article/create',
-    method: 'post',
-    data
-  })
-}
-
-export function updateArticle(data) {
-  return request({
-    url: '/vue-element-admin/article/update',
+    url: '/jobFlow/update',
     method: 'post',
     data
   })

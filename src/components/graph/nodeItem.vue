@@ -1,35 +1,32 @@
 <template>
-  <div class="node " :class="status">
-    <img :src="imgCot.logo" alt="">
-    <span class="label">读数据</span>
+  <div class="node" :class="nodeData.status">
+    <img :src="nodeData.icon" alt="">
+    <span class="label">{{ nodeData.name }}</span>
     <span class="status">
-      <img :src="imgCot[status]" alt="">
+      <img :src="statusImgs[nodeData.status]" alt="">
     </span>
   </div>
 </template>
 
 <script>
+import graphConfig from './config'
 
 export default {
-  name: 'FlinkItem',
+  name: 'NodeItem',
   inject: ['getGraph', 'getNode'],
   data() {
     return {
-      status: 'logo',
-      imgCot: {
-        logo: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*evDjT5vjkX0AAAAAAAAAAAAAARQnAQ',
-        success: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*6l60T6h8TTQAAAAAAAAAAAAAARQnAQ',
-        failed: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SEISQ6My-HoAAAAAAAAAAAAAARQnAQ',
-        running: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*t8fURKfgSOgAAAAAAAAAAAAAARQnAQ'
-      }
+      nodeData: {},
+      statusImgs: graphConfig.nodeStateImgs
     }
   },
   mounted() {
     const self = this
     const node = this.getNode()
-    // 监听数据改变事件
+    this.nodeData = node.getData()
+    // watch data change event and refresh node display
     node.on('change:data', ({ current }) => {
-      self.status = current.status
+      self.nodeData = current
     })
   }
 }
@@ -60,7 +57,7 @@ export default {
         width: 104px;
         margin-left: 8px;
         color: #666;
-        font-size: 12px;
+        font-size: 14px;
     }
 
     .node .status {

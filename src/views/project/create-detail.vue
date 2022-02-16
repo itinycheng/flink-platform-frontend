@@ -2,7 +2,6 @@
   <div id="coverCot" style="width: 100%; height: 100vh; overflow: hidden">
     <section class="section-cot" style="width: 100%; height: 100%;">
       <div id="flow-container" @click.stop="hideFn">
-        <MenuBar v-if="showContextMenu" ref="menuBar" @callBack="contextMenuFn" />
         <header>
           <el-tooltip class="item" effect="dark" content="项目" placement="bottom">
             <i class="el-icon-menu" @click="showDrawerFn()" />
@@ -33,113 +32,42 @@
           </el-tooltip>
         </header>
         <div id="draw-cot" />
-        <Drawer ref="drawer" @addNode="addNode" />
+        <SideBar ref="drawer" @addNode="addNode" />
+        <NodeMenu ref="nodeMenu" />
+        <EdgeMenu ref="edgeMenu" />
       </div>
     </section>
 
-    <DialogCondition ref="dialogCondition" />
     <FormModel ref="formModel" />
-
   </div>
 </template>
 
 <script>
 import { Graph, Path } from '@antv/x6'
+import { getJobByIds } from '@/api/job.js'
+import { updateFlow } from '@/api/job-flow.js'
+
 import '@antv/x6-vue-shape'
 
-import DataJson from '../../data'
-import MenuBar from '../../components/graph/menuBar.vue'
-import Drawer from '../../components/graph/drawer.vue'
-import flinkitem from '../../components/graph/flinkItem.vue'
-import shellitem from '../../components/graph/shellItem.vue'
-
-import DialogCondition from '../../components/graph/condition.vue'
+import DataJson from '@/data'
+import NodeMenu from '@/components/graph/nodeMenu.vue'
+import EdgeMenu from '@/components/graph/edgeMenu.vue'
+import SideBar from '@/components/graph/sideBar.vue'
+import nodeitem from '@/components/graph/nodeItem.vue'
+import graphConfig from '@/components/graph/config'
 import FormModel from '../form/formModel.vue'
 
-const nodeStatusList = [
-  [
-    {
-      id: '1',
-      status: 'running'
-    },
-    {
-      id: '2',
-      status: 'default'
-    },
-    {
-      id: '3',
-      status: 'default'
-    },
-    {
-      id: '4',
-      status: 'default'
-    }
-  ],
-  [
-    {
-      id: '1',
-      status: 'success'
-    },
-    {
-      id: '2',
-      status: 'running'
-    },
-    {
-      id: '3',
-      status: 'default'
-    },
-    {
-      id: '4',
-      status: 'default'
-    }
-  ],
-  [
-    {
-      id: '1',
-      status: 'success'
-    },
-    {
-      id: '2',
-      status: 'success'
-    },
-    {
-      id: '3',
-      status: 'running'
-    },
-    {
-      id: '4',
-      status: 'running'
-    }
-  ],
-  [
-    {
-      id: '1',
-      status: 'success'
-    },
-    {
-      id: '2',
-      status: 'success'
-    },
-    {
-      id: '3',
-      status: 'success'
-    },
-    {
-      id: '4',
-      status: 'failed'
-    }
-  ]
-]
+const nodeStatusList = []
 
 export default {
   name: 'ProjectCreateDetail',
-  components: { MenuBar, Drawer, DialogCondition, FormModel },
+  components: { NodeMenu, EdgeMenu, SideBar, FormModel },
   data() {
     return {
       graph: '',
       timer: '',
       isLock: false,
-      showContextMenu: false
+      sideMenus: graphConfig.sideBarConf
     }
   },
   mounted() {
@@ -149,98 +77,23 @@ export default {
   },
   methods: {
     hideFn() {
-      this.showContextMenu = false
+      this.$refs.nodeMenu.visible = false
+      this.$refs.edgeMenu.visible = false
     },
     initGraph() {
       Graph.registerNode(
-        'dag-shell',
+        'dag-node',
         {
           inherit: 'vue-shape',
           width: 180,
           height: 36,
           component: {
-            template: `<shellitem />`,
+            template: `<nodeitem />`,
             components: {
-              shellitem
+              nodeitem
             }
           },
-          ports: {
-            groups: {
-              top: {
-                position: 'top',
-                attrs:
-                {
-                  circle: {
-                    r: 4,
-                    magnet: true,
-                    stroke:
-                    '#C2C8D5',
-                    strokeWidth: 1,
-                    fill: '#fff'
-                  }
-                }
-              },
-              bottom: {
-                position: 'bottom',
-                attrs: {
-                  circle: {
-                    r: 4,
-                    magnet:
-                    true,
-                    stroke: '#C2C8D5',
-                    strokeWidth: 1,
-                    fill: '#fff'
-                  }
-                }
-              }
-            }
-          }
-        },
-        true
-      )
-
-      Graph.registerNode(
-        'dag-flink',
-        {
-          inherit: 'vue-shape',
-          width: 180,
-          height: 36,
-          component: {
-            template: `<flinkitem />`,
-            components: {
-              flinkitem
-            }
-          },
-          ports: {
-            groups: {
-              top: {
-                position: 'top',
-                attrs:
-                {
-                  circle: {
-                    r: 4,
-                    magnet: true,
-                    stroke: '#C2C8D5',
-                    strokeWidth: 1,
-                    fill: '#fff'
-                  }
-                }
-              },
-              bottom: {
-                position: 'bottom',
-                attrs: {
-                  circle: {
-                    r: 4,
-                    magnet:
-                    true,
-                    stroke: '#C2C8D5',
-                    strokeWidth: 1,
-                    fill: '#fff'
-                  }
-                }
-              }
-            }
-          }
+          ports: { ...graphConfig.nodePorts }
         },
         true
       )
@@ -256,7 +109,8 @@ export default {
               targetMarker: {
                 name: 'block',
                 width: 12,
-                height: 8
+                height: 8,
+                d: 'M 6 -3 0 0 6 3 Z'
               }
             }
           }
@@ -325,6 +179,7 @@ export default {
         connecting: {
           snap: true,
           allowBlank: false,
+          allowMulti: false,
           allowLoop: false,
           highlight: true,
           connector: 'algo-connector',
@@ -337,16 +192,6 @@ export default {
           createEdge() {
             return graph.createEdge({
               shape: 'dag-edge',
-              attrs: {
-                line: {
-                  strokeDasharray: '5 5',
-                  targetMarker: {
-                    name: 'block',
-                    width: 12,
-                    height: 8
-                  }
-                }
-              },
               zIndex: -1
             })
           }
@@ -366,44 +211,17 @@ export default {
       this.graph = graph
 
       graph.on('edge:contextmenu', ({ e, x, y, edge, view }) => {
-        this.showContextMenu = true
+        this.$refs.edgeMenu.visible = true
         this.$nextTick(() => {
-          this.$refs.menuBar.initFn(e.offsetX, e.offsetY, { type: 'edge', item: edge })
+          this.$refs.edgeMenu.initFn(e.offsetX, e.offsetY, edge)
         })
       })
 
       graph.on('node:contextmenu', ({ e, x, y, node, view }) => {
-        this.showContextMenu = true
+        this.$refs.nodeMenu.visible = true
         this.$nextTick(() => {
-          // this.$refs.menuBar.setItem({ type: 'node', item: node })
           const p = graph.localToPage(x, y)
-          this.$refs.menuBar.initFn(p.x, p.y, { type: 'node', item: node })
-        })
-      })
-
-      graph.on('node:dblclick', ({ e, x, y, node, view }) => {
-        alert('dblclick')
-      })
-
-      graph.on('edge:connected', ({ edge }) => {
-        const source = graph.getCellById(edge.source.cell)
-        const target = graph.getCellById(edge.target.cell)
-        if (target.data.type === 'output') {
-          return graph.removeEdge(edge.id)
-        }
-
-        if (source.data.type === 'condition') {
-          if (target.data.t === edge.id || target.data.f === edge.id) {
-            return graph.removeEdge(edge.id)
-          }
-          this.$refs.dialogCondition.visible = true
-          this.$refs.dialogCondition.init(source.data, edge)
-        }
-
-        edge.attr({
-          line: {
-            strokeDasharray: ''
-          }
+          this.$refs.nodeMenu.initFn(p.x, p.y, node)
         })
       })
 
@@ -421,6 +239,76 @@ export default {
           })
       })
     },
+    async startFn() {
+      this.timer && clearTimeout(this.timer)
+      this.drawDag(await this.genDagData() || DataJson)
+      this.showNodeStatus(Object.assign([], nodeStatusList))
+      this.graph.centerContent()
+    },
+    async genDagData() {
+      const flowData = this.$route.query.flow
+      if (!flowData) {
+        return null
+      }
+
+      const data = []
+      const jobs = {}
+      const nodeLayouts = flowData.nodeLayouts
+      const ids = flowData.vertices?.map(vertex => vertex.id)
+      await getJobByIds(ids).then((res) => {
+          res.data?.forEach((item) => {
+            jobs[item.id] = item
+          })
+      })
+
+      flowData.vertices?.forEach(vertex => {
+        const nodeLayout = nodeLayouts[vertex.id]
+        const nodeType = nodeLayout?.type
+        const job = jobs[vertex.id]
+        const defaultConf = graphConfig.sideBarConf[nodeType]
+        data.push({
+          id: vertex.id,
+          x: nodeLayout?.x,
+          y: nodeLayout?.y,
+          shape: 'dag-node',
+          data: {
+            ...defaultConf,
+            id: job.id,
+            name: job.name,
+            type: nodeType
+          }
+        })
+      })
+      flowData.edges?.forEach(edge => {
+        data.push({
+          id: edge.fromVId + '-' + edge.toVId,
+          shape: 'dag-edge',
+          source: { cell: edge.fromVId },
+          target: { cell: edge.toVId },
+          data: { 'status': edge.expectStatus },
+          labels: [{
+            'attrs': {
+              text: { text: edge.expectStatus, fontSize: 14 },
+              rect: { fill: 'none' }
+            }
+          }]
+        })
+      })
+      return data
+    },
+    drawDag(data = []) {
+      const cells = []
+      data.forEach((item) => {
+        if (item.shape === 'dag-edge') {
+          cells.push(this.graph.createEdge(item))
+        } else {
+          delete item.component
+          cells.push(this.graph.createNode(item))
+        }
+      })
+      this.graph.resetCells(cells)
+    },
+
     async showNodeStatus(statusList) {
       const status = statusList.shift()
         status?.forEach((item) => {
@@ -436,19 +324,7 @@ export default {
           this.showNodeStatus(statusList)
         }, 3000)
     },
-    // 初始化节点/边
-    init(data = []) {
-      const cells = []
-      data.forEach((item) => {
-        if (item.shape === 'dag-edge') {
-          cells.push(this.graph.createEdge(item))
-        } else {
-          delete item.component
-          cells.push(this.graph.createNode(item))
-        }
-      })
-      this.graph.resetCells(cells)
-    },
+
     zoomFn(num) {
       this.graph.zoom(num)
     },
@@ -457,14 +333,47 @@ export default {
       num > 1 ? this.graph.zoom(num * -1) : this.graph.zoom(num)
       this.graph.centerContent()
     },
-    startFn(item) {
-      this.timer && clearTimeout(this.timer)
-      this.init(item || DataJson)
-      this.showNodeStatus(Object.assign([], nodeStatusList))
-      this.graph.centerContent()
-    },
-    createMenuFn() {
-
+    saveFn() {
+      const edgeDataArr = this.graph.getEdges().map((edge) => {
+        const edgeData = edge.getData()
+        const sourceData = edge.getSourceNode().getData()
+        const targetData = edge.getTargetNode().getData()
+        return {
+          fromVId: sourceData?.id,
+          toVId: targetData?.id,
+          expectStatus: edgeData?.status
+        }
+      })
+      const nodeDataArr = []
+      const nodeLayouts = {}
+      this.graph.getNodes().map((node) => {
+        const nodeXY = node.position()
+        const nodeData = node.getData()
+        nodeDataArr.push({
+          id: nodeData?.id,
+          jobId: nodeData?.id,
+          precondition: nodeData?.precondition
+        })
+        nodeLayouts[nodeData?.id] = {
+          x: nodeXY.x,
+          y: nodeXY.y,
+          type: nodeData?.type
+        }
+      })
+      const graphJsonData = {
+        vertices: nodeDataArr,
+        edges: edgeDataArr,
+        nodeLayouts: nodeLayouts
+      }
+      updateFlow({ id: this.$route.params.id, flow: graphJsonData })
+        .then(res => {
+          this.$notify({
+            title: 'Success',
+            message: 'Flow Created, id=' + res.data,
+            type: 'success'
+          })
+          this.$router.push('/project/list')
+        })
     },
     keyBindFn() {
       // copy cut paste
@@ -498,9 +407,6 @@ export default {
         return false
       })
     },
-    saveFn() {
-      localStorage.setItem('x6Json', JSON.stringify(this.graph.toJSON({ diff: true })))
-    },
     loadFn() {
       this.timer && clearTimeout(this.timer)
       const x6Json = JSON.parse(localStorage.getItem('x6Json'))
@@ -516,23 +422,6 @@ export default {
         this.graph.disablePanning()
         this.graph.disableKeyboard()
       }
-    },
-    contextMenuFn(type, item) {
-      switch (type) {
-        case 'remove':
-          if (item.type === 'edge') {
-            this.graph.removeEdge(item.item.id)
-          } else if (item.type === 'node') {
-            this.graph.removeNode(item.item.id)
-          }
-          break
-        case 'source':
-          this.$refs.formModel.visible = true
-          this.$refs.formModel.init(item)
-          break
-      }
-
-      this.showContextMenu = false
     },
 
     showDrawerFn() {
@@ -558,6 +447,7 @@ export default {
         display: flex;
         justify-content: flex-end;
         width: 100%;
+        padding-right: 20px;
         height: 50px;
     }
 

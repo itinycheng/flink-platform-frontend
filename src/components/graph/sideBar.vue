@@ -13,8 +13,8 @@
       <section class="listBar" @click.stop="">
         <div class="listBar-cot">
           <div
-            v-for="item in sideBarList"
-            :key="item.name"
+            v-for="(item, key) in sideMenus"
+            :key="key"
             class="drag-cot"
             :class="'icon-' + item.name"
             draggable="true"
@@ -31,15 +31,15 @@
 
 <script>
 const mouseXY = { x: null, y: null }
-import sideBarConf from './config'
+import graphConfig from './config'
 
 export default {
-  name: 'Drawer',
+  name: 'SideBar',
   data() {
     return {
       visible: true,
       direction: 'ltr',
-      sideBarList: sideBarConf
+      sideMenus: graphConfig.sideBarConf
     }
   },
   mounted() {
@@ -67,91 +67,24 @@ export default {
         mouseInGrid = true
       }
       if (mouseInGrid === true) {
+        console.log('drag node')
       }
     },
     nodeConfig(item, x, y) {
       let config = ''
       switch (item.type) {
         case 'SHELL':
-          config = {
-            x: x,
-            y: y,
-            width: 180,
-            height: 40,
-            shape: 'dag-shell',
-            data: item,
-            ports: {
-              groups: {
-                bottom: {
-                  position: 'bottom',
-                  attrs: {
-                    circle: {
-                      r: 4,
-                      magnet: true,
-                      stroke: '#C2C8D5',
-                      strokeWidth: 1,
-                      fill: '#fff'
-                    }
-                  }
-                }
-              },
-              items: [
-                {
-                  id: 'port2',
-                  group: 'bottom' // 指定分组名称
-                }
-              ]
-            }
-          }
-          break
         case 'FLINK':
+        case 'SQL':
           config = {
             x: x,
             y: y,
-            width: 180,
-            height: 40,
-            shape: 'dag-flink',
-            data: item,
-            ports: {
-              groups: {
-                top: {
-                  position: 'top',
-                  attrs: {
-                    circle: {
-                      r: 4,
-                      magnet: true,
-                      stroke: '#C2C8D5',
-                      strokeWidth: 1,
-                      fill: '#fff'
-                    }
-                  }
-                },
-                bottom: {
-                  position: 'bottom',
-                  attrs: {
-                    circle: {
-                      r: 4,
-                      magnet: true,
-                      stroke: '#C2C8D5',
-                      strokeWidth: 1,
-                      fill: '#fff'
-                    }
-                  }
-                }
-              },
-              items: [
-                {
-                  id: 'port1',
-                  group: 'top' // 指定分组名称
-                },
-                {
-                  id: 'port2',
-                  group: 'bottom' // 指定分组名称
-                }
-              ]
-            }
+            shape: 'dag-node',
+            data: item
           }
           break
+        default:
+          config = {}
       }
       return config
     },
@@ -207,12 +140,18 @@ export default {
 .listBar-cot .icon-shell {
   width: 100%;
   height: 60px;
-  background: url("../../assets/toolbar_shell.png") no-repeat 50% 50%;
+  background: url("../../assets/shell.png") no-repeat center center;
 }
 
 .listBar-cot .icon-flink {
   width: 100%;
   height: 60px;
-  background: url("../../assets/toolbar_flink.png") no-repeat 50% 50%;
+  background: url("../../assets/flink.png") no-repeat center center;
+}
+
+.listBar-cot .icon-sql {
+  width: 100%;
+  height: 60px;
+  background: url("../../assets/sql.png") no-repeat center center;
 }
 </style>

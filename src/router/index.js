@@ -73,6 +73,11 @@ export const constantRoutes = [
         name: 'Create Project',
         component: () => import('@/views/project/create-detail'),
         hidden: true
+      }, {
+        path: 'update/:id',
+        name: 'Update Project',
+        component: () => import('@/views/project/create-detail'),
+        hidden: true
       },
       {
         path: 'process',

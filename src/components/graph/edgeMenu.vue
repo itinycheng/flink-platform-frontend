@@ -11,6 +11,7 @@
 </template>
 
 <script>
+import { getEdgeStates } from '@/api/attr.js'
 
 export default {
   name: 'EdgeMenu',
@@ -19,8 +20,8 @@ export default {
       x: '',
       y: '',
       edge: {},
-      visible: false,
-      menuList: ['SUCCESS', 'FAILED', 'RUNNING', 'DELETE']
+      menuList: [],
+      visible: false
     }
   },
   mounted() {
@@ -30,8 +31,16 @@ export default {
       this.x = parseInt(x) + ''
       this.y = y + ''
       this.edge = edge
+      this.menuList = this.getExecStatus()
     },
 
+    getExecStatus() {
+      let id = this.edge.getSourceNode().getData()?.id
+      id = !id ? '' : id
+      getEdgeStates(id).then(result => {
+        this.menuList = [...result, 'DELETE']
+      })
+    },
     handleSelect(key, keyPath) {
       if (key === 'DELETE') {
         this.$parent.graph.removeEdge(this.edge.id)

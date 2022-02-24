@@ -2,6 +2,8 @@
   <el-drawer
     title="Current Node settings"
     :visible.sync="visible"
+    :destroy-on-close="true"
+    :wrapper-closable="false"
     :direction="direction"
     :modal="false"
     :modal-append-to-body="false"
@@ -23,21 +25,11 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="Crontab" prop="cronExpr">
-            <el-input v-model="formData.cronExpr" />
+          <el-form-item label="Description" prop="description">
+            <el-input v-model="formData.description" type="textarea" />
           </el-form-item>
           <el-form-item label="Worker Group" prop="routeUrl">
             <el-input v-model="formData.routeUrl" />
-          </el-form-item>
-          <el-form-item label="Deploy Mode" prop="deployMode">
-            <el-select v-model="formData.deployMode" style="width:100%">
-              <el-option
-                v-for="item in deployModeList"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
-            </el-select>
           </el-form-item>
           <el-form-item label="Execution Mode" prop="execMode">
             <el-select v-model="formData.execMode" style="width:100%">
@@ -49,40 +41,73 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="Catalogs" prop="catalogs">
-            <el-select v-model="formData.catalogs" multiple style="width:100%">
+          <el-form-item label="Deploy Mode" prop="deployMode">
+            <el-select v-model="formData.deployMode" style="width:100%">
               <el-option
-                v-for="item in catalogList"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              >
-                <span style="float: left">{{ item.name }}</span>
-                <span style="float: right; color: #8492a6; font-size: 13px">{{ item.description }}</span>
-              </el-option>
+                v-for="item in deployModeList"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
             </el-select>
           </el-form-item>
-          <el-form-item label="Subject" prop="subject">
-            <SqlEditor
-              v-if="isSql(formData.type)"
-              ref="sqlEditor"
-              :value="formData.subject"
-              @changeTextarea="changeTextarea($event)"
-            />
-            <el-input v-else v-model="formData.subject" type="textarea" />
+          <el-form-item label="Variables" prop="variables">
+            <el-input v-model="formData.variables" placeholder="{'k1': 'v1', ...}" />
           </el-form-item>
-          <el-form-item label="External Jars" prop="extJars">
-            <el-input v-model="formData.extJars" />
-          </el-form-item>
-          <el-form-item label="Main Class" prop="mainClass">
-            <el-input v-model="formData.mainClass" />
-          </el-form-item>
-          <el-form-item label="Main Args" prop="mainArgs">
-            <el-input v-model="formData.mainArgs" />
-          </el-form-item>
-          <el-form-item label="Description" prop="jobDesc">
-            <el-input v-model="formData.description" type="textarea" />
-          </el-form-item>
+
+          <template v-if="nodeType === 'FLINK'">
+            <!-- flink -->
+            <el-form-item label="Catalogs" prop="catalogs">
+              <el-select v-model="formData.catalogs" multiple style="width:100%">
+                <el-option
+                  v-for="item in catalogList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                >
+                  <span style="float: left">{{ item.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ item.description }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="Subject" prop="subject">
+              <SqlEditor
+                v-if="isFlinkSql(formData.type)"
+                ref="sqlEditor"
+                :value="formData.subject"
+                @changeTextarea="changeTextarea($event)"
+              />
+              <el-input v-else v-model="formData.subject" type="textarea" />
+            </el-form-item>
+            <el-form-item label="External Jars" prop="extJars">
+              <el-input v-model="formData.extJars" placeholder="['hdfs:///path1', ...]" />
+            </el-form-item>
+            <el-form-item label="Main Class" prop="mainClass">
+              <el-input v-model="formData.mainClass" />
+            </el-form-item>
+            <el-form-item label="Main Args" prop="mainArgs">
+              <el-input v-model="formData.mainArgs" />
+            </el-form-item>
+          </template>
+
+          <template v-if="nodeType === 'SHELL'">
+            <!-- shell -->
+            <el-form-item label="Subject" prop="subject">
+              <el-input v-model="formData.subject" type="textarea" />
+            </el-form-item>
+          </template>
+
+          <template v-if="nodeType === 'SQL'">
+            <!-- sql -->
+            <el-form-item label="Subject" prop="subject">
+              <SqlEditor
+                ref="sqlEditor"
+                :value="formData.subject"
+                @changeTextarea="changeTextarea($event)"
+              />
+            </el-form-item>
+          </template>
+
           <el-form-item label-width="10%" style="text-align: right;">
             <el-button type="warning" plain @click="resetForm()">Reset Form</el-button>
             <el-button type="success" plain @click="formatSql()">Format SQL</el-button>
@@ -98,6 +123,7 @@
 import { format } from 'sql-formatter'
 import SqlEditor from './SqlEditor.vue'
 import { getJob, createJob, updateJob } from '@/api/job.js'
+import { getCatalogs, getNodeTypes, getDeployModes } from '@/api/attr.js'
 
 export default {
   name: 'FormModel',
@@ -107,6 +133,7 @@ export default {
     return {
       visible: false,
       node: {},
+      nodeType: '',
       direction: 'rtl',
       execModeList: [],
       catalogList: [],
@@ -130,45 +157,58 @@ export default {
     }
   },
   created() {
-    // this.initCatalogList()
   },
   methods: {
     initFn(node) {
       this.node = node
       const data = node.getData()
-      switch (data.type) {
-        case 'FLINK':
-          this.execModeList = ['STREAMING', 'BATCH']
-          this.typeList = ['FLINK_SQL', 'FLINK_JAR']
-          this.deployModeList = ['FLINK_YARN_PER', 'FLINK_YARN_SESSION', 'FLINK_YARN_RUN_APPLICATION']
-          this.catalogList = this.initCatalogList()
-          break
-        case 'SHELL':
-          break
+      this.nodeType = data?.type
+      if (this.nodeType) {
+        this.initNodeTypeList(this.nodeType)
+        this.initExecModeList(this.nodeType)
+        this.initDeployModeList(this.nodeType)
+        switch (this.nodeType) {
+          case 'FLINK':
+            this.getCatalogList()
+            break
+          case 'SHELL':
+            break
+        }
       }
-
       if (data.id) {
-        getJob(data.id).then(res => {
-          const result = res.data
-          const extJars = result.extJars.join(',')
-          this.formData = { ...result, extJars }
+        getJob(data.id).then(result => {
+          const extJars = JSON.stringify(result.extJars || [])
+          const variables = JSON.stringify(result.variables || {})
+          this.formData = { ...result, extJars, variables }
         })
       } else {
         this.resetForm()
       }
     },
-    initEnums(enumsClass, callback) {
-      this.$http.get('/enums', { enumsClass: enumsClass }).then(res => {
-        callback(res.data.result)
+    initDeployModeList(nodeType) {
+      getDeployModes(nodeType).then(result => {
+        this.deployModeList = result
       })
     },
-    initCatalogList() {
-      this.$http.get('/catalog/list').then(res => {
-        this.catalogList = res.data.data
+    initExecModeList(nodeType) {
+      if (nodeType === 'FLINK') {
+        this.execModeList = ['STREAMING', 'BATCH']
+      } else {
+        this.execModeList = ['BATCH']
+      }
+    },
+    initNodeTypeList(nodeType) {
+      getNodeTypes(nodeType).then(result => {
+        this.typeList = result
       })
     },
-    isSql(type) {
-      return type === 'FLINK_SQL' || type === 'CLICKHOUSE_SQL'
+    getCatalogList() {
+      getCatalogs().then(data => {
+        this.catalogList = data
+      })
+    },
+    isFlinkSql(type) {
+      return type === 'FLINK_SQL'
     },
     changeTextarea(sql) {
       this.$set(this.formData, 'subject', sql)
@@ -183,31 +223,31 @@ export default {
           return false
         }
 
-        const extJars = this.formatExtJars(this.formData.extJars)
+        const extJars = JSON.parse(this.formData.extJars || '[]')
+        const variables = JSON.parse(this.formData.variables || '{}')
         const newData = {
           ...this.formData,
-          extJars
+          extJars,
+          variables
         }
         if (newData.id) {
-          updateJob(newData).then(res => {
-            this.modifyNode(res.data)
+          updateJob(newData).then(data => {
+            this.modifyNode(data)
             this.$notify({
               title: 'Success',
-              message: 'Job Updated, id=' + res.data.id,
+              message: 'Job Updated, id=' + data.id,
               type: 'success'
             })
-            this.resetForm()
             this.visible = false
           })
         } else {
-          createJob(newData).then(res => {
-            this.modifyNode(res.data)
+          createJob(newData).then(data => {
+            this.modifyNode(data)
             this.$notify({
               title: 'Success',
-              message: 'Job Created, id=' + res.data.id,
+              message: 'Job Created, id=' + data.id,
               type: 'success'
             })
-            this.resetForm()
             this.visible = false
           })
         }
@@ -226,13 +266,6 @@ export default {
         this.$refs['formData'].resetFields()
       } else {
         this.formData = {}
-      }
-    },
-    formatExtJars(extJars) {
-      if (extJars) {
-        return extJars.split(',')
-      } else {
-        return []
       }
     }
   }

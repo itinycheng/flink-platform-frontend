@@ -45,7 +45,7 @@
 <script>
 import { Graph, Path } from '@antv/x6'
 import { getJobByIds } from '@/api/job.js'
-import { updateFlow } from '@/api/job-flow.js'
+import { getFlow, updateFlow } from '@/api/job-flow.js'
 
 import '@antv/x6-vue-shape'
 
@@ -246,17 +246,24 @@ export default {
       this.graph.centerContent()
     },
     async genDagData() {
-      const flowData = this.$route.query.flow
-      if (!flowData) {
+      const flowId = this.$route.params.id
+      if (!flowId) {
         return null
       }
 
+      const itemData = await getFlow(flowId)
+      if (!itemData || !itemData.flow) {
+        return null
+      }
+
+      const flowData = itemData.flow
+      const nodeLayouts = flowData.nodeLayouts
+
       const data = []
       const jobs = {}
-      const nodeLayouts = flowData.nodeLayouts
       const ids = flowData.vertices?.map(vertex => vertex.id)
-      await getJobByIds(ids).then((res) => {
-          res.data?.forEach((item) => {
+      await getJobByIds(ids).then(result => {
+          result?.forEach((item) => {
             jobs[item.id] = item
           })
       })
@@ -366,10 +373,10 @@ export default {
         nodeLayouts: nodeLayouts
       }
       updateFlow({ id: this.$route.params.id, flow: graphJsonData })
-        .then(res => {
+        .then(result => {
           this.$notify({
             title: 'Success',
-            message: 'Flow Created, id=' + res.data,
+            message: 'Flow Updated, id=' + result,
             type: 'success'
           })
           this.$router.push('/project/list')

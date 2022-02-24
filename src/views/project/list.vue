@@ -2,7 +2,7 @@
   <div class="app-container">
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
-        v-model="listQuery.title"
+        v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
         @keyup.enter.native="handleFilter"
@@ -70,12 +70,7 @@
           <span>{{ row.description }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="User Id" min-width="200" align="left">
-        <template slot-scope="{ row }">
-          <span>{{ row.userId }}</span>
-        </template>
-      </el-table-column>
-      <el-table-column label="Cron Expr" min-width="120" align="center">
+      <el-table-column label="Crontab" min-width="100" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.cronExpr }}</span>
         </template>
@@ -85,14 +80,14 @@
           <span>{{ row.priority }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Status" width="100" align="left">
+      <el-table-column label="Status" width="120" align="center">
         <template slot-scope="{ row }">
           <el-tag :type="row.status | statusFilter">
             {{ row.status }}
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Create Time" min-width="100" align="center">
+      <el-table-column label="Create Time" min-width="130" align="center">
         <template slot-scope="{ row }">
           {{ row.createTime }}
         </template>
@@ -107,20 +102,8 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit
           </el-button>
-          <el-button
-            v-if="row.status != 'published'"
-            size="mini"
-            type="success"
-            @click="handleModifyStatus(row, 'published')"
-          >
-            Publish
-          </el-button>
-          <el-button
-            v-if="row.status != 'draft'"
-            size="mini"
-            @click="handleModifyStatus(row, 'draft')"
-          >
-            Draft
+          <el-button size="mini" type="success" @click="handleModifyStatus(row, 'OFFLINE')">
+            Status
           </el-button>
           <el-button
             v-if="row.status != 'deleted'"
@@ -143,19 +126,21 @@
     />
 
     <ProjectCreateDialog ref="createDialog" />
+    <StatusChangeDialog ref="statusChangeDialog" />
   </div>
 </template>
 
 <script>
-import { fetchFlowList, fetchStatusList } from '@/api/job-flow'
+import { getFlowList, deleteFlow } from '@/api/job-flow'
+import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
-import { parseTime } from '@/utils'
 import Pagination from '@/components/Pagination'
 import ProjectCreateDialog from './create-dialog.vue'
+import StatusChangeDialog from './status-change.vue'
 
 export default {
   name: 'ProjectList',
-  components: { Pagination, ProjectCreateDialog },
+  components: { Pagination, ProjectCreateDialog, StatusChangeDialog },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -178,43 +163,9 @@ export default {
       listQuery: {
         page: 1,
         limit: 20,
+        name: undefined,
         status: undefined,
-        title: undefined,
-        type: undefined,
         sort: '+id'
-      },
-      temp: {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        type: '',
-        status: 'published'
-      },
-      dialogFormVisible: false,
-      dialogStatus: '',
-      textMap: {
-        update: 'Edit',
-        create: 'Create'
-      },
-      dialogPvVisible: false,
-      pvData: [],
-      rules: {
-        type: [
-          { required: true, message: 'type is required', trigger: 'change' }
-        ],
-        timestamp: [
-          {
-            type: 'date',
-            required: true,
-            message: 'timestamp is required',
-            trigger: 'change'
-          }
-        ],
-        title: [
-          { required: true, message: 'title is required', trigger: 'blur' }
-        ]
       }
     }
   },
@@ -227,20 +178,20 @@ export default {
   methods: {
     getStatus() {
       var data = { className: 'JobFlowStatus' }
-      fetchStatusList(data).then((response) => {
-        this.listStatus = response.data
+      getStatusList(data).then((result) => {
+        this.listStatus = result
       })
     },
     getList() {
       this.listLoading = true
-      fetchFlowList(this.listQuery).then((response) => {
-        this.list = response.data.records
-        this.total = response.data.total
+      getFlowList(this.listQuery).then((data) => {
+        this.list = data.records
+        this.total = data.total
 
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1.5 * 1000)
+        }, 1000)
       })
     },
     handleFilter() {
@@ -248,11 +199,8 @@ export default {
       this.getList()
     },
     handleModifyStatus(row, status) {
-      this.$message({
-        message: '操作Success',
-        type: 'success'
-      })
-      row.status = status
+      this.$refs.statusChangeDialog.init(row)
+      // row.status = status
     },
     sortChange(data) {
       const { prop, order } = data
@@ -268,17 +216,6 @@ export default {
       }
       this.handleFilter()
     },
-    resetTemp() {
-      this.temp = {
-        id: undefined,
-        importance: 1,
-        remark: '',
-        timestamp: new Date(),
-        title: '',
-        status: 'published',
-        type: ''
-      }
-    },
     handleCreate() {
       this.$refs.createDialog.init()
     },
@@ -287,24 +224,22 @@ export default {
       this.$refs.createDialog.init(rowData)
     },
     handleDelete(row, index) {
-      this.$notify({
-        title: 'Success',
-        message: 'Delete Successfully',
-        type: 'success',
-        duration: 2000
+      this.$confirm(`Delete project [${row.id}, ${row.name}] ?`, 'Warning', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        deleteFlow(row.id)
+          .then(result => {
+            this.$notify({
+              title: 'Success',
+              message: 'Delete Successfully',
+              type: 'success',
+              duration: 2000
+            })
+            this.list.splice(index, 1)
+          })
       })
-      this.list.splice(index, 1)
-    },
-    formatJson(filterVal) {
-      return this.list.map((v) =>
-        filterVal.map((j) => {
-          if (j === 'timestamp') {
-            return parseTime(v[j])
-          } else {
-            return v[j]
-          }
-        })
-      )
     },
     getSortClass: function(key) {
       const sort = this.listQuery.sort

@@ -12,6 +12,7 @@
 </template>
 
 <script>
+import { deleteJob } from '@/api/job.js'
 
 export default {
   name: 'NodeMenu',
@@ -32,15 +33,21 @@ export default {
       this.node = node
     },
 
-    handleSelect(key, keyPath) {
+    async handleSelect(key, keyPath) {
       switch (key) {
-        case 'edit':
+        case 'edit': {
           this.$parent.$refs.formModel.visible = true
           this.$parent.$refs.formModel.initFn(this.node)
           break
-        case 'delete':
+        }
+        case 'delete': {
+          const jobId = this.node.getData()?.id
+          if (jobId) {
+            await deleteJob(jobId)
+          }
           this.$parent.graph.removeNode(this.node.id)
           break
+        }
       }
       this.visible = false
     }

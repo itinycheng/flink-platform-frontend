@@ -57,7 +57,7 @@ export default {
         width: 104px;
         margin-left: 8px;
         color: #666;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .node .status {

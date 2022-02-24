@@ -33,7 +33,7 @@
 </template>
 
 <script>
-import { getFlow, updateFlow } from '@/api/job-flow.js'
+import { createFlow, updateFlow } from '@/api/job-flow.js'
 
 export default {
   name: 'ProjectCreateDialog',
@@ -74,14 +74,7 @@ export default {
       }
 
       this.visible = false
-      getFlow(id).then(
-        res => {
-          this.$router.push({
-            path: '/project/update/' + res.id,
-            query: { flow: res.flow }
-          })
-        }
-      )
+      this.$router.push(`/project/update/${id}`)
     },
 
     create() {
@@ -89,10 +82,8 @@ export default {
         if (!valid) {
           return false
         }
-        this.$http.post('/jobFlow/create', this.formData).then(res => {
-          if (res.data.code === 0) {
-            this.$router.push('/project/create/' + res.data.data)
-          }
+        createFlow(this.formData).then(id => {
+          this.$router.push(`/project/create/${id}`)
         })
       })
     },

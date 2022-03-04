@@ -39,9 +39,46 @@ export async function updateFlow(data) {
   })
 }
 
+export async function updateGraph(data) {
+  return request({
+    url: '/jobFlow/updateFlow',
+    method: 'post',
+    data
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function deleteFlow(id) {
   return request({
     url: `/jobFlow/delete/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
+export function runOnceFlow(id) {
+  return request({
+    url: `/jobFlow/schedule/runOnce/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
+export function stopSchedFlow(id) {
+  return request({
+    url: `/jobFlow/schedule/stop/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
+export function startSchedFlow(id) {
+  return request({
+    url: `/jobFlow/schedule/start/${id}`,
     method: 'get'
   }).then(res => {
     return res.data

@@ -12,8 +12,6 @@
 </template>
 
 <script>
-import { deleteJob } from '@/api/job.js'
-
 export default {
   name: 'NodeMenu',
   data() {
@@ -41,10 +39,6 @@ export default {
           break
         }
         case 'delete': {
-          const jobId = this.node.getData()?.id
-          if (jobId) {
-            await deleteJob(jobId)
-          }
           this.$parent.graph.removeNode(this.node.id)
           break
         }

@@ -183,6 +183,7 @@ export default {
         })
       } else {
         this.resetForm()
+        this.formData.flowId = this.$route.params.id
       }
     },
     initDeployModeList(nodeType) {

@@ -10,6 +10,9 @@
       <el-form-item label="Project Name" prop="name" :label-width="labelWidth">
         <el-input v-model="formData.name" style="width: 90%" />
       </el-form-item>
+      <el-form-item label="Crontab" prop="cronExpr" :label-width="labelWidth">
+        <el-input v-model="formData.cronExpr" style="width: 90%" />
+      </el-form-item>
       <el-form-item
         label="Description"
         prop="description"
@@ -54,9 +57,9 @@ export default {
     init(data = {}) {
       this.resetForm()
       this.visible = true
-      const { id, name, description } = data
-      this.formData = { id, name, description }
-      this.originForm = { id, name, description }
+      const { id, name, cronExpr, description } = data
+      this.formData = { id, name, cronExpr, description }
+      this.originForm = { id, name, cronExpr, description }
     },
 
     submitForm() {
@@ -69,7 +72,8 @@ export default {
 
     async update(id) {
       if (this.originForm.name !== this.formData.name ||
-      this.originForm.description !== this.formData.description) {
+      this.originForm.description !== this.formData.description ||
+      this.originForm.cronExpr !== this.formData.cronExpr) {
         await updateFlow(this.formData)
       }
 

@@ -102,9 +102,6 @@
           <el-button type="primary" size="mini" @click="handleUpdate(row)">
             Edit
           </el-button>
-          <el-button size="mini" type="success" @click="handleModifyStatus(row, 'OFFLINE')">
-            Status
-          </el-button>
           <el-button
             v-if="row.status != 'deleted'"
             size="mini"
@@ -113,6 +110,18 @@
           >
             Delete
           </el-button>
+          <el-dropdown trigger="click" style="margin: 0 10px;" @command="handleMore">
+            <el-button size="mini" type="success">
+              More
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
+              <el-dropdown-item v-if="row.status === 'SCHEDULING'" :command="{row, toStatus: 'STOP_SCHED'}">Stop Sched</el-dropdown-item>
+              <el-dropdown-item v-if="row.status === 'OFFLINE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
+              <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'OFFLINE'}">Offline</el-dropdown-item>
+              <el-dropdown-item v-if="row.status === 'ONLINE' || row.status === 'SCHEDULING'" :command="{row, toStatus: 'RUN_ONCE'}">Run Once</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -131,7 +140,7 @@
 </template>
 
 <script>
-import { getFlowList, deleteFlow } from '@/api/job-flow'
+import { getFlowList, deleteFlow, updateFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -198,9 +207,32 @@ export default {
       this.listQuery.page = 1
       this.getList()
     },
-    handleModifyStatus(row, status) {
-      this.$refs.statusChangeDialog.init(row)
-      // row.status = status
+    async handleMore(data) {
+      const { row, toStatus } = data
+      if (toStatus === row.status) {
+        return
+      }
+
+      if (toStatus === 'SCHEDULING') {
+        this.$refs.statusChangeDialog.init(row)
+      } else if (toStatus === 'STOP_SCHED') {
+        stopSchedFlow(row.id).then(result => {
+          this.getList()
+        })
+      } else if (toStatus === 'RUN_ONCE') {
+        runOnceFlow(row.id).then(result => {
+          this.$notify({
+            title: 'Success',
+            message: 'Run once Successfully, id=' + result,
+            type: 'success'
+          })
+        })
+      } else {
+        const newStatus = { id: row.id, status: toStatus }
+        updateFlow(newStatus).then(result => {
+          row.status = toStatus
+        })
+      }
     },
     sortChange(data) {
       const { prop, order } = data

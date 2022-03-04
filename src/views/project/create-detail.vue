@@ -19,7 +19,7 @@
             <i class="el-icon-full-screen" @click="centerFn" />
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="执行" placement="bottom">
-            <i class="el-icon-video-play" @click="startFn()" />
+            <i class="el-icon-video-play" @click="runOnceFn()" />
           </el-tooltip>
           <el-tooltip class="item" effect="dark" content="保存" placement="bottom">
             <i class="el-icon-upload" @click="saveFn()" />
@@ -45,7 +45,7 @@
 <script>
 import { Graph, Path } from '@antv/x6'
 import { getJobByIds } from '@/api/job.js'
-import { getFlow, updateFlow } from '@/api/job-flow.js'
+import { getFlow, updateGraph, runOnceFlow } from '@/api/job-flow.js'
 
 import '@antv/x6-vue-shape'
 
@@ -73,7 +73,7 @@ export default {
   mounted() {
     this.initGraph()
     this.keyBindFn()
-    this.startFn()
+    this.initDagFn()
   },
   methods: {
     hideFn() {
@@ -239,7 +239,7 @@ export default {
           })
       })
     },
-    async startFn() {
+    async initDagFn() {
       this.timer && clearTimeout(this.timer)
       this.drawDag(await this.genDagData() || DataJson)
       this.showNodeStatus(Object.assign([], nodeStatusList))
@@ -372,7 +372,7 @@ export default {
         edges: edgeDataArr,
         nodeLayouts: nodeLayouts
       }
-      updateFlow({ id: this.$route.params.id, flow: graphJsonData })
+      updateGraph({ id: this.$route.params.id, flow: graphJsonData })
         .then(result => {
           this.$notify({
             title: 'Success',
@@ -414,11 +414,21 @@ export default {
         return false
       })
     },
+    runOnceFn() {
+      const flowId = this.$route.params.id
+      runOnceFlow(flowId).then(result => {
+        this.$notify({
+          title: 'Success',
+          message: 'Flow Run Once, id=' + result,
+          type: 'success'
+        })
+      })
+    },
     loadFn() {
       this.timer && clearTimeout(this.timer)
       const x6Json = JSON.parse(localStorage.getItem('x6Json'))
 
-      this.startFn(x6Json.cells)
+      this.initDagFn(x6Json.cells)
     },
     lockFn() {
       this.isLock = !this.isLock

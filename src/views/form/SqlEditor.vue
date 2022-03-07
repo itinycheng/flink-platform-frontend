@@ -1,6 +1,6 @@
 <template>
   <div class="sql-area">
-    <textarea ref="sqlText" v-model="value" />
+    <textarea ref="sqlText" v-model="value" :disabled="readOnly"/>
   </div>
 </template>
 

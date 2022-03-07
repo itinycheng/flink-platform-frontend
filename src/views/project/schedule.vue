@@ -1,11 +1,11 @@
 <template>
   <el-dialog
-    title="Modify Status"
+    title="Scheduling"
     width="30%"
     :destroy-on-close="true"
     :visible.sync="visible"
   >
-    <el-form ref="statusData" :model="statusData" :disabled="true">
+    <el-form :disabled="true">
       <el-form-item label="CronTab" prop="cronExpr" :label-width="labelWidth">
         <el-input v-model="row.cronExpr" style="width:90%" />
       </el-form-item>
@@ -24,7 +24,7 @@ import { startSchedFlow } from '@/api/job-flow.js'
 import { getStatusList } from '@/api/attr.js'
 
 export default {
-  name: 'StatusChangeDialog',
+  name: 'ScheduleDialog',
   data() {
     return {
       visible: false,
@@ -60,7 +60,6 @@ export default {
     },
     closeForm() {
       this.visible = false
-      this.$refs.statusData.resetFields()
     }
   }
 }

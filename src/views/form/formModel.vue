@@ -11,7 +11,7 @@
   >
     <el-row :gutter="20">
       <el-col :span="22">
-        <el-form ref="formData" :model="formData" :rules="rules" label-width="150px">
+        <el-form ref="formData" :model="formData" :disabled="disabled" :rules="rules" label-width="150px">
           <el-form-item label="Node Name" prop="name">
             <el-input v-model="formData.name" />
           </el-form-item>
@@ -27,6 +27,9 @@
           </el-form-item>
           <el-form-item label="Description" prop="description">
             <el-input v-model="formData.description" type="textarea" />
+          </el-form-item>
+          <el-form-item label="Version" prop="version">
+            <el-input v-model="formData.version" />
           </el-form-item>
           <el-form-item label="Worker Group" prop="routeUrl">
             <el-input v-model="formData.routeUrl" />
@@ -75,6 +78,7 @@
                 v-if="isFlinkSql(formData.type)"
                 ref="sqlEditor"
                 :value="formData.subject"
+                :readOnly="disabled"
                 @changeTextarea="changeTextarea($event)"
               />
               <el-input v-else v-model="formData.subject" type="textarea" />
@@ -132,6 +136,7 @@ export default {
   data() {
     return {
       visible: false,
+      disabled: false,
       node: {},
       nodeType: '',
       direction: 'rtl',
@@ -157,6 +162,7 @@ export default {
     }
   },
   created() {
+    this.disabled = this.$route.params.operation === 'display'
   },
   methods: {
     initFn(node) {

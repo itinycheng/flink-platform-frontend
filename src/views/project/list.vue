@@ -62,7 +62,7 @@
       </el-table-column>
       <el-table-column label="Name" min-width="150" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.name }}</span>
+          <router-link :to="'/project/flow/display/'+row.id" class="link-type">{{ row.name }}</router-link>
         </template>
       </el-table-column>
       <el-table-column label="Description" min-width="200" align="left">
@@ -99,20 +99,12 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row, $index }">
-          <el-button type="primary" size="mini" @click="handleUpdate(row)">
+          <el-button type="primary" size="mini" :disabled="row.status === 'SCHEDULING'" @click="handleUpdate(row)">
             Edit
-          </el-button>
-          <el-button
-            v-if="row.status != 'deleted'"
-            size="mini"
-            type="danger"
-            @click="handleDelete(row, $index)"
-          >
-            Delete
           </el-button>
           <el-dropdown trigger="click" style="margin: 0 10px;" @command="handleMore">
             <el-button size="mini" type="success">
-              More
+              Action
             </el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
@@ -122,6 +114,13 @@
               <el-dropdown-item v-if="row.status === 'ONLINE' || row.status === 'SCHEDULING'" :command="{row, toStatus: 'RUN_ONCE'}">Run Once</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
+          <el-button
+            size="mini"
+            type="danger"
+            @click="handleDelete(row, $index)"
+          >
+            Delete
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -135,7 +134,7 @@
     />
 
     <ProjectCreateDialog ref="createDialog" />
-    <StatusChangeDialog ref="statusChangeDialog" />
+    <ScheduleDialog ref="scheduleDialog" />
   </div>
 </template>
 
@@ -145,11 +144,11 @@ import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import ProjectCreateDialog from './create-dialog.vue'
-import StatusChangeDialog from './status-change.vue'
+import ScheduleDialog from './schedule.vue'
 
 export default {
   name: 'ProjectList',
-  components: { Pagination, ProjectCreateDialog, StatusChangeDialog },
+  components: { Pagination, ProjectCreateDialog, ScheduleDialog },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -214,7 +213,7 @@ export default {
       }
 
       if (toStatus === 'SCHEDULING') {
-        this.$refs.statusChangeDialog.init(row)
+        this.$refs.scheduleDialog.init(row)
       } else if (toStatus === 'STOP_SCHED') {
         stopSchedFlow(row.id).then(result => {
           this.getList()

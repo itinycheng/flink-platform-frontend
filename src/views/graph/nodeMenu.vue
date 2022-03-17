@@ -34,8 +34,8 @@ export default {
     async handleSelect(key, keyPath) {
       switch (key) {
         case 'edit': {
-          this.$parent.$refs.formModel.visible = true
           this.$parent.$refs.formModel.initFn(this.node)
+          this.$parent.$refs.formModel.visible = true
           break
         }
         case 'delete': {

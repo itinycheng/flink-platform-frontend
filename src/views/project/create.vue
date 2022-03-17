@@ -78,7 +78,7 @@ export default {
       }
 
       this.visible = false
-      this.$router.push(`/project/flow/update/${id}`)
+      this.$router.push(`/project/flow/edit/${id}`)
     },
 
     create() {
@@ -87,7 +87,7 @@ export default {
           return false
         }
         createFlow(this.formData).then(id => {
-          this.$router.push(`/project/flow/create/${id}`)
+          this.$router.push(`/project/flow/edit/${id}`)
         })
       })
     },

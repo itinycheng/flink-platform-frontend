@@ -96,3 +96,17 @@ export function getFlowRunList(query) {
     return res.data
   })
 }
+
+export async function getFlowRun(id) {
+  return request({
+    url: `/jobFlowRun/get/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
+export async function getFlowOrFlowRun(id, type) {
+  return type !== 'instance'
+    ? getFlow(id) : getFlowRun(id)
+}

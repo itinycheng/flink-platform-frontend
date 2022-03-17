@@ -62,7 +62,7 @@
       </el-table-column>
       <el-table-column label="Name" min-width="150" align="center">
         <template slot-scope="{ row }">
-          <router-link :to="'/project/flow/display/'+row.id" class="link-type">{{ row.name }}</router-link>
+          <router-link :to="'/project/flow/show/'+row.id" class="link-type">{{ row.name }}</router-link>
         </template>
       </el-table-column>
       <el-table-column label="Description" min-width="200" align="left">
@@ -143,7 +143,7 @@ import { getFlowList, deleteFlow, updateFlow, stopSchedFlow, runOnceFlow } from 
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-import ProjectCreateDialog from './create-dialog.vue'
+import ProjectCreateDialog from './create.vue'
 import ScheduleDialog from './schedule.vue'
 
 export default {

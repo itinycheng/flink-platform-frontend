@@ -23,11 +23,43 @@ export default {
   mounted() {
     const self = this
     const node = this.getNode()
-    this.nodeData = node.getData()
+    this.nodeData = this.display(node.getData())
     // watch data change event and refresh node display
     node.on('change:data', ({ current }) => {
-      self.nodeData = current
+      self.nodeData = self.display(current)
     })
+  },
+  methods: {
+    display(data) {
+      return { ...data,
+        name: this.displayName(data.name),
+        status: this.displayStatus(data.status)
+      }
+    },
+    displayName(name) {
+      if (name && name.length > 10) {
+        return name.substr(0, 11) + '...'
+      } else {
+        return name
+      }
+    },
+    displayStatus(status) {
+      switch (status) {
+        case 'SUBMITTED':
+        case 'RUNNING':
+        case 'RETRY':
+          return 'running'
+        case 'SUCCESS':
+          return 'success'
+        case 'FAILURE':
+        case 'KILLED':
+        case 'ABNORMAL':
+        case 'NOT_EXIST':
+          return 'failed'
+        default:
+          return 'default'
+      }
+    }
   }
 }
 </script>

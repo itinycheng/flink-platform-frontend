@@ -1,10 +1,11 @@
 <template>
   <div class="sql-area">
-    <textarea ref="sqlText" v-model="value" :disabled="readOnly"/>
+    <textarea ref="sqlText" v-model="value" :disabled="readOnly" />
   </div>
 </template>
 
 <script>
+import { format } from 'sql-formatter'
 import 'codemirror/theme/ambiance.css'
 import 'codemirror/lib/codemirror.css'
 import 'codemirror/addon/hint/show-hint.css'
@@ -24,7 +25,7 @@ export default {
     },
     sqlStyle: {
       type: String,
-      default: 'mysql'
+      default: 'spark'
     },
     readOnly: {
       type: Boolean
@@ -73,14 +74,12 @@ export default {
     })
   },
   methods: {
-    setVal() {
-      if (this.sqlData) {
-        if (this.value === '') {
-          this.sqlData.setValue('')
-        } else {
-          this.sqlData.setValue(this.value)
-        }
-      }
+    setVal(text) {
+      this.sqlData.setValue(text)
+    },
+    format() {
+      const newText = format(this.sqlData.getValue(), { language: this.sqlStyle })
+      this.sqlData.setValue(newText)
     }
   }
 }

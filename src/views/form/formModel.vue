@@ -77,8 +77,8 @@
               <SqlEditor
                 v-if="isFlinkSql(formData.type)"
                 ref="sqlEditor"
-                :value="formData.subject"
-                :readOnly="disabled"
+                :value.sync="formData.subject"
+                :read-only="disabled"
                 @changeTextarea="changeTextarea($event)"
               />
               <el-input v-else v-model="formData.subject" type="textarea" />
@@ -106,7 +106,8 @@
             <el-form-item label="Subject" prop="subject">
               <SqlEditor
                 ref="sqlEditor"
-                :value="formData.subject"
+                :value.sync="formData.subject"
+                :read-only="disabled"
                 @changeTextarea="changeTextarea($event)"
               />
             </el-form-item>
@@ -124,19 +125,23 @@
 </template>
 
 <script>
-import { format } from 'sql-formatter'
 import SqlEditor from './SqlEditor.vue'
-import { getJob, createJob, updateJob } from '@/api/job.js'
+import { getJobOrJobRun, createJob, updateJob } from '@/api/job.js'
 import { getCatalogs, getNodeTypes, getDeployModes } from '@/api/attr.js'
 
 export default {
   name: 'FormModel',
   components: { SqlEditor },
   filters: { },
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       visible: false,
-      disabled: false,
       node: {},
       nodeType: '',
       direction: 'rtl',
@@ -162,7 +167,6 @@ export default {
     }
   },
   created() {
-    this.disabled = this.$route.params.operation === 'display'
   },
   methods: {
     initFn(node) {
@@ -182,10 +186,14 @@ export default {
         }
       }
       if (data.id) {
-        getJob(data.id).then(result => {
+        const type = this.$route.params.type
+        getJobOrJobRun(data.id, type).then(result => {
           const extJars = JSON.stringify(result.extJars || [])
           const variables = JSON.stringify(result.variables || {})
           this.formData = { ...result, extJars, variables }
+          if (this.$refs.sqlEditor) {
+            this.$refs.sqlEditor.setVal(this.formData.subject)
+          }
         })
       } else {
         this.resetForm()
@@ -221,8 +229,7 @@ export default {
       this.$set(this.formData, 'subject', sql)
     },
     formatSql() {
-      const editor = this.$refs.sqlEditor
-      editor.sqlData.setValue(format(editor.sqlData.getValue(), { language: 'mysql' }))
+      this.$refs.sqlEditor.format()
     },
     submitForm() {
       this.$refs['formData'].validate((valid) => {
@@ -273,6 +280,9 @@ export default {
         this.$refs['formData'].resetFields()
       } else {
         this.formData = {}
+      }
+      if (this.$refs.sqlEditor) {
+        this.$refs.sqlEditor.setVal('')
       }
     }
   }

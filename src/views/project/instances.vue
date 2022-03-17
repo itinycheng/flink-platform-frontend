@@ -59,10 +59,9 @@
       <el-table-column label="Name" min-width="350" align="center">
         <template slot-scope="{ row }">
           <router-link
-            :to="'/project/flow/display/' + row.id"
+            :to="'/project/flow/instance/' + row.id"
             class="link-type"
-            >{{ row.name }}</router-link
-          >
+          >{{ row.name }}</router-link>
         </template>
       </el-table-column>
       <el-table-column label="Host" min-width="120" align="center">
@@ -108,25 +107,25 @@
 </template>
 
 <script>
-import { getFlowRunList } from "@/api/job-flow";
-import { getStatusList } from "@/api/attr";
-import waves from "@/directive/waves";
-import Pagination from "@/components/Pagination";
+import { getFlowRunList } from '@/api/job-flow'
+import { getStatusList } from '@/api/attr'
+import waves from '@/directive/waves'
+import Pagination from '@/components/Pagination'
 
 export default {
-  name: "ProjectList",
+  name: 'ProjectList',
   components: { Pagination },
   directives: { waves },
   filters: {
     statusFilter(status) {
       const statusMap = {
-        OFFLINE: "info",
-        ONLINE: "",
-        SCHEDULING: "success",
-        DELETE: "danger",
-      };
-      return statusMap[status];
-    },
+        OFFLINE: 'info',
+        ONLINE: '',
+        SCHEDULING: 'success',
+        DELETE: 'danger'
+      }
+      return statusMap[status]
+    }
   },
   data() {
     return {
@@ -139,58 +138,58 @@ export default {
         limit: 20,
         name: undefined,
         status: undefined,
-        sort: "+id",
-      },
-    };
+        sort: '-id'
+      }
+    }
   },
 
   created() {
-    this.getStatus();
-    this.getList();
+    this.getStatus()
+    this.getList()
   },
 
   methods: {
     getStatus() {
-      var data = { className: "ExecutionStatus" };
+      var data = { className: 'ExecutionStatus' }
       getStatusList(data).then((result) => {
-        this.listStatus = result;
-      });
+        this.listStatus = result
+      })
     },
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       getFlowRunList(this.listQuery).then((data) => {
-        this.list = data.records;
-        this.total = data.total;
+        this.list = data.records
+        this.total = data.total
 
         setTimeout(() => {
-          this.listLoading = false;
-        }, 1000);
-      });
+          this.listLoading = false
+        }, 1000)
+      })
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     sortChange(data) {
-      const { prop, order } = data;
-      if (prop === "id") {
-        this.sortByID(order);
+      const { prop, order } = data
+      if (prop === 'id') {
+        this.sortByID(order)
       }
     },
     sortByID(order) {
-      if (order === "ascending") {
-        this.listQuery.sort = "+id";
+      if (order === 'ascending') {
+        this.listQuery.sort = '+id'
       } else {
-        this.listQuery.sort = "-id";
+        this.listQuery.sort = '-id'
       }
-      this.handleFilter();
+      this.handleFilter()
     },
-    getSortClass: function (key) {
-      const sort = this.listQuery.sort;
-      return sort === `+${key}` ? "ascending" : "descending";
-    },
-  },
-};
+    getSortClass: function(key) {
+      const sort = this.listQuery.sort
+      return sort === `+${key}` ? 'ascending' : 'descending'
+    }
+  }
+}
 </script>
 
 <style scoped>

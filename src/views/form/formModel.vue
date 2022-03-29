@@ -12,8 +12,21 @@
     <el-row :gutter="20">
       <el-col :span="22">
         <el-form ref="formData" :model="formData" :disabled="disabled" :rules="rules" label-width="150px">
+          <el-form-item label="Execute Condition" prop="precondition">
+            <el-select v-model="formData.precondition" style="width:100%">
+              <el-option
+                v-for="item in preconditionList"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="Node Name" prop="name">
             <el-input v-model="formData.name" />
+          </el-form-item>
+          <el-form-item label="Description" prop="description">
+            <el-input v-model="formData.description" type="textarea" />
           </el-form-item>
           <el-form-item label="Node Type" prop="type">
             <el-select v-model="formData.type" style="width:100%">
@@ -25,14 +38,25 @@
               />
             </el-select>
           </el-form-item>
-          <el-form-item label="Description" prop="description">
-            <el-input v-model="formData.description" type="textarea" />
-          </el-form-item>
           <el-form-item label="Version" prop="version">
-            <el-input v-model="formData.version" />
+            <el-select v-model="formData.version" style="width:100%">
+              <el-option
+                v-for="item in versionList"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="Worker Group" prop="routeUrl">
-            <el-input v-model="formData.routeUrl" />
+            <el-select v-model="formData.routeUrl" style="width:100%">
+              <el-option
+                v-for="item in routeUrlList"
+                :key="item"
+                :label="item"
+                :value="item"
+              />
+            </el-select>
           </el-form-item>
           <el-form-item label="Execution Mode" prop="execMode">
             <el-select v-model="formData.execMode" style="width:100%">
@@ -127,7 +151,7 @@
 <script>
 import SqlEditor from './SqlEditor.vue'
 import { getJobOrJobRun, createJob, updateJob } from '@/api/job.js'
-import { getCatalogs, getNodeTypes, getDeployModes } from '@/api/attr.js'
+import { getCatalogs, getNodeTypes, getDeployModes, getRouteUrls, getVersions, getPreconditions } from '@/api/attr.js'
 
 export default {
   name: 'FormModel',
@@ -149,19 +173,31 @@ export default {
       catalogList: [],
       typeList: [],
       deployModeList: [],
+      routeUrlList: [],
+      versionList: [],
+      preconditionList: [],
       formData: {},
       rules: {
+        precondition: [
+          { required: true, message: 'Please select execute condition', trigger: 'blur' }
+        ],
         name: [
-          { required: true, message: '请输入任务名称', trigger: 'blur' }
+          { required: true, message: 'Please input node name', trigger: 'blur' }
         ],
         type: [
-          { required: true, message: '请选择任务类型', trigger: 'change' }
+          { required: true, message: 'Please select node type', trigger: 'change' }
+        ],
+        version: [
+          { required: true, message: 'Please select version', trigger: 'change' }
+        ],
+        routeUrl: [
+          { required: true, message: 'Please select worker group', trigger: 'change' }
         ],
         execMode: [
-          { required: true, message: '请选择执行模式', trigger: 'change' }
+          { required: true, message: 'Please select execution mode', trigger: 'change' }
         ],
         deployMode: [
-          { required: true, message: '请选择发布模式', trigger: 'change' }
+          { required: true, message: 'Please select deploy mode', trigger: 'change' }
         ]
       }
     }
@@ -173,10 +209,13 @@ export default {
       this.node = node
       const data = node.getData()
       this.nodeType = data?.type
+      this.initRouteUrlList()
+      this.initPreconditionList()
       if (this.nodeType) {
         this.initNodeTypeList(this.nodeType)
         this.initExecModeList(this.nodeType)
         this.initDeployModeList(this.nodeType)
+        this.initVersionList(this.nodeType)
         switch (this.nodeType) {
           case 'FLINK':
             this.getCatalogList()
@@ -199,6 +238,21 @@ export default {
         this.resetForm()
         this.formData.flowId = this.$route.params.id
       }
+    },
+    initRouteUrlList() {
+      getRouteUrls().then(result => {
+        this.routeUrlList = result
+      })
+    },
+    initPreconditionList() {
+      getPreconditions().then(result => {
+        this.preconditionList = result
+      })
+    },
+    initVersionList(nodeType) {
+      getVersions(nodeType).then(result => {
+        this.versionList = result
+      })
     },
     initDeployModeList(nodeType) {
       getDeployModes(nodeType).then(result => {

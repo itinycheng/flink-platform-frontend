@@ -1,7 +1,7 @@
 <template>
   <div class="Ec-x6-icon">
     <el-drawer
-      title="工具栏"
+      title="Toolbar"
       :visible.sync="visible"
       :direction="direction"
       size="100"

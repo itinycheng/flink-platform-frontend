@@ -45,3 +45,30 @@ export function getStatusList(query) {
     return res.data
   })
 }
+
+export function getRouteUrls() {
+  return request({
+    url: '/attr/routeUrls',
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
+export function getVersions(type) {
+  return request({
+    url: `/attr/versions?type=${type}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
+export function getPreconditions() {
+  return request({
+    url: `/attr/preconditions`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}

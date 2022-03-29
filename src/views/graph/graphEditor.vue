@@ -1,12 +1,12 @@
 <template>
   <div id="coverCot" style="width: 100%; height: 100vh; overflow: hidden">
     <section class="section-cot" style="width: 100%; height: 100%">
-      <div id="flow-container" @click.stop="hideFn">
+      <div id="flow-container" @click.stop="hideFn()">
         <header>
           <el-tooltip
             class="item"
             effect="dark"
-            content="项目"
+            content="Toolbar"
             placement="bottom"
           >
             <i class="el-icon-menu" @click="showDrawerFn()" />
@@ -14,7 +14,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="长按shift多选"
+            content="Press shift to select more"
             placement="bottom"
           >
             <i class="el-icon-crop" />
@@ -22,7 +22,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="放大"
+            content="Zoom in"
             placement="bottom"
           >
             <i class="el-icon-zoom-in" @click="zoomFn(0.2)" />
@@ -30,7 +30,7 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="缩小"
+            content="Zoom out"
             placement="bottom"
           >
             <i class="el-icon-zoom-out" @click="zoomFn(-0.2)" />
@@ -38,15 +38,15 @@
           <el-tooltip
             class="item"
             effect="dark"
-            content="适应屏幕"
+            content="Center graph"
             placement="bottom"
           >
-            <i class="el-icon-full-screen" @click="centerFn" />
+            <i class="el-icon-full-screen" @click="centerFn()" />
           </el-tooltip>
           <el-tooltip
             class="item"
             effect="dark"
-            content="执行"
+            content="Run once"
             placement="bottom"
           >
             <i class="el-icon-video-play" @click="runOnceFn()" />
@@ -55,23 +55,23 @@
             v-if="!isLock"
             class="item"
             effect="dark"
-            content="保存"
+            content="Save"
             placement="bottom"
           >
             <i class="el-icon-upload" @click="saveFn()" />
           </el-tooltip>
-          <el-tooltip
+          <!-- <el-tooltip
             class="item"
             effect="dark"
             content="加载保存页面"
             placement="bottom"
           >
             <i class="el-icon-link" @click="loadFn()" />
-          </el-tooltip>
+          </el-tooltip> -->
           <el-tooltip
             class="item"
             effect="dark"
-            content="是否禁用"
+            content="Is lock"
             placement="bottom"
           >
             <i
@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import { Graph, Path } from '@antv/x6'
+import { Graph, Path, DataUri } from '@antv/x6'
 import { getJobOrJobRunList } from '@/api/job.js'
 import { getFlowOrFlowRun, updateGraph, runOnceFlow } from '@/api/job-flow.js'
 
@@ -499,9 +499,17 @@ export default {
         })
       })
     },
-    loadFn() {
-      const x6Json = JSON.parse(localStorage.getItem('x6Json'))
-      this.initDagFn(x6Json.cells)
+    graphToPng() {
+      this.graph.toPNG((dataUri) => {
+        DataUri.downloadDataUri(dataUri, 'graph.png')
+      }, {
+        padding: {
+          top: 20,
+          right: 30,
+          bottom: 40,
+          left: 50,
+        },
+      })
     },
     showDrawerFn() {
       this.$refs.drawer.visible = !this.$refs.drawer.visible

@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="Create Project"
+    title="Edit Project"
     :show-close="false"
     :close-on-click-modal="false"
     :close-on-press-escape="false"

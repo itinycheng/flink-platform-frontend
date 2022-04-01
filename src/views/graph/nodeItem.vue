@@ -47,7 +47,6 @@ export default {
       switch (status) {
         case 'SUBMITTED':
         case 'RUNNING':
-        case 'RETRY':
           return 'running'
         case 'SUCCESS':
           return 'success'
@@ -55,6 +54,7 @@ export default {
         case 'KILLED':
         case 'ABNORMAL':
         case 'NOT_EXIST':
+        case 'ERROR':
           return 'failed'
         default:
           return 'default'

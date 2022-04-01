@@ -351,7 +351,8 @@ export default {
             name: job.name,
             status: job.status,
             type: nodeType,
-            jType: job.jType
+            jType: job.jType,
+            precondition: vertex.precondition
           }
         })
       })
@@ -507,8 +508,8 @@ export default {
           top: 20,
           right: 30,
           bottom: 40,
-          left: 50,
-        },
+          left: 50
+        }
       })
     },
     showDrawerFn() {

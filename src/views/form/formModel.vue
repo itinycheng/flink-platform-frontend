@@ -5,8 +5,8 @@
     :destroy-on-close="true"
     :wrapper-closable="false"
     :direction="direction"
-    :modal="false"
-    :modal-append-to-body="false"
+    :modal="true"
+    :modal-append-to-body="true"
     size="40%"
   >
     <el-row :gutter="20">
@@ -84,7 +84,7 @@
 
           <template v-if="nodeType === 'FLINK'">
             <!-- flink -->
-            <el-form-item label="Catalogs" prop="catalogs">
+            <el-form-item v-if="formData.type === 'FLINK_SQL'" label="Catalogs" prop="catalogs">
               <el-select v-model="formData.catalogs" multiple style="width:100%">
                 <el-option
                   v-for="item in catalogList"
@@ -105,7 +105,7 @@
                 :read-only="disabled"
                 @changeTextarea="changeTextarea($event)"
               />
-              <el-input v-else v-model="formData.subject" type="textarea" />
+              <el-input v-else v-model="formData.subject" type="textarea" :autosize="{ minRows: 4, maxRows: 13}" />
             </el-form-item>
             <el-form-item label="External Jars" prop="extJars">
               <el-input v-model="formData.extJars" placeholder="['hdfs:///path1', ...]" />
@@ -208,6 +208,7 @@ export default {
     initFn(node) {
       this.node = node
       const data = node.getData()
+      const precondition = data.precondition
       this.nodeType = data?.type
       this.initRouteUrlList()
       this.initPreconditionList()
@@ -224,12 +225,13 @@ export default {
             break
         }
       }
+
       if (data.id) {
         const type = this.$route.params.type
         getJobOrJobRun(data.id, type).then(result => {
           const extJars = JSON.stringify(result.extJars || [])
           const variables = JSON.stringify(result.variables || {})
-          this.formData = { ...result, extJars, variables }
+          this.formData = { ...result, extJars, variables, precondition }
           if (this.$refs.sqlEditor) {
             this.$refs.sqlEditor.setVal(this.formData.subject)
           }
@@ -237,6 +239,7 @@ export default {
       } else {
         this.resetForm()
         this.formData.flowId = this.$route.params.id
+        this.formData.precondition = precondition
       }
     },
     initRouteUrlList() {
@@ -300,7 +303,7 @@ export default {
         }
         if (newData.id) {
           updateJob(newData).then(data => {
-            this.modifyNode(data)
+            this.modifyNode(newData)
             this.$notify({
               title: 'Success',
               message: 'Job Updated, id=' + data.id,
@@ -310,7 +313,7 @@ export default {
           })
         } else {
           createJob(newData).then(data => {
-            this.modifyNode(data)
+            this.modifyNode(newData)
             this.$notify({
               title: 'Success',
               message: 'Job Created, id=' + data.id,
@@ -326,7 +329,8 @@ export default {
       this.node.setData({
         ...data,
         id: resData.id,
-        name: resData.name
+        name: resData.name,
+        precondition: resData.precondition
       })
     },
     resetForm() {

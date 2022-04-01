@@ -13,21 +13,24 @@ const graphConfig = {
       name: 'shell',
       type: 'SHELL',
       icon: shellImg,
-      status: 'default'
+      status: 'default',
+      precondition: 'AND'
     },
     'FLINK': {
       id: null,
       name: 'flink',
       type: 'FLINK',
       icon: flinkImg,
-      status: 'default'
+      status: 'default',
+      precondition: 'AND'
     },
     'SQL': {
       id: null,
       name: 'sql',
       type: 'SQL',
       icon: sqlImg,
-      status: 'default'
+      status: 'default',
+      precondition: 'AND'
     }
   },
 

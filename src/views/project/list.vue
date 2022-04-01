@@ -87,6 +87,11 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="Notify" width="120" align="center">
+        <template slot-scope="{ row }">
+          {{ row.alerts }}
+        </template>
+      </el-table-column>
       <el-table-column label="Create Time" min-width="130" align="center">
         <template slot-scope="{ row }">
           {{ row.createTime }}
@@ -107,6 +112,7 @@
               Action
             </el-button>
             <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item :command="{row, toStatus: 'ALERT'}">Edit Alert</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'SCHEDULING'" :command="{row, toStatus: 'STOP_SCHED'}">Stop Sched</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'OFFLINE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
@@ -135,6 +141,7 @@
 
     <ProjectCreateDialog ref="createDialog" />
     <ScheduleDialog ref="scheduleDialog" />
+    <EditAlertDialog ref="editAlertDialog" />
   </div>
 </template>
 
@@ -145,10 +152,11 @@ import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import ProjectCreateDialog from './create.vue'
 import ScheduleDialog from './schedule.vue'
+import EditAlertDialog from './alerts.vue'
 
 export default {
   name: 'ProjectList',
-  components: { Pagination, ProjectCreateDialog, ScheduleDialog },
+  components: { Pagination, ProjectCreateDialog, ScheduleDialog, EditAlertDialog },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -208,6 +216,17 @@ export default {
     },
     async handleMore(data) {
       const { row, toStatus } = data
+      // edit alert info
+      if (toStatus === 'ALERT') {
+        this.$refs.editAlertDialog.init(row)
+        return
+      }
+      // delete flow
+      if (toStatus === 'DELETE_FLOW') {
+        return
+      }
+
+      // process and status handle
       if (toStatus === row.status) {
         return
       }
@@ -220,8 +239,7 @@ export default {
         })
       } else if (toStatus === 'RUN_ONCE') {
         runOnceFlow(row.id).then(result => {
-          this.$notify({
-            title: 'Success',
+          this.$message({
             message: 'Run once Successfully, id=' + result,
             type: 'success'
           })

@@ -86,6 +86,28 @@ export const constantRoutes = [
     ]
   },
 
+  {
+    path: '/manage',
+    component: Layout,
+    redirect: '/manage/alert',
+    name: 'Manage Center',
+    meta: { title: 'Manage Center', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'alert',
+        name: 'Alert Management',
+        component: () => import('@/views/manage/alert'),
+        meta: { title: 'Alert Management', icon: 'tree' }
+      },
+      {
+        path: 'user',
+        name: 'User Management',
+        component: () => import('@/views/manage/alert'),
+        meta: { title: 'User Management', icon: 'tree' }
+      }
+    ]
+  },
+
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

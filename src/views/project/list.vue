@@ -280,11 +280,9 @@ export default {
       }).then(() => {
         deleteFlow(row.id)
           .then(result => {
-            this.$notify({
-              title: 'Success',
-              message: 'Delete Successfully',
-              type: 'success',
-              duration: 2000
+            this.$message({
+              message: 'Delete Successfully, id=' + result,
+              type: 'success'
             })
             this.list.splice(index, 1)
           })

@@ -84,10 +84,25 @@
 
           <template v-if="nodeType === 'FLINK'">
             <!-- flink -->
-            <el-form-item v-if="formData.type === 'FLINK_SQL'" label="Catalogs" prop="catalogs">
-              <el-select v-model="formData.catalogs" multiple style="width:100%">
+            <template v-if="formData.type === 'FLINK_SQL'">
+              <el-form-item label="Catalogs" prop="catalogs">
+                <el-select v-model="formData.config.catalogs" multiple style="width:100%">
+                  <el-option
+                    v-for="item in catalogList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  >
+                    <span style="float: left">{{ item.name }}</span>
+                    <span style="float: right; color: #8492a6; font-size: 13px">{{ item.description }}</span>
+                  </el-option>
+                </el-select>
+              </el-form-item>
+            </template>
+            <el-form-item label="External Jars" prop="extJars">
+              <el-select v-model="formData.config.extJars" multiple style="width:100%">
                 <el-option
-                  v-for="item in catalogList"
+                  v-for="item in extJarList"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
@@ -99,7 +114,7 @@
             </el-form-item>
             <el-form-item label="Subject" prop="subject">
               <SqlEditor
-                v-if="isFlinkSql(formData.type)"
+                v-if="formData.type === 'FLINK_SQL'"
                 ref="sqlEditor"
                 :value.sync="formData.subject"
                 :read-only="disabled"
@@ -107,15 +122,14 @@
               />
               <el-input v-else v-model="formData.subject" type="textarea" :autosize="{ minRows: 4, maxRows: 13}" />
             </el-form-item>
-            <el-form-item label="External Jars" prop="extJars">
-              <el-input v-model="formData.extJars" placeholder="['hdfs:///path1', ...]" />
-            </el-form-item>
-            <el-form-item label="Main Class" prop="mainClass">
-              <el-input v-model="formData.mainClass" />
-            </el-form-item>
-            <el-form-item label="Main Args" prop="mainArgs">
-              <el-input v-model="formData.mainArgs" />
-            </el-form-item>
+            <template v-if="formData.type === 'FLINK_JAR'">
+              <el-form-item label="Main Class" prop="mainClass">
+                <el-input v-model="formData.config.mainClass" />
+              </el-form-item>
+              <el-form-item label="Main Args" prop="mainArgs">
+                <el-input v-model="formData.config.mainArgs" />
+              </el-form-item>
+            </template>
           </template>
 
           <template v-if="nodeType === 'SHELL'">
@@ -152,6 +166,7 @@
 import SqlEditor from './SqlEditor.vue'
 import { getJobOrJobRun, createJob, updateJob } from '@/api/job.js'
 import { getCatalogs, getNodeTypes, getDeployModes, getRouteUrls, getVersions, getPreconditions } from '@/api/attr.js'
+import { getResourceList } from '@/api/resource.js'
 
 export default {
   name: 'FormModel',
@@ -171,12 +186,13 @@ export default {
       direction: 'rtl',
       execModeList: [],
       catalogList: [],
+      extJarList: [],
       typeList: [],
       deployModeList: [],
       routeUrlList: [],
       versionList: [],
       preconditionList: [],
-      formData: {},
+      formData: { config: {}},
       rules: {
         precondition: [
           { required: true, message: 'Please select execute condition', trigger: 'blur' }
@@ -220,6 +236,7 @@ export default {
         switch (this.nodeType) {
           case 'FLINK':
             this.getCatalogList()
+            this.getExtJarList()
             break
           case 'SHELL':
             break
@@ -229,9 +246,8 @@ export default {
       if (data.id) {
         const type = this.$route.params.type
         getJobOrJobRun(data.id, type).then(result => {
-          const extJars = JSON.stringify(result.extJars || [])
           const variables = JSON.stringify(result.variables || {})
-          this.formData = { ...result, extJars, variables, precondition }
+          this.formData = { ...result, variables, precondition }
           if (this.$refs.sqlEditor) {
             this.$refs.sqlEditor.setVal(this.formData.subject)
           }
@@ -279,8 +295,10 @@ export default {
         this.catalogList = data
       })
     },
-    isFlinkSql(type) {
-      return type === 'FLINK_SQL'
+    getExtJarList() {
+      getResourceList({ type: 'JAR' }).then(data => {
+        this.extJarList = data
+      })
     },
     changeTextarea(sql) {
       this.$set(this.formData, 'subject', sql)
@@ -294,31 +312,21 @@ export default {
           return false
         }
 
-        const extJars = JSON.parse(this.formData.extJars || '[]')
         const variables = JSON.parse(this.formData.variables || '{}')
         const newData = {
           ...this.formData,
-          extJars,
           variables
         }
         if (newData.id) {
           updateJob(newData).then(data => {
             this.modifyNode(newData)
-            this.$notify({
-              title: 'Success',
-              message: 'Job Updated, id=' + data.id,
-              type: 'success'
-            })
+            this.$message.success('Job Updated, id=' + data.id)
             this.visible = false
           })
         } else {
           createJob(newData).then(data => {
             this.modifyNode(newData)
-            this.$notify({
-              title: 'Success',
-              message: 'Job Created, id=' + data.id,
-              type: 'success'
-            })
+            this.$message.success('Job Created, id=' + data.id)
             this.visible = false
           })
         }
@@ -337,7 +345,7 @@ export default {
       if (this.$refs['formData']) {
         this.$refs['formData'].resetFields()
       } else {
-        this.formData = {}
+        this.formData = { config: {}}
       }
       if (this.$refs.sqlEditor) {
         this.$refs.sqlEditor.setVal('')

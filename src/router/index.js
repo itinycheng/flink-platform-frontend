@@ -95,15 +95,28 @@ export const constantRoutes = [
     children: [
       {
         path: 'alert',
-        name: 'Alert Management',
+        name: 'Alert Manage',
         component: () => import('@/views/manage/alert'),
-        meta: { title: 'Alert Management', icon: 'tree' }
+        meta: { title: 'Alert Manage', icon: 'tree' }
       },
       {
         path: 'user',
-        name: 'User Management',
-        component: () => import('@/views/manage/alert'),
-        meta: { title: 'User Management', icon: 'tree' }
+        name: 'User Manage',
+        component: () => import('@/views/manage/user'),
+        meta: { title: 'User Manage', icon: 'tree' }
+      },
+      {
+        path: 'resource',
+        name: 'Resource Manage',
+        component: () => import('@/views/manage/resource'),
+        meta: { title: 'Resource Manage', icon: 'tree' }
+      },
+      {
+        path: 'resource/:id',
+        name: 'Resource Manage',
+        component: () => import('@/views/manage/resource'),
+        meta: { title: 'Resource Manage', icon: 'tree' },
+        hidden: true
       }
     ]
   },

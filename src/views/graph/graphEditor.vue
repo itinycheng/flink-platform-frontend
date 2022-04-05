@@ -124,6 +124,7 @@ export default {
     this.keyBindFn()
     this.initDagFn()
   },
+  beforeDestroy() {},
   methods: {
     hideFn() {
       this.$refs.nodeMenu.visible = false
@@ -446,8 +447,7 @@ export default {
       }
       updateGraph({ id: this.id, flow: graphJsonData }).then(
         (result) => {
-          this.$notify({
-            title: 'Success',
+          this.$message({
             message: 'Flow Updated, id=' + result,
             type: 'success'
           })

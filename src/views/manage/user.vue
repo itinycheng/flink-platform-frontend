@@ -3,7 +3,7 @@
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
         v-model="listQuery.name"
-        placeholder="Name"
+        placeholder="Username"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
@@ -40,14 +40,14 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Name" min-width="120" align="center">
+      <el-table-column label="Username" min-width="120" align="center">
         <template slot-scope="{ row }">
-          {{ row.name }}
+          {{ row.username }}
         </template>
       </el-table-column>
-      <el-table-column label="User Id" min-width="100" align="center">
+      <el-table-column label="Password" min-width="100" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.userId }}</span>
+          <span>{{ row.password }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Type" width="120" align="center">
@@ -55,14 +55,19 @@
           {{ row.type }}
         </template>
       </el-table-column>
-      <el-table-column label="Description" min-width="180" align="center">
+      <el-table-column label="Email" min-width="180" align="center">
         <template slot-scope="{ row }">
-          {{ row.description }}
+          {{ row.email }}
         </template>
       </el-table-column>
-      <el-table-column label="Alert Config" min-width="200" align="center">
+      <el-table-column label="Status" min-width="200" align="center">
         <template slot-scope="{ row }">
-          {{ row.config }}
+          {{ row.status }}
+        </template>
+      </el-table-column>
+      <el-table-column label="Update Time" min-width="160" align="center">
+        <template slot-scope="{ row }">
+          {{ row.updateTime }}
         </template>
       </el-table-column>
       <el-table-column label="Create Time" min-width="160" align="center">
@@ -76,9 +81,8 @@
         width="180"
         class-name="small-padding fixed-width"
       >
-        <template slot-scope="{ row, $index }">
+        <template slot-scope="{ row }">
           <el-button type="success" size="mini" @click="openForm(row)"> Edit </el-button>
-          <el-button type="danger" size="mini" @click="deleteRow(row, $index)"> Delete </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -91,37 +95,33 @@
       @pagination="getList"
     />
 
-    <el-dialog title="Edit Alert" :visible.sync="dialogFormVisible">
+    <el-dialog title="Edit User" :visible.sync="dialogFormVisible">
       <el-row :gutter="20">
         <el-col :span="22">
           <el-form :model="formData" :rules="formRules" label-width="120px">
-            <el-form-item label="Alert Name" prop="name">
-              <el-input v-model="formData.name" />
+            <el-form-item label="Username" prop="username">
+              <el-input v-model="formData.username" :disabled="formData.id > 0" />
             </el-form-item>
-            <el-form-item label="Description" prop="description">
-              <el-input v-model="formData.description" type="textarea" />
+            <el-form-item label="Password" prop="password">
+              <el-input v-model="formData.password" />
             </el-form-item>
-            <el-form-item label="Alert Type" prop="type">
-              <el-select v-model="formData.type" style="width:100%" placeholder="Please select alert type">
+            <el-form-item label="Type" prop="type">
+              <el-select v-model="formData.type" style="width:100%" placeholder="Please select type">
                 <el-option
-                  v-for="item in alertTypeList"
+                  v-for="item in userTypeList"
                   :key="item.name"
                   :label="item.name"
                   :value="item.name"
                 />
               </el-select>
             </el-form-item>
-
-            <!-- Fei shu -->
-            <template v-if="formData.type === 'FEI_SHU'">
-              <el-form-item label="Webhook" prop="webhook">
-                <el-input v-model="formData.config.webhook" />
-              </el-form-item>
-              <el-form-item label="Content" prop="content">
-                <el-input v-model="formData.config.content" type="textarea" />
-              </el-form-item>
-            </template>
-
+            <el-form-item label="Email" prop="email">
+              <el-input v-model="formData.email" />
+            </el-form-item>
+            <!-- <el-form-item label="Status" prop="status">
+              <el-input v-model="formData.status" />
+            </el-form-item>
+            -->
             <el-form-item style="text-align: right;">
               <el-button @click.stop="closeForm">Cancel</el-button>
               <el-button type="primary" @click.stop="submitForm">Confirm</el-button>
@@ -134,7 +134,7 @@
 </template>
 
 <script>
-import { getAlert, getAlertPage, createAlert, updateAlert, deleteAlert } from '@/api/alert'
+import { getUser, getUserPage, createUser, updateUser } from '@/api/user'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -147,14 +147,14 @@ export default {
     return {
       // edit
       dialogFormVisible: false,
-      alertTypeList: [],
-      formData: { config: {}},
+      userTypeList: [],
+      formData: {},
       formRules: {
-        name: [
-          { required: true, message: 'Please enter name', trigger: 'blur' }
+        username: [
+          { required: true, message: 'Please enter username', trigger: 'blur' }
         ],
-        type: [
-          { required: true, message: 'Please select type', trigger: 'blur' }
+        password: [
+          { required: true, message: 'Please enter password', trigger: 'blur' }
         ]
       },
       // list
@@ -175,15 +175,15 @@ export default {
   },
   methods: {
     getList() {
-      getAlertPage(this.listQuery).then((data) => {
+      getUserPage(this.listQuery).then((data) => {
         this.list = data.records
         this.total = data.total
       })
     },
     getTypes() {
-      const data = { className: 'AlertType' }
+      const data = { className: 'UserType' }
       getStatusList(data).then((result) => {
-        this.alertTypeList = result
+        this.userTypeList = result
       })
     },
     handleFilter() {
@@ -192,7 +192,7 @@ export default {
     },
     openForm(row) {
       if (row.id) {
-        getAlert(row.id).then((data) => {
+        getUser(row.id).then((data) => {
           this.formData = data
         })
       } else {
@@ -205,37 +205,20 @@ export default {
       this.resetForm()
     },
     resetForm() {
-      this.formData = { config: {}}
+      this.formData = { }
     },
     submitForm() {
-      this.formData.config.type = this.formData.type
       if (this.formData.id) {
-        updateAlert(this.formData).then(id => {
+        updateUser(this.formData).then(id => {
           this.closeForm()
           this.getList()
         })
       } else {
-        createAlert(this.formData).then(id => {
+        createUser(this.formData).then(id => {
           this.closeForm()
           this.getList()
         })
       }
-    },
-    deleteRow(row, index) {
-      this.$confirm(`Delete Alert [${row.id}, ${row.name}] ?`, 'Warning', {
-        confirmButtonText: 'Confirm',
-        cancelButtonText: 'Cancel',
-        type: 'warning'
-      }).then(() => {
-        deleteAlert(row.id)
-          .then(result => {
-            this.$message({
-              message: `Delete [${row.name}] Successfully`,
-              type: 'success'
-            })
-            this.list.splice(index, 1)
-          })
-      })
     },
     sortChange(data) {
       const { prop, order } = data

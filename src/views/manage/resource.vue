@@ -94,8 +94,8 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row, $index }">
-          <el-button type="success" size="mini" @click="openForm(row)"> Edit </el-button>
-          <el-button type="danger" size="mini" @click="deleteRow(row, $index)"> Delete </el-button>
+          <el-button type="primary" icon="el-icon-edit" circle :disabled="row.type === 'DIR'" @click="openForm(row)" />
+          <el-button type="danger" icon="el-icon-delete" circle @click="deleteRow(row, $index)" />
         </template>
       </el-table-column>
     </el-table>
@@ -227,7 +227,9 @@ export default {
     },
     removeFile() {
       deleteFile({ fullName: this.formData.fullName }).then(() => {
+        this.formData.name = ''
         this.formData.fullName = ''
+        this.fileList = []
       })
     },
     handleUploadSuccess(resp) {
@@ -245,6 +247,10 @@ export default {
       if (row.id) {
         getResource(row.id).then((data) => {
           this.formData = data
+          this.fileList = [{
+            name: data.name,
+            url: data.fullName
+          }]
         })
       } else {
         this.resetForm()

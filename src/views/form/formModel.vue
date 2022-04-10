@@ -312,6 +312,7 @@ export default {
           return false
         }
 
+        this.formData.config.type = this.formData.type
         const variables = JSON.parse(this.formData.variables || '{}')
         const newData = {
           ...this.formData,
@@ -319,13 +320,13 @@ export default {
         }
         if (newData.id) {
           updateJob(newData).then(data => {
-            this.modifyNode(newData)
+            this.modifyNode(data)
             this.$message.success('Job Updated, id=' + data.id)
             this.visible = false
           })
         } else {
           createJob(newData).then(data => {
-            this.modifyNode(newData)
+            this.modifyNode(data)
             this.$message.success('Job Created, id=' + data.id)
             this.visible = false
           })

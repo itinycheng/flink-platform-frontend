@@ -5,7 +5,7 @@
 ## Overview
 
 ![overview](img/overview.jpg)
-![overview](img/graph.jpg)
+![graph](img/graph.jpg)
 
 For more information please visit [flink-platform-backend](https://github.com/itinycheng/flink-platform-backend).
 
@@ -63,4 +63,4 @@ Modern browsers and Internet Explorer 10+.
 
 ## License
 
-[MIT](https://github.com/PanJiaChen/vue-admin-template/blob/master/LICENSE) license.
+[MIT](https://github.com/itinycheng/flink-platform-frontend/blob/master/LICENSE) license.

@@ -49,13 +49,16 @@
             </el-select>
           </el-form-item>
           <el-form-item label="Worker Group" prop="routeUrl">
-            <el-select v-model="formData.routeUrl" style="width:100%">
+            <el-select v-model="formData.routeUrl" multiple style="width:100%">
               <el-option
                 v-for="item in routeUrlList"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              >
+                <span style="float: left">{{ item.name }}</span>
+                <span style="float: right; color: #8492a6; font-size: 13px">{{ item.ip }}</span>
+              </el-option>
             </el-select>
           </el-form-item>
           <el-form-item label="Execution Mode" prop="execMode">
@@ -312,12 +315,12 @@ export default {
           return false
         }
 
+        if (this.formData.routeUrl) {
+          this.formData.routeUrl = this.formData.routeUrl.filter(Boolean)
+        }
         this.formData.config.type = this.formData.type
         const variables = JSON.parse(this.formData.variables || '{}')
-        const newData = {
-          ...this.formData,
-          variables
-        }
+        const newData = { ...this.formData, variables }
         if (newData.id) {
           updateJob(newData).then(data => {
             this.modifyNode(data)

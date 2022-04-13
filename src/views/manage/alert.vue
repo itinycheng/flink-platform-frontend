@@ -140,7 +140,7 @@ import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'ProjectList',
+  name: 'AlertList',
   components: { Pagination },
   directives: { waves },
   data() {

@@ -117,6 +117,12 @@ export const constantRoutes = [
         component: () => import('@/views/manage/resource'),
         meta: { title: 'Resource Manage', icon: 'tree' },
         hidden: true
+      },
+      {
+        path: 'worker',
+        name: 'Worker Manage',
+        component: () => import('@/views/manage/worker'),
+        meta: { title: 'Worker Manage', icon: 'tree' }
       }
     ]
   },

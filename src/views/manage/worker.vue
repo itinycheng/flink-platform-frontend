@@ -3,7 +3,13 @@
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
         v-model="listQuery.name"
-        placeholder="Username"
+        placeholder="Name"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-input
+        v-model="listQuery.ip"
+        placeholder="IP"
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
@@ -40,29 +46,34 @@
           <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Username" min-width="120" align="center">
+      <el-table-column label="Name" min-width="120" align="center">
         <template slot-scope="{ row }">
-          {{ row.username }}
+          {{ row.name }}
         </template>
       </el-table-column>
-      <el-table-column label="Password" min-width="100" align="center">
+      <el-table-column label="Desc" min-width="120" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.password }}</span>
+          {{ row.desc }}
         </template>
       </el-table-column>
-      <el-table-column label="Type" width="120" align="center">
+      <el-table-column label="IP" min-width="100" align="center">
         <template slot-scope="{ row }">
-          {{ row.type }}
+          <span>{{ row.ip }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Email" min-width="180" align="center">
+      <el-table-column label="Port" width="120" align="center">
         <template slot-scope="{ row }">
-          {{ row.email }}
+          {{ row.port }}
         </template>
       </el-table-column>
-      <el-table-column label="Status" min-width="200" align="center">
+      <el-table-column label="Status" min-width="180" align="center">
         <template slot-scope="{ row }">
           {{ row.status }}
+        </template>
+      </el-table-column>
+      <el-table-column label="Heartbeat" min-width="200" align="center">
+        <template slot-scope="{ row }">
+          {{ row.heartbeat }}
         </template>
       </el-table-column>
       <el-table-column label="Update Time" min-width="160" align="center">
@@ -95,33 +106,32 @@
       @pagination="getList"
     />
 
-    <el-dialog title="Edit User" :visible.sync="dialogFormVisible">
+    <el-dialog title="Edit Worker" :visible.sync="dialogFormVisible">
       <el-row :gutter="20">
         <el-col :span="22">
           <el-form :model="formData" :rules="formRules" label-width="120px">
-            <el-form-item label="Username" prop="username">
-              <el-input v-model="formData.username" :disabled="formData.id > 0" />
+            <el-form-item label="Name" prop="name">
+              <el-input v-model="formData.name" />
             </el-form-item>
-            <el-form-item label="Password" prop="password">
-              <el-input v-model="formData.password" />
+            <el-form-item label="Desc" prop="desc">
+              <el-input v-model="formData.desc" type="textarea" />
             </el-form-item>
-            <el-form-item label="Type" prop="type">
-              <el-select v-model="formData.type" style="width:100%" placeholder="Please select type">
+            <el-form-item label="IP" prop="ip">
+              <el-input v-model="formData.ip" />
+            </el-form-item>
+            <el-form-item label="Port" prop="port">
+              <el-input v-model="formData.port" />
+            </el-form-item>
+            <el-form-item label="Status" prop="status">
+              <el-select v-model="formData.status" style="width:100%" placeholder="Please select status">
                 <el-option
-                  v-for="item in userTypeList"
+                  v-for="item in statusList"
                   :key="item.name"
                   :label="item.name"
                   :value="item.name"
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Email" prop="email">
-              <el-input v-model="formData.email" />
-            </el-form-item>
-            <!-- <el-form-item label="Status" prop="status">
-              <el-input v-model="formData.status" />
-            </el-form-item>
-            -->
             <el-form-item style="text-align: right;">
               <el-button @click.stop="closeForm">Cancel</el-button>
               <el-button type="primary" @click.stop="submitForm">Confirm</el-button>
@@ -134,27 +144,30 @@
 </template>
 
 <script>
-import { getUser, getUserPage, createUser, updateUser } from '@/api/user'
+import { getWorker, getWorkerPage, createWorker, updateWorker } from '@/api/worker'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 
 export default {
-  name: 'UserList',
+  name: 'WorkerList',
   components: { Pagination },
   directives: { waves },
   data() {
     return {
       // edit
       dialogFormVisible: false,
-      userTypeList: [],
+      statusList: [],
       formData: {},
       formRules: {
-        username: [
-          { required: true, message: 'Please enter username', trigger: 'blur' }
+        name: [
+          { required: true, message: 'Please enter name', trigger: 'blur' }
         ],
-        password: [
-          { required: true, message: 'Please enter password', trigger: 'blur' }
+        ip: [
+          { required: true, message: 'Please enter ip', trigger: 'blur' }
+        ],
+        port: [
+          { required: true, message: 'Please enter port', trigger: 'blur' }
         ]
       },
       // list
@@ -164,7 +177,7 @@ export default {
         page: 1,
         limit: 20,
         name: undefined,
-        status: undefined,
+        ip: undefined,
         sort: '-id'
       }
     }
@@ -175,15 +188,15 @@ export default {
   },
   methods: {
     getList() {
-      getUserPage(this.listQuery).then((data) => {
+      getWorkerPage(this.listQuery).then((data) => {
         this.list = data.records
         this.total = data.total
       })
     },
     getTypes() {
-      const data = { className: 'UserType' }
+      const data = { className: 'WorkerStatus' }
       getStatusList(data).then((result) => {
-        this.userTypeList = result
+        this.statusList = result
       })
     },
     handleFilter() {
@@ -192,7 +205,7 @@ export default {
     },
     openForm(row) {
       if (row.id) {
-        getUser(row.id).then((data) => {
+        getWorker(row.id).then((data) => {
           this.formData = data
         })
       } else {
@@ -209,12 +222,12 @@ export default {
     },
     submitForm() {
       if (this.formData.id) {
-        updateUser(this.formData).then(id => {
+        updateWorker(this.formData).then(id => {
           this.closeForm()
           this.getList()
         })
       } else {
-        createUser(this.formData).then(id => {
+        createWorker(this.formData).then(id => {
           this.closeForm()
           this.getList()
         })

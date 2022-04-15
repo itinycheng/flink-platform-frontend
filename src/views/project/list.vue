@@ -89,7 +89,7 @@
       </el-table-column>
       <el-table-column label="Notify" width="120" align="center">
         <template slot-scope="{ row }">
-          {{ row.alerts }}
+          {{ row.alerts? row.alerts.map(item => item.alertId) : '' }}
         </template>
       </el-table-column>
       <el-table-column label="Create Time" min-width="130" align="center">
@@ -207,7 +207,7 @@ export default {
         // Just to simulate the time of the request
         setTimeout(() => {
           this.listLoading = false
-        }, 1000)
+        }, 500)
       })
     },
     handleFilter() {

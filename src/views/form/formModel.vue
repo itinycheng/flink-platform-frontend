@@ -123,9 +123,12 @@
                 :read-only="disabled"
                 @changeTextarea="changeTextarea($event)"
               />
-              <el-input v-else v-model="formData.subject" type="textarea" :autosize="{ minRows: 4, maxRows: 13}" />
+              <el-input v-else v-model="formData.subject" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" />
             </el-form-item>
             <template v-if="formData.type === 'FLINK_JAR'">
+              <el-form-item label="Option Args" prop="optionArgs">
+                <el-input v-model="formData.config.optionArgs" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" />
+              </el-form-item>
               <el-form-item label="Main Class" prop="mainClass">
                 <el-input v-model="formData.config.mainClass" />
               </el-form-item>

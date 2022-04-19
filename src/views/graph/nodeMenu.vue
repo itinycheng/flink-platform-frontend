@@ -8,10 +8,13 @@
   >
     <el-menu-item index="edit">Edit</el-menu-item>
     <el-menu-item index="delete">Delete</el-menu-item>
+    <el-menu-item v-if="node.data && node.data.id" index="runOnce">RunOnce</el-menu-item>
   </el-menu>
 </template>
 
 <script>
+import { runOnceJob } from '@/api/job'
+
 export default {
   name: 'NodeMenu',
   data() {
@@ -33,6 +36,16 @@ export default {
 
     async handleSelect(key, keyPath) {
       switch (key) {
+        case 'runOnce': {
+          const jobOrRunId = this.node.getData()?.id
+          const jobId = this.node.id
+          if (jobOrRunId && jobId) {
+            await runOnceJob(jobId).then((id) => {
+              this.$message.success(`Job run once Successfully, id=${id}`)
+            })
+          }
+          break
+        }
         case 'edit': {
           this.$parent.$refs.formModel.initFn(this.node)
           this.$parent.$refs.formModel.visible = true

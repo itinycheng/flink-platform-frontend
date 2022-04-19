@@ -51,7 +51,7 @@ export default {
       await startSchedFlow(this.row.id).then(result => {
         this.$notify({
           title: 'Success',
-          message: 'Start Successfully, id=' + result,
+          message: 'Scheduled Successfully, id=' + result,
           type: 'success'
         })
         this.closeForm()

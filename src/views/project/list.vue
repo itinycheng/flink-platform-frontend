@@ -123,6 +123,7 @@
           <el-button
             size="mini"
             type="danger"
+            :disabled="row.status === 'SCHEDULING'"
             @click="handleDelete(row, $index)"
           >
             Delete

@@ -48,6 +48,15 @@ export async function getJobByIds(data) {
   })
 }
 
+export async function runOnceJob(id) {
+  return request({
+    url: `/jobInfo/schedule/runOnce/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
 // ----- job run instance -----
 
 export function getJobRun(id) {

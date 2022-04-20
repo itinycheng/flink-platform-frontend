@@ -2,6 +2,19 @@
   <div class="app-container">
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
+        v-model="listQuery.flowRunId"
+        placeholder="Flow Run Id"
+        class="filter-item"
+        :disabled="this.$route.params.id > 0"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-input
+        v-model="listQuery.jobId"
+        placeholder="Job Id"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
@@ -48,33 +61,37 @@
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <router-link
-            :to="'/project/instance/' + row.id"
-            class="link-type"
-          >{{ row.id }}</router-link>
+          <span>{{ row.id }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Flow Id" min-width="100" align="left">
+      <el-table-column label="Name" min-width="300" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.flowId }}</span>
+          <el-button type="text" @click="displayRowJson(row)">{{ row.name }}</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="Name" min-width="350" align="center">
+      <el-table-column label="Job Id" min-width="120" align="center">
         <template slot-scope="{ row }">
-          <router-link
-            :to="'/project/flow/instance/' + row.id"
-            class="link-type"
-          >{{ row.name }}</router-link>
+          <span>{{ row.jobId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Host" min-width="120" align="center">
+      <el-table-column label="Flow Run Id" min-width="120" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.host }}</span>
+          <span>{{ row.flowRunId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Priority" min-width="100" align="center">
+      <el-table-column label="Type" min-width="100" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.priority }}</span>
+          <span>{{ row.type }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Version" min-width="100" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.version }}</span>
+        </template>
+      </el-table-column>
+      <el-table-column label="Config" min-width="100" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.config }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" width="120" align="center">
@@ -84,14 +101,14 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Start Time" min-width="160" align="center">
+      <el-table-column label="Submit Time" min-width="160" align="center">
         <template slot-scope="{ row }">
-          {{ row.startTime }}
+          {{ row.submitTime }}
         </template>
       </el-table-column>
       <el-table-column label="Stop Time" min-width="160" align="center">
         <template slot-scope="{ row }">
-          {{ row.endTime }}
+          {{ row.stopTime }}
         </template>
       </el-table-column>
       <el-table-column label="Create Time" min-width="160" align="center">
@@ -116,18 +133,29 @@
       :limit.sync="listQuery.limit"
       @pagination="getList"
     />
+
+    <el-dialog title="Job Run Detail" :visible.sync="dialogVisible" width="40%">
+      <json-viewer
+        :value="jsonData"
+        :expand-depth="5"
+        copyable
+        boxed
+        sort
+      />
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { getFlowRunList } from '@/api/job-flow'
+import { getJobRunPage } from '@/api/job'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
+import JsonViewer from 'vue-json-viewer'
 
 export default {
   name: 'ProjectList',
-  components: { Pagination },
+  components: { Pagination, JsonViewer },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -142,6 +170,10 @@ export default {
   },
   data() {
     return {
+      // dialog
+      dialogVisible: false,
+      jsonData: {},
+      // list
       listStatus: [],
       list: null,
       total: 0,
@@ -151,6 +183,8 @@ export default {
         limit: 20,
         name: undefined,
         status: undefined,
+        flowRunId: this.$route.params.id,
+        jobId: undefined,
         sort: '-id'
       }
     }
@@ -170,18 +204,23 @@ export default {
     },
     getList() {
       this.listLoading = true
-      getFlowRunList(this.listQuery).then((data) => {
+      getJobRunPage(this.listQuery).then((data) => {
         this.list = data.records
         this.total = data.total
 
         setTimeout(() => {
           this.listLoading = false
-        }, 1000)
+        }, 500)
       })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    displayRowJson(row) {
+      console.log(row)
+      this.jsonData = row
+      this.dialogVisible = true
     },
     sortChange(data) {
       const { prop, order } = data

@@ -68,6 +68,16 @@ export function getJobRun(id) {
   })
 }
 
+export function getJobRunPage(query) {
+  return request({
+    url: '/jobRun/page',
+    method: 'get',
+    params: query
+  }).then(res => {
+    return res.data
+  })
+}
+
 export async function getJobRunByJobIds(flowRunId, jobIds) {
   const data = { flowRunId, jobIds }
   return request({

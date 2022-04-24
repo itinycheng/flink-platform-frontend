@@ -20,6 +20,16 @@
           :value="item.name"
         />
       </el-select>
+      <el-date-picker
+        v-model="timeRange"
+        style="margin-right: 15px;"
+        type="datetimerange"
+        :picker-options="pickerOptions"
+        range-separator="-"
+        start-placeholder="Start date"
+        end-placeholder="End date"
+        align="right"
+      />
       <el-button
         v-waves
         type="primary"
@@ -113,17 +123,18 @@
       v-show="total > 0"
       :total="total"
       :page.sync="listQuery.page"
-      :limit.sync="listQuery.limit"
+      :limit.sync="listQuery.size"
       @pagination="getList"
     />
   </div>
 </template>
 
 <script>
-import { getFlowRunList } from '@/api/job-flow'
+import { getFlowRunPage } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
+import { pickerOptions, formatDate } from '@/components/DatePicker/date-picker'
 
 export default {
   name: 'ProjectList',
@@ -142,15 +153,21 @@ export default {
   },
   data() {
     return {
+      // time range
+      timeRange: [new Date(new Date().getTime() - 3600 * 1000 * 24), new Date()],
+      pickerOptions: pickerOptions,
+      // list
       listStatus: [],
       list: null,
       total: 0,
       listLoading: true,
       listQuery: {
         page: 1,
-        limit: 20,
+        size: 20,
         name: undefined,
         status: undefined,
+        startTime: undefined,
+        endTime: undefined,
         sort: '-id'
       }
     }
@@ -170,7 +187,9 @@ export default {
     },
     getList() {
       this.listLoading = true
-      getFlowRunList(this.listQuery).then((data) => {
+      this.listQuery.startTime = formatDate(this.timeRange?.[0])
+      this.listQuery.endTime = formatDate(this.timeRange?.[1])
+      getFlowRunPage(this.listQuery).then((data) => {
         this.list = data.records
         this.total = data.total
 

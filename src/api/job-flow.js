@@ -87,9 +87,9 @@ export function startSchedFlow(id) {
 
 // ----- flow run instance -----
 
-export function getFlowRunList(query) {
+export function getFlowRunPage(query) {
   return request({
-    url: '/jobFlowRun/list',
+    url: '/jobFlowRun/page',
     method: 'get',
     params: query
   }).then(res => {

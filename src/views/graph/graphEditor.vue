@@ -98,7 +98,6 @@ import { getFlowOrFlowRun, updateGraph, runOnceFlow } from '@/api/job-flow.js'
 
 import '@antv/x6-vue-shape'
 
-import DataJson from '@/data'
 import NodeMenu from './nodeMenu.vue'
 import EdgeMenu from './edgeMenu.vue'
 import SideBar from './sideBar.vue'
@@ -299,7 +298,7 @@ export default {
     },
     async initDagFn() {
       const nodeStatusList = []
-      this.drawDag((await this.genDagData()) || DataJson)
+      this.drawDag((await this.genDagData()) || [])
       this.showNodeStatus(Object.assign([], nodeStatusList))
       this.graph.centerContent()
       if (this.isLock) {

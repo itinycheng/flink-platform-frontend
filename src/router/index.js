@@ -79,7 +79,7 @@ export const constantRoutes = [
       },
       {
         path: 'instance',
-        name: 'Process Instance',
+        name: 'ProjectInstance',
         component: () => import('@/views/project/instances'),
         meta: { title: 'Instances', icon: 'tree' }
       },
@@ -92,7 +92,7 @@ export const constantRoutes = [
       },
       {
         path: 'jobRuns',
-        name: 'Job Runs',
+        name: 'ProjectJobRuns',
         component: () => import('@/views/project/jobRuns'),
         meta: { title: 'Job Runs', icon: 'tree' }
       }

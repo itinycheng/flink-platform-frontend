@@ -29,10 +29,13 @@ export const pickerOptions = {
   }]
 }
 
-export function formatDate(date) {
-  if (date) {
-    return moment(date).format('YYYY-MM-DD HH:mm:ss')
-  } else {
-    return ''
+export function calcTimeRangeToNow(offset) {
+  if (!offset) {
+    offset = -1
   }
+
+  const start = new Date().getTime() + 3600 * 1000 * 24 * offset
+  const end = new Date()
+  return [moment(start).format('YYYY-MM-DD HH:mm:ss'),
+    moment(end).format('YYYY-MM-DD HH:mm:ss')]
 }

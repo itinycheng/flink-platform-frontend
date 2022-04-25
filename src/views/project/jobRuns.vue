@@ -162,7 +162,7 @@ import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import JsonViewer from 'vue-json-viewer'
-import { pickerOptions, formatDate } from '@/components/DatePicker/date-picker'
+import { pickerOptions, calcTimeRangeToNow } from '@/components/DatePicker/date-picker'
 
 export default {
   name: 'ProjectList',
@@ -182,7 +182,7 @@ export default {
   data() {
     return {
       // time range
-      timeRange: [new Date(new Date().getTime() - 3600 * 1000 * 24), new Date()],
+      timeRange: calcTimeRangeToNow(-1),
       pickerOptions: pickerOptions,
       // dialog
       dialogVisible: false,
@@ -205,6 +205,10 @@ export default {
   },
 
   created() {
+    if (this.$route.params?.status) {
+      this.listQuery.status = this.$route.params.status
+      this.timeRange = this.$route.params.timeRange
+    }
     this.getStatus()
     this.getList()
   },
@@ -218,8 +222,8 @@ export default {
     },
     getList() {
       this.listLoading = true
-      this.listQuery.startTime = formatDate(this.timeRange?.[0])
-      this.listQuery.endTime = formatDate(this.timeRange?.[1])
+      this.listQuery.startTime = this.timeRange?.[0]
+      this.listQuery.endTime = this.timeRange?.[1]
       getJobRunPage(this.listQuery).then((data) => {
         this.list = data.records
         this.total = data.total

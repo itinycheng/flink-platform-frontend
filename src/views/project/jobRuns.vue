@@ -5,7 +5,7 @@
         v-model="listQuery.flowRunId"
         placeholder="Flow Run Id"
         class="filter-item"
-        :disabled="this.$route.params.id > 0"
+        :disabled="this.$route.params.flowRunId > 0"
         @keyup.enter.native="handleFilter"
       />
       <el-input
@@ -37,6 +37,7 @@
         v-model="timeRange"
         style="margin-right: 15px;"
         type="datetimerange"
+        value-format="yyyy-MM-dd HH:mm:ss"
         :picker-options="pickerOptions"
         range-separator="-"
         start-placeholder="Start date"
@@ -197,7 +198,7 @@ export default {
         size: 20,
         name: undefined,
         status: undefined,
-        flowRunId: this.$route.params.id,
+        flowRunId: undefined,
         jobId: undefined,
         sort: '-id'
       }
@@ -205,7 +206,8 @@ export default {
   },
 
   created() {
-    if (this.$route.params?.status) {
+    if (this.$route.params?.timeRange) {
+      this.listQuery.flowRunId = this.$route.params.flowRunId
       this.listQuery.status = this.$route.params.status
       this.timeRange = this.$route.params.timeRange
     }
@@ -238,7 +240,6 @@ export default {
       this.getList()
     },
     displayRowJson(row) {
-      console.log(row)
       this.jsonData = row
       this.dialogVisible = true
     },

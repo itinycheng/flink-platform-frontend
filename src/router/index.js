@@ -84,13 +84,6 @@ export const constantRoutes = [
         meta: { title: 'Instances', icon: 'tree' }
       },
       {
-        path: 'instance/:id',
-        name: 'Instance Detail',
-        component: () => import('@/views/project/jobRuns'),
-        meta: { title: 'Instance Detail', icon: 'tree' },
-        hidden: true
-      },
-      {
         path: 'jobRuns',
         name: 'ProjectJobRuns',
         component: () => import('@/views/project/jobRuns'),

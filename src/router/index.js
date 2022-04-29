@@ -125,10 +125,38 @@ export const constantRoutes = [
         hidden: true
       },
       {
+        path: 'datasource',
+        name: 'DataSource Manage',
+        component: () => import('@/views/manage/datasource'),
+        meta: { title: 'DataSource Manage', icon: 'tree' }
+      },
+      {
         path: 'worker',
         name: 'Worker Manage',
         component: () => import('@/views/manage/worker'),
         meta: { title: 'Worker Manage', icon: 'tree' }
+      }
+    ]
+  },
+
+  {
+    path: '/extension',
+    component: Layout,
+    redirect: '/extension/reactive',
+    name: 'Extension',
+    meta: { title: 'Extension', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'reactive',
+        name: 'Reactive',
+        component: () => import('@/views/extension/reactive'),
+        meta: { title: 'Reactive', icon: 'tree' }
+      },
+      {
+        path: 'other',
+        name: 'Other',
+        component: () => import('@/views/extension/reactive'),
+        meta: { title: 'Other', icon: 'tree' }
       }
     ]
   },

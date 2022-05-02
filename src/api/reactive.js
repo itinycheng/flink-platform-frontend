@@ -1,8 +1,17 @@
 import request from '@/utils/request'
 
-export function syncExec(data) {
+export function getJobToDbTypeMap() {
   return request({
-    url: `/reactive/sync`,
+    url: `/reactive/jobToDbTypes`,
+    method: 'get',
+  }).then(res => {
+    return res.data
+  })
+}
+
+export function execJob(data) {
+  return request({
+    url: `/reactive/execJob`,
     method: 'post',
     data
   }).then(res => {
@@ -10,11 +19,10 @@ export function syncExec(data) {
   })
 }
 
-export function asyncExec(data) {
+export function getExecLog(execId) {
   return request({
-    url: `/reactive/async`,
-    method: 'post',
-    data
+    url: `/reactive/execLog/${execId}`,
+    method: 'get',
   }).then(res => {
     return res.data
   })

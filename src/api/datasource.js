@@ -19,10 +19,11 @@ export function getDataSourcePage(query) {
   })
 }
 
-export function getDataSourceList() {
+export function getDataSourceList(query) {
   return request({
     url: '/datasource/list',
-    method: 'get'
+    method: 'get',
+    params: query
   }).then(res => {
     return res.data
   })

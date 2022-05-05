@@ -19,10 +19,11 @@ export function execJob(data) {
   })
 }
 
-export function getExecLog(execId) {
+export function getExecLog(execId, query) {
   return request({
     url: `/reactive/execLog/${execId}`,
     method: 'get',
+    params: query
   }).then(res => {
     return res.data
   })

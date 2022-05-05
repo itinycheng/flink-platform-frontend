@@ -23,7 +23,7 @@
             />
           </el-select>
         </el-form-item>
-        <el-form-item label="Worker Group" prop="routeUrl">
+        <el-form-item label="Worker" prop="routeUrl">
           <el-select v-model="formData.routeUrl" multiple style="width: 100%">
             <el-option
               v-for="item in routeUrlList"
@@ -136,12 +136,15 @@
           />
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click.stop="submitForm()"
-            >Execution</el-button
-          >
-          <el-button type="success" plain @click="formatSql()"
-            >Format SQL</el-button
-          >
+          <el-button
+            type="primary"
+            @click.stop="submitForm()"
+          >Execution</el-button>
+          <el-button
+            type="success"
+            plain
+            @click="formatSql()"
+          >Format SQL</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -167,19 +170,19 @@
 </template>
 
 <script>
-import SqlEditor from "@/views/form/SqlEditor";
-import { execJob, getJobToDbTypeMap, getExecLog } from "@/api/reactive";
-import { getDataSourceList } from "@/api/datasource";
-import { getResourceList } from "@/api/resource";
+import SqlEditor from '@/views/form/SqlEditor'
+import { execJob, getJobToDbTypeMap, getExecLog } from '@/api/reactive'
+import { getDataSourceList } from '@/api/datasource'
+import { getResourceList } from '@/api/resource'
 import {
   getCatalogs,
   getDeployModes,
   getRouteUrls,
-  getVersions,
-} from "@/api/attr";
+  getVersions
+} from '@/api/attr'
 
 export default {
-  name: "Reactive",
+  name: 'Reactive',
   components: { SqlEditor },
   data() {
     return {
@@ -197,144 +200,152 @@ export default {
       // sync and async
       timer: undefined,
       execId: null,
-      execLog: "",
+      execLog: '',
       tableHeader: [],
       tableData: [],
       exception: null,
-      formData: { config: {} },
+      formData: { config: {}},
       rules: {
         type: [
           {
             required: true,
-            message: "Please select job type",
-            trigger: "blur",
-          },
+            message: 'Please select job type',
+            trigger: 'blur'
+          }
+        ],
+        routeUrl: [
+          {
+            required: true,
+            message: 'Please select worker',
+            trigger: 'blur'
+          }
         ],
         subject: [
           {
             required: true,
-            message: "Please enter content",
-            trigger: "change",
-          },
-        ],
-      },
-    };
+            message: 'Please enter content',
+            trigger: 'change'
+          }
+        ]
+      }
+    }
   },
   created() {
-    this.initJobToDbTypes();
-    this.initRouteUrlList();
+    this.initJobToDbTypes()
+    this.initRouteUrlList()
   },
   beforeDestroy() {
-    clearInterval(this.timer);
+    clearInterval(this.timer)
   },
   methods: {
     initJobToDbTypes() {
       getJobToDbTypeMap().then((data) => {
-        this.jobToDbTypeMap = data;
-      });
+        this.jobToDbTypeMap = data
+      })
     },
     initRouteUrlList() {
       getRouteUrls().then((result) => {
-        this.routeUrlList = result;
-      });
+        this.routeUrlList = result
+      })
     },
     initForm() {
-      this.resetForm();
-      const jobType = this.formData.type;
-      if (jobType === "FLINK_SQL") {
-        this.initVersionList("FLINK");
-        this.initDeployModeList("FLINK");
-        this.execModeList = ["STREAMING", "BATCH"];
-        this.getCatalogList();
-        this.getExtJarList();
+      this.resetForm()
+      const jobType = this.formData.type
+      if (jobType === 'FLINK_SQL') {
+        this.initVersionList('FLINK')
+        this.initDeployModeList('FLINK')
+        this.execModeList = ['STREAMING', 'BATCH']
+        this.getCatalogList()
+        this.getExtJarList()
       }
 
-      const dbType = this.jobToDbTypeMap[jobType];
+      const dbType = this.jobToDbTypeMap[jobType]
       if (!dbType) {
-        this.dataSourceList = [];
+        this.dataSourceList = []
       } else {
         getDataSourceList({ type: dbType }).then((data) => {
-          this.dataSourceList = data;
-        });
+          this.dataSourceList = data
+        })
       }
     },
 
     initVersionList(nodeType) {
       getVersions(nodeType).then((result) => {
-        this.versionList = result;
-      });
+        this.versionList = result
+      })
     },
     initDeployModeList(nodeType) {
       getDeployModes(nodeType).then((result) => {
-        this.deployModeList = result;
-      });
+        this.deployModeList = result
+      })
     },
     getCatalogList() {
       getCatalogs().then((data) => {
-        this.catalogList = data;
-      });
+        this.catalogList = data
+      })
     },
     getExtJarList() {
-      getResourceList({ type: "JAR" }).then((data) => {
-        this.extJarList = data;
-      });
+      getResourceList({ type: 'JAR' }).then((data) => {
+        this.extJarList = data
+      })
     },
 
     appendExecLog() {
-      getExecLog(this.execId).then((res) => {
-        this.execLog = this.execLog + res.log;
+      const worker = this.formData.routeUrl?.[0]
+      getExecLog(this.execId, { worker: worker }).then((res) => {
+        this.execLog = this.execLog + res.log
         if (!res.remain) {
-          clearInterval(this.timer);
+          clearInterval(this.timer)
         }
-      });
+      })
     },
 
     submitForm() {
-      this.$refs["formData"].validate((valid) => {
+      this.$refs['formData'].validate((valid) => {
         if (valid) {
-          this.formData.config.type = this.formData.type;
+          this.formData.config.type = this.formData.type
           execJob(this.formData).then((res) => {
-            this.resetResult();
+            this.resetResult()
             if (res.sync) {
-              this.tableHeader = res.meta;
-              this.tableData = res.data;
-              this.exception = res.exception;
+              this.tableHeader = res.meta
+              this.tableData = res.data
+              this.exception = res.exception
             } else {
-              this.execId = res.execId;
+              this.execId = res.execId
               this.timer = setInterval(() => {
-                setTimeout(this.appendExecLog, 0);
-              }, 3000);
+                setTimeout(this.appendExecLog, 0)
+              }, 3000)
             }
-          });
+          })
         } else {
-          console.log("error submit!!");
-          return false;
+          console.log('error submit!!')
+          return false
         }
-      });
+      })
     },
     changeTextarea(sql) {
-      this.$set(this.formData, "subject", sql);
+      this.$set(this.formData, 'subject', sql)
     },
     formatSql() {
-      this.$refs.sqlEditor.format();
+      this.$refs.sqlEditor.format()
     },
     resetForm() {
-      const subject = this.formData.subject;
-      const type = this.formData.type;
-      const tmp = { config: {} };
-      this.formData = { ...tmp, subject, type };
+      const subject = this.formData.subject
+      const type = this.formData.type
+      const tmp = { config: {}}
+      this.formData = { ...tmp, subject, type }
     },
     resetResult() {
-      clearInterval(this.timer);
-      this.timer = undefined;
-      this.execId = null;
-      this.execLog = "";
-      this.tableHeader = [];
-      this.tableData = [];
-      this.exception = null;
-    },
-  },
-};
+      clearInterval(this.timer)
+      this.timer = undefined
+      this.execId = null
+      this.execLog = ''
+      this.tableHeader = []
+      this.tableData = []
+      this.exception = null
+    }
+  }
+}
 </script>
 
 <style lang="scss" scoped>

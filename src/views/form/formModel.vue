@@ -29,7 +29,7 @@
             <el-input v-model="formData.description" type="textarea" />
           </el-form-item>
           <el-form-item label="Node Type" prop="type">
-            <el-select v-model="formData.type" style="width:100%">
+            <el-select v-model="formData.type" style="width:100%" @change="changeJobType()">
               <el-option
                 v-for="item in typeList"
                 :key="item"
@@ -147,6 +147,20 @@
 
           <template v-if="nodeType === 'SQL'">
             <!-- sql -->
+            <el-form-item label="DataSource" prop="config.dsId">
+              <el-select
+                v-model="formData.config.dsId"
+                style="width: 100%"
+                placeholder="Please select data source"
+              >
+                <el-option
+                  v-for="item in dataSourceList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+            </el-form-item>
             <el-form-item label="Subject" prop="subject">
               <SqlEditor
                 ref="sqlEditor"
@@ -173,6 +187,7 @@ import SqlEditor from './SqlEditor.vue'
 import { getJobOrJobRun, createJob, updateJob } from '@/api/job.js'
 import { getCatalogs, getNodeTypes, getDeployModes, getRouteUrls, getVersions, getPreconditions } from '@/api/attr.js'
 import { getResourceList } from '@/api/resource.js'
+import { getDataSourceList } from '@/api/datasource'
 
 export default {
   name: 'FormModel',
@@ -197,6 +212,7 @@ export default {
       deployModeList: [],
       routeUrlList: [],
       versionList: [],
+      dataSourceList: [],
       preconditionList: [],
       formData: { config: {}},
       rules: {
@@ -220,7 +236,10 @@ export default {
         ],
         deployMode: [
           { required: true, message: 'Please select deploy mode', trigger: 'change' }
-        ]
+        ],
+        'config.dsId': [{
+          required: true, message: 'Please choose data source', trigger: 'change'
+        }]
       }
     }
   },
@@ -254,6 +273,7 @@ export default {
         getJobOrJobRun(data.id, type).then(result => {
           const variables = JSON.stringify(result.variables || {})
           this.formData = { ...result, variables, precondition }
+          this.changeJobType()
           if (this.$refs.sqlEditor) {
             this.$refs.sqlEditor.setVal(this.formData.subject)
           }
@@ -264,6 +284,13 @@ export default {
         this.formData.precondition = precondition
       }
     },
+    changeJobType() {
+      const jobType = this.formData.type
+      getDataSourceList({ jobType: jobType }).then((data) => {
+        this.dataSourceList = data
+      })
+    },
+
     initRouteUrlList() {
       getRouteUrls().then(result => {
         this.routeUrlList = result

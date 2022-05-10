@@ -226,6 +226,13 @@ export default {
             message: 'Please enter content',
             trigger: 'change'
           }
+        ],
+        'config.dsId': [
+          {
+            required: true,
+            message: 'Please choose data source',
+            trigger: 'change'
+          }
         ]
       }
     }
@@ -263,7 +270,7 @@ export default {
       if (!dbType) {
         this.dataSourceList = []
       } else {
-        getDataSourceList({ type: dbType }).then((data) => {
+        getDataSourceList({ dbType: dbType }).then((data) => {
           this.dataSourceList = data
         })
       }

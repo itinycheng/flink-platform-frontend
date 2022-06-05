@@ -76,6 +76,7 @@ export default {
         case 'SHELL':
         case 'FLINK':
         case 'SQL':
+        case 'CONDITION':
           config = {
             x: x,
             y: y,
@@ -153,5 +154,11 @@ export default {
   width: 100%;
   height: 60px;
   background: url("../../assets/sql.png") no-repeat center center;
+}
+
+.listBar-cot .icon-condition {
+  width: 100%;
+  height: 60px;
+  background: url("../../assets/condition.png") no-repeat center center;
 }
 </style>

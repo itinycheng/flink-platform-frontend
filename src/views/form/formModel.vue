@@ -12,16 +12,6 @@
     <el-row :gutter="20">
       <el-col :span="22">
         <el-form ref="formData" :model="formData" :disabled="disabled" :rules="rules" label-width="150px">
-          <el-form-item label="Execute Condition" prop="precondition">
-            <el-select v-model="formData.precondition" style="width:100%">
-              <el-option
-                v-for="item in preconditionList"
-                :key="item"
-                :label="item"
-                :value="item"
-              />
-            </el-select>
-          </el-form-item>
           <el-form-item label="Node Name" prop="name">
             <el-input v-model="formData.name" />
           </el-form-item>
@@ -171,6 +161,23 @@
             </el-form-item>
           </template>
 
+          <template v-if="nodeType === 'CONDITION'">
+            <el-form-item label="Precondition" prop="config.condition">
+              <el-select
+                v-model="formData.config.condition"
+                style="width: 100%"
+                placeholder="Please select preVertices' join condition"
+              >
+                <el-option
+                  v-for="item in preconditionList"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                />
+              </el-select>
+            </el-form-item>
+          </template>
+
           <el-form-item label-width="10%" style="text-align: right;">
             <el-button type="warning" plain @click="resetForm()">Reset Form</el-button>
             <el-button type="success" plain @click="formatSql()">Format SQL</el-button>
@@ -216,9 +223,6 @@ export default {
       preconditionList: [],
       formData: { config: {}},
       rules: {
-        precondition: [
-          { required: true, message: 'Please select execute condition', trigger: 'blur' }
-        ],
         name: [
           { required: true, message: 'Please input node name', trigger: 'blur' }
         ],
@@ -239,6 +243,9 @@ export default {
         ],
         'config.dsId': [{
           required: true, message: 'Please choose data source', trigger: 'change'
+        }],
+        'config.condition': [{
+          required: true, message: 'Please choose vertex precondition', trigger: 'change'
         }]
       }
     }
@@ -249,7 +256,6 @@ export default {
     initFn(node) {
       this.node = node
       const data = node.getData()
-      const precondition = data.precondition
       this.nodeType = data?.type
       this.initRouteUrlList()
       this.initPreconditionList()
@@ -272,7 +278,7 @@ export default {
         const type = this.$route.params.type
         getJobOrJobRun(data.id, type).then(result => {
           const variables = JSON.stringify(result.variables || {})
-          this.formData = { ...result, variables, precondition }
+          this.formData = { ...result, variables }
           this.changeJobType()
           if (this.$refs.sqlEditor) {
             this.$refs.sqlEditor.setVal(this.formData.subject)
@@ -281,7 +287,6 @@ export default {
       } else {
         this.resetForm()
         this.formData.flowId = this.$route.params.id
-        this.formData.precondition = precondition
       }
     },
     changeJobType() {
@@ -368,11 +373,15 @@ export default {
     },
     modifyNode(resData) {
       const data = this.node.getData()
+      let precondition = 'AND'
+      if (resData?.type === 'CONDITION') {
+        precondition = resData.config.condition
+      }
       this.node.setData({
         ...data,
         id: resData.id,
         name: resData.name,
-        precondition: resData.precondition
+        precondition: precondition
       })
     },
     resetForm() {

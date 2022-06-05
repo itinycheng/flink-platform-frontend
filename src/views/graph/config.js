@@ -1,6 +1,7 @@
 import flinkImg from '@/assets/flink.png'
 import shellImg from '@/assets/shell.png'
 import sqlImg from '@/assets/sql.png'
+`import conditionImg from '@/assets/condition.png'
 import operation from '@/assets/operation.png'
 import statusRunning from '@/assets/running.png'
 import statusFailed from '@/assets/failed.png'
@@ -13,24 +14,28 @@ const graphConfig = {
       name: 'shell',
       type: 'SHELL',
       icon: shellImg,
-      status: 'default',
-      precondition: 'AND'
+      status: 'default'
     },
     'FLINK': {
       id: null,
       name: 'flink',
       type: 'FLINK',
       icon: flinkImg,
-      status: 'default',
-      precondition: 'AND'
+      status: 'default'
     },
     'SQL': {
       id: null,
       name: 'sql',
       type: 'SQL',
       icon: sqlImg,
-      status: 'default',
-      precondition: 'AND'
+      status: 'default'
+    },
+    'CONDITION': {
+      id: null,
+      name: 'condition',
+      type: 'CONDITION',
+      icon: conditionImg,
+      status: 'default'
     }
   },
 

@@ -193,6 +193,10 @@ export default {
     openForm(row) {
       if (row.id) {
         getAlert(row.id).then((data) => {
+          var content = data.config.content
+          if (content && typeof content === 'object') {
+            data.config.content = JSON.stringify(content)
+          }
           this.formData = data
         })
       } else {
@@ -209,6 +213,14 @@ export default {
     },
     submitForm() {
       this.formData.config.type = this.formData.type
+      var content = this.formData.config.content
+      if (content) {
+        try {
+          this.formData.config.content = JSON.parse(content)
+        } catch (e) {
+          console.log(e)
+        }
+      }
       if (this.formData.id) {
         updateAlert(this.formData).then(id => {
           this.closeForm()

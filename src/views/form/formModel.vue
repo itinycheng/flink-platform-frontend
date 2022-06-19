@@ -130,8 +130,11 @@
 
           <template v-if="nodeType === 'SHELL'">
             <!-- shell -->
+            <el-form-item label="Timeout" prop="timeout">
+              <el-input v-model="formData.config.timeout" />
+            </el-form-item>
             <el-form-item label="Subject" prop="subject">
-              <el-input v-model="formData.subject" type="textarea" />
+              <el-input v-model="formData.subject" type="textarea" :autosize="{ minRows: 2, maxRows: 10}" />
             </el-form-item>
           </template>
 

@@ -1,5 +1,15 @@
 import request from '@/utils/request'
 
+export function getJobList(query) {
+  return request({
+    url: `/jobInfo/list`,
+    method: 'get',
+    params: query
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function getJob(id) {
   return request({
     url: `/jobInfo/get/${id}`,

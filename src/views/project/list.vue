@@ -147,7 +147,7 @@
 </template>
 
 <script>
-import { getFlowList, deleteFlow, updateFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
+import { getFlowPage, deleteFlow, updateFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -201,7 +201,7 @@ export default {
     },
     getList() {
       this.listLoading = true
-      getFlowList(this.listQuery).then((data) => {
+      getFlowPage(this.listQuery).then((data) => {
         this.list = data.records
         this.total = data.total
 

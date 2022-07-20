@@ -72,3 +72,12 @@ export function getPreconditions() {
     return res.data
   })
 }
+
+export function getDependentRelations() {
+  return request({
+    url: `/attr/dependentRelations`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}

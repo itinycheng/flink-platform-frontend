@@ -2,6 +2,7 @@ import flinkImg from '@/assets/flink.png'
 import shellImg from '@/assets/shell.png'
 import sqlImg from '@/assets/sql.png'
 import conditionImg from '@/assets/condition.png'
+import dependentImg from '@/assets/dependent.png'
 import operation from '@/assets/operation.png'
 import statusRunning from '@/assets/running.png'
 import statusFailed from '@/assets/failed.png'
@@ -35,6 +36,13 @@ const graphConfig = {
       name: 'condition',
       type: 'CONDITION',
       icon: conditionImg,
+      status: 'default'
+    },
+    'DEPENDENT': {
+      id: null,
+      name: 'dependent',
+      type: 'DEPENDENT',
+      icon: dependentImg,
       status: 'default'
     }
   },

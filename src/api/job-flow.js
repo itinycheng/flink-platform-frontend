@@ -1,8 +1,18 @@
 import request from '@/utils/request'
 
-export function getFlowList(query) {
+export function getFlowPage(query) {
   return request({
-    url: '/jobFlow/list',
+    url: '/jobFlow/page',
+    method: 'get',
+    params: query
+  }).then(res => {
+    return res.data
+  })
+}
+
+export function getFlowIdNameList(query) {
+  return request({
+    url: '/jobFlow/idNameMapList',
     method: 'get',
     params: query
   }).then(res => {

@@ -198,7 +198,7 @@
             </el-form-item>
 
             <template v-for="(dependentItem, index) in formData.config.dependentItems">
-              <el-row :key="'r' + index" :gutter="10">
+              <el-row :key="'f' + index" :gutter="10">
                 <el-col :span="14">
                   <el-form-item
                     :label="'Dependent' + index"
@@ -211,7 +211,7 @@
                       placeholder="Please select dependent job flow"
                       style="width: 100%"
                       size="small"
-                      @change="changeDependentFlow"
+                      @change="changeDependentFlow($event, index)"
                     >
                       <el-option
                         v-for="item in jobFlowList"
@@ -235,7 +235,7 @@
                       size="small"
                     >
                       <el-option
-                        v-for="item in jobList"
+                        v-for="item in jobLists[index]"
                         :key="item.id"
                         :label="item.name"
                         :value="item.id"
@@ -267,24 +267,41 @@
                   </el-form-item>
                 </el-col>
               </el-row>
-              <el-row :key="'d' + index">
-                <el-col :span="24">
+              <el-row :key="'tr' + index" :gutter="10">
+                <el-col :span="14">
                   <el-form-item
                     :prop="'config.dependentItems.' + index + '.timeRange'"
-                    :rules="{ required: true, message: 'Please select time range', trigger: 'change' }"
+                    :rules="[{ required: true, message: 'Please choose time range type' }]"
                   >
-                    <el-date-picker
+                    <el-select
                       v-model="dependentItem.timeRange"
-                      :picker-options="pickerOptions"
-                      type="datetimerange"
-                      value-format="yyyy-MM-dd HH:mm:ss"
-                      range-separator="-"
-                      start-placeholder="Start date"
-                      end-placeholder="End date"
-                      style="width: 100%;"
+                      placeholder="Please select dependent job flow"
+                      style="width: 100%"
                       size="small"
-                    />
+                    >
+                      <el-option
+                        v-for="item in timeRangeList"
+                        :key="item.name"
+                        :label="item.name"
+                        :value="item.name"
+                      />
+                    </el-select>
                   </el-form-item>
+                </el-col>
+                <el-col :span="8">
+                  <el-form-item
+                    :prop="'config.dependentItems.' + index + '.lastN'"
+                    label-width="0px"
+                    :rules="[
+                      { required: true, message: 'Please input last N(integer)' },
+                      { type: 'number', message: 'Value of Last N is a number' }
+                    ]"
+                  >
+                    <el-input v-model.number="dependentItem.lastN" size="small" placeholder="Please input lastN (integer)" />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="2">
+                  <el-button icon="el-icon-delete" size="small" circle @click="deleteDependentItem(dependentItem)" />
                 </el-col>
               </el-row>
             </template>
@@ -309,7 +326,6 @@ import { getCatalogs, getNodeTypes, getDeployModes, getRouteUrls, getVersions, g
 import { getResourceList } from '@/api/resource.js'
 import { getDataSourceList } from '@/api/datasource'
 import { getFlowIdNameList } from '@/api/job-flow'
-import { pickerOptions } from '@/components/DatePicker/date-picker'
 
 export default {
   name: 'FormModel',
@@ -333,15 +349,15 @@ export default {
       typeList: [],
       deployModeList: [],
       executionStatusList: [],
+      timeRangeList: [],
       routeUrlList: [],
       versionList: [],
       dataSourceList: [],
       preconditionList: [],
       dependentRelationList: [],
-      jobList: [],
+      jobLists: [],
       jobFlowList: [],
       formData: { config: {}},
-      pickerOptions: pickerOptions,
       rules: {
         name: [
           { required: true, message: 'Please input node name', trigger: 'blur' }
@@ -396,6 +412,7 @@ export default {
             this.initDependentRelationList()
             this.initDependentJobFlowList()
             this.initExecutionStatusList()
+            this.initTimeRangeList()
             break
           case 'SHELL':
           default:
@@ -468,6 +485,12 @@ export default {
         this.executionStatusList = result
       })
     },
+    initTimeRangeList() {
+      var data = { className: 'TimeRange' }
+      getStatusList(data).then((result) => {
+        this.timeRangeList = result
+      })
+    },
     initNodeTypeList(nodeType) {
       getNodeTypes(nodeType).then(result => {
         this.typeList = result
@@ -483,10 +506,10 @@ export default {
         this.extJarList = data
       })
     },
-    changeDependentFlow(flowId) {
-      this.$delete(this.formData.config, 'jobId')
+    changeDependentFlow(flowId, index) {
       getJobList({ flowId: flowId }).then(data => {
-        this.jobList = data
+        this.jobLists.splice(index, 1, data || [])
+        this.formData.config.dependentItems[index].jobId = null
       })
     },
     addDependentItem() {
@@ -494,6 +517,13 @@ export default {
         this.formData.config.dependentItems = []
       }
       this.formData.config.dependentItems.push({ flowId: null })
+    },
+    deleteDependentItem(dependentItem) {
+      var dependentItems = this.formData.config.dependentItems
+      var index = dependentItems.indexOf(dependentItem)
+      if (index !== -1) {
+        dependentItems.splice(index, 1)
+      }
     },
     isSqlNode() {
       return this.formData.type?.indexOf('SQL') !== -1

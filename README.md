@@ -5,7 +5,7 @@
 ## Overview
 
 ![overview](img/overview.jpg)
-![graph](img/graph.jpg)
+![workflow](img/workflow.png)
 
 For more information please visit [flink-platform-backend](https://github.com/itinycheng/flink-platform-backend).
 

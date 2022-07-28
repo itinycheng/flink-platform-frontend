@@ -424,6 +424,7 @@ export default {
         const type = this.$route.params.type
         getJobOrJobRun(data.id, type).then(result => {
           const variables = JSON.stringify(result.variables || {})
+          this.initDependentJobLists(result.config)
           this.formData = { ...result, variables }
           this.changeJobType()
           if (this.$refs.sqlEditor) {
@@ -461,6 +462,14 @@ export default {
       getFlowIdNameList().then(data => {
         this.jobFlowList = data
       })
+    },
+    initDependentJobLists(config) {
+      const dependentItems = config.dependentItems || []
+      for (var i = 0; i < dependentItems.length; i++) {
+        getJobList({ flowId: dependentItems[i].flowId }).then(data => {
+          this.jobLists.splice(i, 1, data || [])
+        })
+      }
     },
     initVersionList(nodeType) {
       getVersions(nodeType).then(result => {
@@ -540,9 +549,6 @@ export default {
           return false
         }
 
-        if (this.formData.routeUrl) {
-          this.formData.routeUrl = this.formData.routeUrl.filter(Boolean)
-        }
         this.formData.config.type = this.formData.type
         const variables = JSON.parse(this.formData.variables || '{}')
         const newData = { ...this.formData, variables }

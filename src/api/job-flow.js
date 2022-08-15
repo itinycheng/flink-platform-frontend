@@ -59,9 +59,9 @@ export async function updateGraph(data) {
   })
 }
 
-export function deleteFlow(id) {
+export function purgeFlow(id) {
   return request({
-    url: `/jobFlow/delete/${id}`,
+    url: `/jobFlow/purge/${id}`,
     method: 'get'
   }).then(res => {
     return res.data

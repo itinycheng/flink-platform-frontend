@@ -121,12 +121,21 @@
             </el-dropdown-menu>
           </el-dropdown>
           <el-button
+            v-if="row.status !== 'DELETE'"
             size="mini"
             type="danger"
             :disabled="row.status === 'SCHEDULING'"
             @click="handleDelete(row, $index)"
           >
             Delete
+          </el-button>
+          <el-button
+            v-if="row.status === 'DELETE'"
+            size="mini"
+            type="danger"
+            @click="handlePurge(row, $index)"
+          >
+            Purge
           </el-button>
         </template>
       </el-table-column>
@@ -147,7 +156,7 @@
 </template>
 
 <script>
-import { getFlowPage, deleteFlow, updateFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
+import { getFlowPage, updateFlow, purgeFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -279,10 +288,26 @@ export default {
         cancelButtonText: 'Cancel',
         type: 'warning'
       }).then(() => {
-        deleteFlow(row.id)
+        updateFlow({ id: row.id, status: 'DELETE' })
           .then(result => {
             this.$message({
-              message: 'Delete Successfully, id=' + result,
+              message: 'Delete successfully, id=' + result,
+              type: 'success'
+            })
+            this.list.splice(index, 1)
+          })
+      })
+    },
+    handlePurge(row, index) {
+      this.$confirm(`Purge project [${row.id}, ${row.name}] ?`, 'Warning', {
+        confirmButtonText: 'Confirm',
+        cancelButtonText: 'Cancel',
+        type: 'warning'
+      }).then(() => {
+        purgeFlow(row.id)
+          .then(result => {
+            this.$message({
+              message: 'Purge forever successfully, id=' + result,
               type: 'success'
             })
             this.list.splice(index, 1)

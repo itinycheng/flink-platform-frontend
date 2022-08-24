@@ -2,19 +2,6 @@
   <div class="app-container">
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
-        v-model="listQuery.flowRunId"
-        placeholder="Flow Run Id"
-        class="filter-item"
-        :disabled="this.$route.params.flowRunId > 0"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-input
-        v-model="listQuery.jobId"
-        placeholder="Job Id"
-        class="filter-item"
-        @keyup.enter.native="handleFilter"
-      />
-      <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
@@ -33,6 +20,19 @@
           :value="item.name"
         />
       </el-select>
+      <el-input
+        v-model="listQuery.flowRunId"
+        placeholder="Flow Run Id"
+        class="filter-item"
+        :disabled="this.$route.params.flowRunId > 0"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-input
+        v-model="listQuery.jobId"
+        placeholder="Job Id"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
       <el-date-picker
         v-model="timeRange"
         style="margin-right: 15px;"

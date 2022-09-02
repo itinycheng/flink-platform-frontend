@@ -149,8 +149,14 @@
       </el-form>
     </div>
 
+    <div v-if="execId">
+      <el-divider content-position="left">
+        <el-link type="danger">execution_id: {{ execId }}</el-link>
+      </el-divider>
+    </div>
+
     <el-table
-      v-if="!exception && !execId"
+      v-if="tableHeader || tableData"
       style="width: 100%"
       border
       stripe
@@ -165,7 +171,7 @@
         </el-table-column>
       </template>
     </el-table>
-    <pre v-else>{{ exception }} {{ execLog }}</pre>
+    <pre v-if="exception || execLog ">{{ exception }} {{ execLog }}</pre>
   </div>
 </template>
 
@@ -314,6 +320,7 @@ export default {
           execJob(this.formData).then((res) => {
             this.resetResult()
             if (res.sync) {
+              this.execId = res.execId
               this.tableHeader = res.meta
               this.tableData = res.data
               this.exception = res.exception

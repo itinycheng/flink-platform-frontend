@@ -72,7 +72,10 @@
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <span>{{ row.id }}</span>
+          <span v-if="row.backInfo.trackingUrl">
+            <el-link type="primary" :href="row.backInfo.trackingUrl" target="_blank">{{ row.id }}</el-link>
+          </span>
+          <span v-else>{{ row.id }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Name" min-width="300" align="center">
@@ -227,9 +230,15 @@ export default {
       this.listQuery.startTime = this.timeRange?.[0]
       this.listQuery.endTime = this.timeRange?.[1]
       getJobRunPage(this.listQuery).then((data) => {
-        this.list = data.records
         this.total = data.total
-
+        this.list = data.records.map(item => {
+          try {
+            item.backInfo = JSON.parse(item.backInfo)
+          } catch (err) {
+            item.backInfo = {}
+          }
+          return item
+        })
         setTimeout(() => {
           this.listLoading = false
         }, 500)

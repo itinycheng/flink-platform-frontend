@@ -332,10 +332,11 @@
 <script>
 import SqlEditor from './SqlEditor.vue'
 import { getJobOrJobRun, createJob, updateJob, getJobList } from '@/api/job.js'
-import { getCatalogs, getNodeTypes, getDeployModes, getRouteUrls, getVersions, getPreconditions, getDependentRelations, getStatusList } from '@/api/attr.js'
+import { getNodeTypes, getDeployModes, getRouteUrls, getVersions, getPreconditions, getDependentRelations, getStatusList } from '@/api/attr.js'
 import { getResourceList } from '@/api/resource.js'
 import { getDataSourceList } from '@/api/datasource'
 import { getFlowIdNameList } from '@/api/job-flow'
+import { getCatalogs } from '@/api/catalog'
 
 export default {
   name: 'FormModel',

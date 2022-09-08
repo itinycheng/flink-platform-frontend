@@ -1,14 +1,5 @@
 import request from '@/utils/request'
 
-export function getCatalogs() {
-  return request({
-    url: '/catalog/list',
-    method: 'get'
-  }).then(res => {
-    return res.data
-  })
-}
-
 export function getEdgeStates(sourceJobId) {
   return request({
     url: `/attr/edgeStates?jobId=${sourceJobId}`,

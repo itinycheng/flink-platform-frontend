@@ -153,6 +153,12 @@ export const constantRoutes = [
         meta: { title: 'DataSource Manage', icon: 'tree' }
       },
       {
+        path: 'catalog',
+        name: 'Catalog Manage',
+        component: () => import('@/views/manage/catalog'),
+        meta: { title: 'Catalog Manage', icon: 'tree' }
+      },
+      {
         path: 'worker',
         name: 'Worker Manage',
         component: () => import('@/views/manage/worker'),

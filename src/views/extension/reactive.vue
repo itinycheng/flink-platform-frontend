@@ -181,11 +181,11 @@ import { execJob, getJobToDbTypeMap, getExecLog } from '@/api/reactive'
 import { getDataSourceList } from '@/api/datasource'
 import { getResourceList } from '@/api/resource'
 import {
-  getCatalogs,
   getDeployModes,
   getRouteUrls,
   getVersions
 } from '@/api/attr'
+import { getCatalogs } from '@/api/catalog'
 
 export default {
   name: 'Reactive',

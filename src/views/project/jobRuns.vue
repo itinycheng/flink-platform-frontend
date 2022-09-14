@@ -72,7 +72,7 @@
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <span v-if="row.backInfo.trackingUrl">
+          <span v-if="row.backInfo && row.backInfo.trackingUrl">
             <el-link type="primary" :href="row.backInfo.trackingUrl" target="_blank">{{ row.id }}</el-link>
           </span>
           <span v-else>{{ row.id }}</span>

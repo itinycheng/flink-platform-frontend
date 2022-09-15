@@ -120,3 +120,14 @@ export async function getFlowOrFlowRun(id, type) {
   return type !== 'instance'
     ? getFlow(id) : getFlowRun(id)
 }
+
+// ---------- quartz --------
+export function parseCronExpr(query) {
+  return request({
+    url: '/quartz/parseExpr',
+    method: 'get',
+    params: query
+  }).then(res => {
+    return res.data
+  })
+}

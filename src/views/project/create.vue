@@ -26,8 +26,23 @@
         />
       </el-form-item>
     </el-form>
+    <el-table
+      v-if="cronList && cronList.length > 0"
+      :data="cronList"
+      style="width: 90%; padding-left: 120px"
+    >
+      <el-table-column
+        label="Execution Time"
+        align="left"
+      >
+        <template slot-scope="{ row }">
+          <span>{{ row }}</span>
+        </template>
+      </el-table-column>
+    </el-table>
     <div slot="footer">
       <el-button @click="cancelForm()">Cancel</el-button>
+      <el-button type="warning" @click="getCrontab()">CronTab</el-button>
       <el-button type="primary" @click="submitForm()">
         Confirm
       </el-button>
@@ -36,7 +51,7 @@
 </template>
 
 <script>
-import { createFlow, updateFlow } from '@/api/job-flow.js'
+import { createFlow, updateFlow, parseCronExpr } from '@/api/job-flow.js'
 
 export default {
   name: 'ProjectCreateDialog',
@@ -44,6 +59,7 @@ export default {
     return {
       visible: false,
       labelWidth: '120px',
+      cronList: [],
       originForm: {},
       formData: {},
       formRules: {
@@ -62,6 +78,12 @@ export default {
       this.originForm = { id, name, cronExpr, description }
     },
 
+    getCrontab() {
+      parseCronExpr({ 'cron': this.formData.cronExpr }).then((data) => {
+        this.cronList = data
+      })
+    },
+
     submitForm() {
       if (this.formData.id) {
         this.update(this.formData.id)
@@ -70,15 +92,18 @@ export default {
       }
     },
 
-    async update(id) {
+    update(id) {
       if (this.originForm.name !== this.formData.name ||
       this.originForm.description !== this.formData.description ||
       this.originForm.cronExpr !== this.formData.cronExpr) {
-        await updateFlow(this.formData)
+        updateFlow(this.formData).then(id => {
+          this.visible = false
+          this.$router.push(`/project/flow/edit/${id}`)
+        })
+      } else {
+        this.visible = false
+        this.$router.push(`/project/flow/edit/${id}`)
       }
-
-      this.visible = false
-      this.$router.push(`/project/flow/edit/${id}`)
     },
 
     create() {

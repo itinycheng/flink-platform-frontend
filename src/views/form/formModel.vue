@@ -531,6 +531,7 @@ export default {
       getJobList({ flowId: flowId }).then(data => {
         this.jobLists.splice(index, 1, data || [])
         this.formData.config.dependentItems[index].jobId = null
+        this.$forceUpdate()
       })
     },
     addDependentItem() {
@@ -538,6 +539,7 @@ export default {
         this.formData.config.dependentItems = []
       }
       this.formData.config.dependentItems.push({ flowId: null })
+      this.$forceUpdate()
     },
     deleteDependentItem(dependentItem) {
       var dependentItems = this.formData.config.dependentItems
@@ -545,9 +547,11 @@ export default {
       if (index !== -1) {
         dependentItems.splice(index, 1)
       }
+      this.$forceUpdate()
     },
     isSqlNode() {
-      return this.formData.type?.indexOf('SQL') !== -1
+      const formType = this.formData.type
+      return formType && formType.indexOf('SQL') !== -1
     },
     changeTextarea(sql) {
       this.$set(this.formData, 'subject', sql)

@@ -121,6 +121,15 @@ export async function getFlowOrFlowRun(id, type) {
     ? getFlow(id) : getFlowRun(id)
 }
 
+export function killFlowRun(flowRunId) {
+  return request({
+    url: `/jobFlowRun/kill/${flowRunId}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
 // ---------- quartz --------
 export function parseCronExpr(query) {
   return request({

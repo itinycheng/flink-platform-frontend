@@ -108,3 +108,12 @@ export function getJobOrJobRun(id, type) {
   return type !== 'instance'
     ? getJob(id) : getJobRun(id)
 }
+
+export function killJobRun(runId) {
+  return request({
+    url: `/jobRun/kill/${runId}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}

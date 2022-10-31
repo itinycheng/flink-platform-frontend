@@ -136,7 +136,14 @@
         width="120"
         class-name="small-padding fixed-width"
       >
-        <el-button type="success" size="mini"> Action </el-button>
+        <template slot-scope="{ row }">
+          <el-dropdown trigger="click" style="margin: 0 10px;" @command="handleMore">
+            <el-button type="success" size="mini"> Action </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item :command="{row, toStatus: 'KILL'}">Kill Job</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+        </template>
       </el-table-column>
     </el-table>
 
@@ -161,7 +168,7 @@
 </template>
 
 <script>
-import { getJobRunPage } from '@/api/job'
+import { getJobRunPage, killJobRun } from '@/api/job'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -247,6 +254,14 @@ export default {
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    handleMore(data) {
+      const { row, toStatus } = data
+      if (toStatus === 'KILL') {
+        killJobRun(row.id).then(result => {
+          this.getList()
+        })
+      }
     },
     displayRowJson(row) {
       this.jsonData = row

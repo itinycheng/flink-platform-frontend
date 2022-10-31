@@ -113,7 +113,7 @@
         <el-col :span="22">
           <el-form :model="formData" :rules="formRules" label-width="150px">
             <el-form-item label="Name" prop="name">
-              <el-input v-model="formData.name" :disabled="formData.type != 'DIR'" />
+              <el-input v-model="formData.name" />
             </el-form-item>
             <el-form-item label="Description" prop="description">
               <el-input v-model="formData.description" type="textarea" />
@@ -145,7 +145,6 @@
                   <el-button size="small" type="primary">Upload</el-button>
                 </el-upload>
               </el-form-item>
-
             </template>
 
             <el-form-item style="text-align: right;">

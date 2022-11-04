@@ -37,5 +37,5 @@ export function calcTimeRangeToNow(offset) {
   const start = new Date().getTime() + 3600 * 1000 * 24 * offset
   const end = new Date()
   return [moment(start).format('YYYY-MM-DD HH:mm:ss'),
-    moment(end).format('YYYY-MM-DD HH:mm:ss')]
+    moment(end).format('YYYY-MM-DD 23:59:59')]
 }

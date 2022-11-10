@@ -41,9 +41,9 @@
       </el-table-column>
     </el-table>
     <div slot="footer">
-      <el-button @click="cancelForm()">Cancel</el-button>
-      <el-button type="warning" @click="getCrontab()">CronTab</el-button>
-      <el-button type="primary" @click="submitForm()">
+      <el-button @click.stop="cancelForm()">Cancel</el-button>
+      <el-button type="warning" @click.stop="getCrontab()">CronTab</el-button>
+      <el-button type="primary" @click.stop="submitForm()">
         Confirm
       </el-button>
     </div>

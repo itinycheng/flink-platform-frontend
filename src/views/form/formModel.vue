@@ -140,7 +140,7 @@
 
           <template v-if="nodeType === 'SHELL'">
             <!-- shell -->
-            <el-form-item label="Timeout" prop="timeout">
+            <el-form-item label="Timeout" prop="config.timeout">
               <el-input v-model="formData.config.timeout" />
             </el-form-item>
             <el-form-item label="Subject" prop="subject">
@@ -397,7 +397,9 @@ export default {
         }],
         'config.relation': [{
           required: true, message: 'Please choose dependent relation', trigger: 'change'
-        }]
+        }],
+        'config.timeout': [
+          { required: true, message: 'Please enter timeout', trigger: 'change' }]
       }
     }
   },

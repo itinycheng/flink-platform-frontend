@@ -130,7 +130,7 @@
             </el-form-item>
 
             <!-- File -->
-            <template v-if="formData.type !== 'DIR'">
+            <template v-if="formData.type && formData.type !== 'DIR'">
               <el-form-item label="File" prop="type">
                 <el-upload
                   :action="baseUrl + '/resource/upload'"
@@ -262,6 +262,7 @@ export default {
     },
     resetForm() {
       this.formData = { }
+      this.fileList = []
     },
     submitForm() {
       this.formData.pid = this.$route.params.id

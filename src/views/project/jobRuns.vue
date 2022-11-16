@@ -108,6 +108,11 @@
           <span>{{ row.config }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="Host" min-width="120" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.host }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="Status" width="120" align="center">
         <template slot-scope="{ row }">
           <el-tag :type="row.status | statusFilter">

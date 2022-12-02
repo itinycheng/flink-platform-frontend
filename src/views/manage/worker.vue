@@ -66,9 +66,9 @@
           {{ row.port }}
         </template>
       </el-table-column>
-      <el-table-column label="Status" min-width="180" align="center">
+      <el-table-column label="Role" min-width="180" align="center">
         <template slot-scope="{ row }">
-          {{ row.status }}
+          {{ row.role }}
         </template>
       </el-table-column>
       <el-table-column label="Heartbeat" min-width="200" align="center">
@@ -122,10 +122,10 @@
             <el-form-item label="Port" prop="port">
               <el-input v-model="formData.port" />
             </el-form-item>
-            <el-form-item label="Status" prop="status">
-              <el-select v-model="formData.status" style="width:100%" placeholder="Please select status">
+            <el-form-item label="Role" prop="role">
+              <el-select v-model="formData.role" style="width:100%" placeholder="Please select role">
                 <el-option
-                  v-for="item in statusList"
+                  v-for="item in roleList"
                   :key="item.name"
                   :label="item.name"
                   :value="item.name"
@@ -157,7 +157,7 @@ export default {
     return {
       // edit
       dialogFormVisible: false,
-      statusList: [],
+      roleList: [],
       formData: {},
       formRules: {
         name: [
@@ -196,7 +196,7 @@ export default {
     getTypes() {
       const data = { className: 'WorkerStatus' }
       getStatusList(data).then((result) => {
-        this.statusList = result
+        this.roleList = result
       })
     },
     handleFilter() {

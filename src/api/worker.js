@@ -34,3 +34,12 @@ export function getWorker(id) {
     return res.data
   })
 }
+
+export function purgeWorker(id) {
+  return request({
+    url: `/worker/purge/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}

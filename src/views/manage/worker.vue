@@ -13,6 +13,19 @@
         class="filter-item"
         @keyup.enter.native="handleFilter"
       />
+      <el-select
+        v-model="listQuery.role"
+        placeholder="Role"
+        clearable
+        class="filter-item"
+      >
+        <el-option
+          v-for="item in roleList"
+          :key="item.name"
+          :label="item.name"
+          :value="item.name"
+        />
+      </el-select>
       <el-button
         v-waves
         type="primary"
@@ -66,9 +79,9 @@
           {{ row.port }}
         </template>
       </el-table-column>
-      <el-table-column label="Status" min-width="180" align="center">
+      <el-table-column label="Role" min-width="180" align="center">
         <template slot-scope="{ row }">
-          {{ row.status }}
+          {{ row.role }}
         </template>
       </el-table-column>
       <el-table-column label="Heartbeat" min-width="200" align="center">
@@ -93,7 +106,16 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="success" size="mini" @click="openForm(row)"> Edit </el-button>
+          <el-button type="primary" size="mini" @click="openForm(row)"> Edit </el-button>
+          <el-dropdown trigger="click" style="margin: 0 10px;" @command="handleMore">
+            <el-button size="mini" type="success">
+              Actions
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item v-if="row.role !== 'INACTIVE'" :command="{row, toRole: 'INACTIVE'}">Delete</el-dropdown-item>
+              <el-dropdown-item v-if="row.role === 'INACTIVE'" :command="{row, toRole: 'PURGE'}">Purge</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
         </template>
       </el-table-column>
     </el-table>
@@ -122,10 +144,10 @@
             <el-form-item label="Port" prop="port">
               <el-input v-model="formData.port" />
             </el-form-item>
-            <el-form-item label="Status" prop="status">
-              <el-select v-model="formData.status" style="width:100%" placeholder="Please select status">
+            <el-form-item label="Role" prop="role">
+              <el-select v-model="formData.role" style="width:100%" placeholder="Please select role">
                 <el-option
-                  v-for="item in statusList"
+                  v-for="item in roleList"
                   :key="item.name"
                   :label="item.name"
                   :value="item.name"
@@ -144,7 +166,7 @@
 </template>
 
 <script>
-import { getWorker, getWorkerPage, createWorker, updateWorker } from '@/api/worker'
+import { getWorker, getWorkerPage, createWorker, updateWorker, purgeWorker } from '@/api/worker'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -157,7 +179,7 @@ export default {
     return {
       // edit
       dialogFormVisible: false,
-      statusList: [],
+      roleList: [],
       formData: {},
       formRules: {
         name: [
@@ -196,12 +218,36 @@ export default {
     getTypes() {
       const data = { className: 'WorkerStatus' }
       getStatusList(data).then((result) => {
-        this.statusList = result
+        this.roleList = result
       })
     },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
+    },
+    handleMore(data) {
+      const { row, toRole } = data
+      if (toRole === 'INACTIVE') {
+        const newStatus = { id: row.id, role: toRole }
+        updateWorker(newStatus).then(result => {
+          this.getList()
+        })
+      } else if (toRole === 'PURGE') {
+        this.$confirm(`Purge worker info [${row.id}, ${row.name}] ?`, 'Warning', {
+          confirmButtonText: 'Confirm',
+          cancelButtonText: 'Cancel',
+          type: 'warning'
+        }).then(() => {
+          purgeWorker(row.id)
+            .then(result => {
+              this.$message({
+                message: 'Purged worker successfully, id=' + result,
+                type: 'success'
+              })
+              this.getList()
+            })
+        })
+      }
     },
     openForm(row) {
       if (row.id) {

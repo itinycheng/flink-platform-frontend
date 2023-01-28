@@ -120,6 +120,11 @@
           </el-tag>
         </template>
       </el-table-column>
+      <el-table-column label="Duration" width="120" align="center">
+        <template slot-scope="{ row }">
+          <span>{{ row.duration }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="Submit Time" min-width="160" align="center">
         <template slot-scope="{ row }">
           {{ row.submitTime }}

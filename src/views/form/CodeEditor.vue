@@ -1,6 +1,6 @@
 <template>
-  <div class="sql-area">
-    <textarea ref="sqlText" v-model="value" :disabled="readOnly" />
+  <div class="code-area">
+    <textarea ref="codeText" v-model="value" :disabled="readOnly" />
   </div>
 </template>
 
@@ -15,17 +15,18 @@ require('codemirror/addon/selection/active-line')
 require('codemirror/mode/sql/sql')
 require('codemirror/addon/hint/show-hint')
 require('codemirror/addon/hint/sql-hint')
+require('codemirror/mode/shell/shell')
 
 export default {
-  name: 'SqlEditor',
+  name: 'CodeEditor',
   props: {
-    value: {
+    mode: {
       type: String,
       default: ''
     },
-    sqlStyle: {
+    value: {
       type: String,
-      default: 'spark'
+      default: ''
     },
     readOnly: {
       type: Boolean
@@ -54,9 +55,9 @@ export default {
   },
 
   mounted() {
-    this.sqlData = CodeMirror.fromTextArea(this.$refs.sqlText, {
+    this.sqlData = CodeMirror.fromTextArea(this.$refs.codeText, {
       value: this.value,
-      mode: 'text/x-mariadb',
+      mode: this.mode,
       indentWithTabs: true,
       smartIndent: true,
       lineNumbers: true,
@@ -78,8 +79,20 @@ export default {
       this.sqlData.setValue(text)
     },
     format() {
-      const newText = format(this.sqlData.getValue(), { language: this.sqlStyle })
+      const language = this.getLangFormatOption()
+      const newText = format(this.sqlData.getValue(), { language })
       this.sqlData.setValue(newText)
+    },
+    getLangFormatOption() {
+      switch (this.mode) {
+        case 'text/x-sh':
+          return ''
+        case 'text/x-sql':
+          return 'sql'
+        case 'text/x-hive':
+        default:
+          return 'spark'
+      }
     }
   }
 }
@@ -97,7 +110,7 @@ export default {
   z-index: 9999 !important;
 }
 
-.sql-area{
+.code-area{
     border:1px solid #eee
 }
 </style>

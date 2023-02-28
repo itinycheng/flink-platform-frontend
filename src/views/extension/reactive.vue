@@ -129,9 +129,10 @@
         </template>
 
         <el-form-item label="SQL" prop="subject">
-          <SqlEditor
-            ref="sqlEditor"
+          <CodeEditor
+            ref="codeEditor"
             :value.sync="formData.subject"
+            mode="text/x-hive"
             @changeTextarea="changeTextarea($event)"
           />
         </el-form-item>
@@ -176,7 +177,7 @@
 </template>
 
 <script>
-import SqlEditor from '@/views/form/SqlEditor'
+import CodeEditor from '@/views/form/CodeEditor'
 import { execJob, getJobToDbTypeMap, getExecLog } from '@/api/reactive'
 import { getDataSourceList } from '@/api/datasource'
 import { getResourceList } from '@/api/resource'
@@ -189,7 +190,7 @@ import { getCatalogs } from '@/api/catalog'
 
 export default {
   name: 'Reactive',
-  components: { SqlEditor },
+  components: { CodeEditor },
   data() {
     return {
       // common
@@ -341,7 +342,7 @@ export default {
       this.$set(this.formData, 'subject', sql)
     },
     formatSql() {
-      this.$refs.sqlEditor.format()
+      this.$refs.codeEditor.format()
     },
     resetForm() {
       const subject = this.formData.subject

@@ -115,12 +115,13 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="Subject" prop="subject">
-              <SqlEditor
+            <el-form-item label="Flink SQL" prop="subject">
+              <CodeEditor
                 v-if="formData.type === 'FLINK_SQL'"
-                ref="sqlEditor"
+                ref="codeEditor"
                 :value.sync="formData.subject"
                 :read-only="disabled"
+                mode="text/x-hive"
                 @changeTextarea="changeTextarea($event)"
               />
               <el-input v-else v-model="formData.subject" type="textarea" :autosize="{ minRows: 2, maxRows: 4}" />
@@ -141,10 +142,16 @@
           <template v-if="nodeType === 'SHELL'">
             <!-- shell -->
             <el-form-item label="Timeout" prop="config.timeout">
-              <el-input v-model="formData.config.timeout" placeholder="Unit: s sec, m min, h hour, d day"/>
+              <el-input v-model="formData.config.timeout" placeholder="Unit: s sec, m min, h hour, d day" />
             </el-form-item>
-            <el-form-item label="Subject" prop="subject">
-              <el-input v-model="formData.subject" type="textarea" :autosize="{ minRows: 2, maxRows: 10}" />
+            <el-form-item label="Script" prop="subject">
+              <CodeEditor
+                ref="codeEditor"
+                :value.sync="formData.subject"
+                :read-only="disabled"
+                mode="text/x-sh"
+                @changeTextarea="changeTextarea($event)"
+              />
             </el-form-item>
           </template>
 
@@ -164,11 +171,12 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Subject" prop="subject">
-              <SqlEditor
-                ref="sqlEditor"
+            <el-form-item label="SQL" prop="subject">
+              <CodeEditor
+                ref="codeEditor"
                 :value.sync="formData.subject"
                 :read-only="disabled"
+                mode="text/x-sql"
                 @changeTextarea="changeTextarea($event)"
               />
             </el-form-item>
@@ -330,7 +338,7 @@
 </template>
 
 <script>
-import SqlEditor from './SqlEditor.vue'
+import CodeEditor from './CodeEditor.vue'
 import { getJobOrJobRun, createJob, updateJob, getJobList } from '@/api/job.js'
 import { getNodeTypes, getDeployModes, getRouteUrls, getVersions, getPreconditions, getDependentRelations, getStatusList } from '@/api/attr.js'
 import { getResourceList } from '@/api/resource.js'
@@ -340,7 +348,7 @@ import { getCatalogs } from '@/api/catalog'
 
 export default {
   name: 'FormModel',
-  components: { SqlEditor },
+  components: { CodeEditor },
   filters: { },
   props: {
     disabled: {
@@ -441,8 +449,8 @@ export default {
           this.initDependentJobLists(result.config)
           this.formData = { ...result, variables }
           this.changeJobType()
-          if (this.$refs.sqlEditor) {
-            this.$refs.sqlEditor.setVal(this.formData.subject)
+          if (this.$refs.codeEditor) {
+            this.$refs.codeEditor.setVal(this.formData.subject)
           }
         })
       } else {
@@ -559,7 +567,7 @@ export default {
       this.$set(this.formData, 'subject', sql)
     },
     formatSql() {
-      this.$refs.sqlEditor.format()
+      this.$refs.codeEditor.format()
     },
     submitForm() {
       this.$refs['formData'].validate((valid) => {
@@ -604,8 +612,8 @@ export default {
       } else {
         this.formData = { config: {}}
       }
-      if (this.$refs.sqlEditor) {
-        this.$refs.sqlEditor.setVal('')
+      if (this.$refs.codeEditor) {
+        this.$refs.codeEditor.setVal('')
       }
     }
   }

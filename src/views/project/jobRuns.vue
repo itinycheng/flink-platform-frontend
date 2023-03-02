@@ -165,7 +165,7 @@
       @pagination="getList"
     />
 
-    <el-dialog title="Job Run Detail" :visible.sync="dialogVisible" width="40%">
+    <el-dialog title="Job Run Detail" :visible.sync="dialogVisible" width="50%">
       <json-viewer
         :value="jsonData"
         :expand-depth="5"
@@ -299,9 +299,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .filter-item {
   width: 200px;
   margin-right: 15px;
+}
+
+.jv-container .jv-string {
+    white-space: nowrap !important;
 }
 </style>

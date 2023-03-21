@@ -191,7 +191,7 @@ export default {
         size: 20,
         name: undefined,
         status: undefined,
-        sort: '+id'
+        sort: '-id'
       }
     }
   },

@@ -192,10 +192,12 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        OFFLINE: 'info',
-        ONLINE: '',
-        SCHEDULING: 'success',
-        DELETE: 'danger'
+        NOT_EXIST: 'info',
+        SUCCESS: 'success',
+        ERROR: 'danger',
+        KILLED: 'danger',
+        FAILURE: 'danger',
+        ABNORMAL: 'danger'
       }
       return statusMap[status]
     }

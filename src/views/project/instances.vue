@@ -69,7 +69,7 @@
           <span>{{ row.flowId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Name" min-width="350" align="center">
+      <el-table-column label="Name" min-width="300" align="center">
         <template slot-scope="{ row }">
           <router-link
             :to="'/project/flow/instance/' + row.id"
@@ -87,7 +87,7 @@
           <span>{{ row.priority }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Status" width="120" align="center">
+      <el-table-column label="Status" width="160" align="center">
         <template slot-scope="{ row }">
           <el-tag :type="row.status | statusFilter">
             {{ row.status }}
@@ -155,10 +155,13 @@ export default {
   filters: {
     statusFilter(status) {
       const statusMap = {
-        OFFLINE: 'info',
-        ONLINE: '',
-        SCHEDULING: 'success',
-        DELETE: 'danger'
+        NOT_EXIST: 'info',
+        SUCCESS: 'success',
+        ERROR: 'danger',
+        KILLED: 'danger',
+        FAILURE: 'danger',
+        ABNORMAL: 'danger',
+        EXPECTED_FAILURE: 'warning'
       }
       return statusMap[status]
     }

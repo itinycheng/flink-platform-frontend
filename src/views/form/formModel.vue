@@ -115,7 +115,7 @@
                 </el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="Flink SQL" prop="subject">
+            <el-form-item label="Flink SQL/Jar" prop="subject">
               <CodeEditor
                 v-if="formData.type === 'FLINK_SQL'"
                 ref="codeEditor"

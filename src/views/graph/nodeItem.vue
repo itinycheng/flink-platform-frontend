@@ -45,6 +45,7 @@ export default {
     },
     displayStatus(status) {
       switch (status) {
+        case 'CREATED':
         case 'SUBMITTED':
         case 'RUNNING':
           return 'running'

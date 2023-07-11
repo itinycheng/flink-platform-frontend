@@ -14,6 +14,14 @@
           <el-tooltip
             class="item"
             effect="dark"
+            content="Edit params"
+            placement="bottom"
+          >
+            <i class="el-icon-notebook-2" @click="openParamDialog()" />
+          </el-tooltip>
+          <el-tooltip
+            class="item"
+            effect="dark"
             content="Press shift to select more"
             placement="bottom"
           >
@@ -88,6 +96,7 @@
     </section>
 
     <FormModel ref="formModel" :disabled="isLock" />
+    <EditParamDialog ref="editParamDialog" :disabled="isLock" />
   </div>
 </template>
 
@@ -104,10 +113,11 @@ import SideBar from './sideBar.vue'
 import nodeitem from './nodeItem.vue'
 import graphConfig from './config'
 import FormModel from '../form/formModel.vue'
+import EditParamDialog from './jobParams.vue'
 
 export default {
   name: 'ProjectCreateDetail',
-  components: { NodeMenu, EdgeMenu, SideBar, FormModel },
+  components: { NodeMenu, EdgeMenu, SideBar, FormModel, EditParamDialog },
   data() {
     return {
       id: null,
@@ -517,6 +527,10 @@ export default {
     addNode(option) {
       const p = this.graph.pageToLocal(option.x, option.y)
       this.graph.addNode(Object.assign({}, option, p))
+    },
+    openParamDialog() {
+      const data = { id: this.id, type: this.type }
+      this.$refs.editParamDialog.init(data)
     }
   }
 }

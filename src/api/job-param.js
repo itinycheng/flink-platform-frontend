@@ -19,10 +19,11 @@ export function getParamPage(query) {
   })
 }
 
-export function getParamList() {
+export function getParamList(query) {
   return request({
     url: '/jobParam/list',
-    method: 'get'
+    method: 'get',
+    params: query
   }).then(res => {
     return res.data
   })

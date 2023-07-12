@@ -82,6 +82,11 @@
           <span>{{ row.host }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="Cron Expr" min-width="120" align="center">
+        <template slot-scope="{ row }">
+          {{ row.cronExpr }}
+        </template>
+      </el-table-column>
       <el-table-column label="Priority" min-width="100" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.priority }}</span>
@@ -107,11 +112,6 @@
       <el-table-column label="Stop Time" min-width="160" align="center">
         <template slot-scope="{ row }">
           {{ row.endTime }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Create Time" min-width="160" align="center">
-        <template slot-scope="{ row }">
-          {{ row.createTime }}
         </template>
       </el-table-column>
       <el-table-column

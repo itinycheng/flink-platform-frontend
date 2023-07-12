@@ -92,6 +92,11 @@
           {{ row.alerts? row.alerts.map(item => item.alertId) : '' }}
         </template>
       </el-table-column>
+      <el-table-column label="Update Time" min-width="130" align="center">
+        <template slot-scope="{ row }">
+          {{ row.updateTime }}
+        </template>
+      </el-table-column>
       <el-table-column label="Create Time" min-width="130" align="center">
         <template slot-scope="{ row }">
           {{ row.createTime }}

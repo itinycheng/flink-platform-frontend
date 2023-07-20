@@ -4,7 +4,7 @@
     <el-table
       :data="tableData"
       style="width: 100%; margin-bottom: 10px;"
-      max-height="250"
+      max-height="350"
     >
       <el-table-column
         fixed

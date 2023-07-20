@@ -169,6 +169,12 @@ export const constantRoutes = [
         name: 'JobParam Manage',
         component: () => import('@/views/manage/jobParam'),
         meta: { title: 'JobParam Manage', icon: 'tree' }
+      },
+      {
+        path: 'tag',
+        name: 'Tag Manage',
+        component: () => import('@/views/manage/tag'),
+        meta: { title: 'Tag Manage', icon: 'tree' }
       }
     ]
   },

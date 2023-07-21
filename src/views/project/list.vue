@@ -14,10 +14,23 @@
         class="filter-item"
       >
         <el-option
-          v-for="item in listStatus"
+          v-for="item in statusList"
           :key="item.name"
           :label="item.name"
           :value="item.name"
+        />
+      </el-select>
+      <el-select
+        v-model="listQuery.tag"
+        placeholder="Tag"
+        clearable
+        class="filter-item"
+      >
+        <el-option
+          v-for="item in tagList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.code"
         />
       </el-select>
       <el-button
@@ -75,9 +88,9 @@
           <span>{{ row.cronExpr }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Priority" min-width="100" align="center">
+      <el-table-column label="Tag" min-width="100" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.priority }}</span>
+          <span>{{ row.tags }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" width="120" align="center">
@@ -118,6 +131,7 @@
             </el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item :command="{row, toStatus: 'ALERT'}">Edit Alert</el-dropdown-item>
+              <el-dropdown-item :command="{row, toStatus: 'TAG'}">Edit Tag</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'SCHEDULING'" :command="{row, toStatus: 'STOP_SCHED'}">Stop Sched</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'OFFLINE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
@@ -157,21 +171,24 @@
     <ProjectCreateDialog ref="createDialog" />
     <ScheduleDialog ref="scheduleDialog" />
     <EditAlertDialog ref="editAlertDialog" />
+    <EditTagDialog ref="editTagDialog" />
   </div>
 </template>
 
 <script>
 import { getFlowPage, updateFlow, purgeFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
+import { getTagList } from '@/api/tag'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import ProjectCreateDialog from './create.vue'
 import ScheduleDialog from './schedule.vue'
 import EditAlertDialog from './alerts.vue'
+import EditTagDialog from './tags.vue'
 
 export default {
   name: 'ProjectList',
-  components: { Pagination, ProjectCreateDialog, ScheduleDialog, EditAlertDialog },
+  components: { Pagination, ProjectCreateDialog, ScheduleDialog, EditAlertDialog, EditTagDialog },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -186,7 +203,8 @@ export default {
   },
   data() {
     return {
-      listStatus: [],
+      statusList: [],
+      tagList: [],
       tableKey: 0,
       list: null,
       total: 0,
@@ -203,14 +221,20 @@ export default {
 
   created() {
     this.getStatus()
+    this.getTags()
     this.getList()
   },
 
   methods: {
+    getTags() {
+      getTagList().then((result) => {
+        this.tagList = result
+      })
+    },
     getStatus() {
       var data = { className: 'JobFlowStatus' }
       getStatusList(data).then((result) => {
-        this.listStatus = result
+        this.statusList = result
       })
     },
     getList() {
@@ -234,6 +258,12 @@ export default {
       // edit alert info
       if (toStatus === 'ALERT') {
         this.$refs.editAlertDialog.init(row)
+        return
+      }
+
+      // edit tag
+      if (toStatus === 'TAG') {
+        this.$refs.editTagDialog.init(row)
         return
       }
       // delete flow

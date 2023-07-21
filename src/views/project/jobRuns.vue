@@ -24,7 +24,6 @@
         v-model="listQuery.flowRunId"
         placeholder="Flow Run Id"
         class="filter-item"
-        :disabled="this.$route.params.flowRunId > 0"
         @keyup.enter.native="handleFilter"
       />
       <el-input

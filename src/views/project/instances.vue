@@ -20,6 +20,19 @@
           :value="item.name"
         />
       </el-select>
+      <el-select
+        v-model="listQuery.tag"
+        placeholder="Tag"
+        clearable
+        class="filter-item"
+      >
+        <el-option
+          v-for="item in tagList"
+          :key="item.id"
+          :label="item.name"
+          :value="item.code"
+        />
+      </el-select>
       <el-date-picker
         v-model="timeRange"
         style="margin-right: 15px;"
@@ -87,9 +100,9 @@
           {{ row.cronExpr }}
         </template>
       </el-table-column>
-      <el-table-column label="Priority" min-width="100" align="center">
+      <el-table-column label="Tags" min-width="100" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.priority }}</span>
+          <span>{{ row.tags }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" width="160" align="center">
@@ -144,6 +157,7 @@
 <script>
 import { getFlowRunPage, killFlowRun } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
+import { getTagList } from '@/api/tag'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import { pickerOptions, calcTimeRangeToNow } from '@/components/DatePicker/date-picker'
@@ -173,6 +187,7 @@ export default {
       pickerOptions: pickerOptions,
       // list
       listStatus: [],
+      tagList: [],
       list: null,
       total: 0,
       listLoading: true,
@@ -194,10 +209,16 @@ export default {
       this.timeRange = this.$route.params.timeRange
     }
     this.getStatus()
+    this.getTags()
     this.getList()
   },
 
   methods: {
+    getTags() {
+      getTagList().then((result) => {
+        this.tagList = result
+      })
+    },
     getStatus() {
       var data = { className: 'ExecutionStatus' }
       getStatusList(data).then((result) => {

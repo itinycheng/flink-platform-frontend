@@ -132,6 +132,7 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item :command="{row, toStatus: 'ALERT'}">Edit Alert</el-dropdown-item>
               <el-dropdown-item :command="{row, toStatus: 'TAG'}">Edit Tag</el-dropdown-item>
+              <el-dropdown-item :command="{row, toStatus: 'COPY'}">Copy Workflow</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'SCHEDULING'" :command="{row, toStatus: 'STOP_SCHED'}">Stop Sched</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'OFFLINE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
@@ -176,7 +177,7 @@
 </template>
 
 <script>
-import { getFlowPage, updateFlow, purgeFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
+import { getFlowPage, updateFlow, purgeFlow, copyFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import { getTagList } from '@/api/tag'
 import waves from '@/directive/waves'
@@ -266,6 +267,15 @@ export default {
         this.$refs.editTagDialog.init(row)
         return
       }
+
+      // copy workflow
+      if (toStatus === 'COPY') {
+        copyFlow(row.id).then(result => {
+          this.getList()
+        })
+        return
+      }
+
       // delete flow
       if (toStatus === 'DELETE_FLOW') {
         return

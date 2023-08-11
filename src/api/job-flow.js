@@ -68,6 +68,15 @@ export function purgeFlow(id) {
   })
 }
 
+export function copyFlow(id) {
+  return request({
+    url: `/jobFlow/copy/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function runOnceFlow(id) {
   return request({
     url: `/jobFlow/schedule/runOnce/${id}`,

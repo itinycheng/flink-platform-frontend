@@ -43,13 +43,13 @@
         width="100"
       >
         <template slot-scope="scope">
-          <el-button type="text" size="small" @click="showEditParam(scope.$index, tableData)">Edit</el-button>
-          <el-button type="text" size="small" @click="deleteRow(scope.$index, tableData)">Disable</el-button>
+          <el-button type="text" size="small" :disabled="disabled" @click="showEditParam(scope.$index, tableData)">Edit</el-button>
+          <el-button type="text" size="small" :disabled="disabled" @click="deleteRow(scope.$index, tableData)">Disable</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-form :inline="true" :model="formData" :rules="formRules">
+    <el-form :inline="true" :model="formData" :disabled="disabled" :rules="formRules">
       <el-form-item label="Name">
         <el-input v-model="formData.paramName" placeholder="param name" />
       </el-form-item>
@@ -80,6 +80,12 @@ import { getStatusList } from '@/api/attr'
 
 export default {
   name: 'EditParamDialog',
+  props: {
+    disabled: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       visible: false,

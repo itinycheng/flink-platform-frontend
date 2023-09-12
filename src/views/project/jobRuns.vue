@@ -251,9 +251,13 @@ export default {
         this.total = data.total
         this.list = data.records.map(item => {
           try {
-            item.backInfo = JSON.parse(item.backInfo)
+            // backward compatibility, remove in the future.
+            if (typeof item.backInfo === 'string') {
+              item.backInfo = JSON.parse(item.backInfo)
+            }
           } catch (err) {
             item.backInfo = {}
+            console.error('parse backInfo failed', err)
           }
           return item
         })

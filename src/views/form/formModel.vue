@@ -71,6 +71,13 @@
               />
             </el-select>
           </el-form-item>
+          <el-form-item label="Retry Times" prop="config.retryTimes">
+            <el-input v-model="formData.config.retryTimes" placeholder="integer" />
+          </el-form-item>
+          <el-form-item label="Retry Interval" prop="config.retryInterval">
+            <el-input v-model="formData.config.retryInterval" placeholder="Unit: s sec, m min, h hour, d day" />
+          </el-form-item>
+
           <el-form-item label="Variables" prop="variables">
             <el-input v-model="formData.variables" placeholder="{'k1': 'v1', ...}" />
           </el-form-item>
@@ -396,6 +403,9 @@ export default {
         ],
         deployMode: [
           { required: true, message: 'Please select deploy mode', trigger: 'change' }
+        ],
+        'config.retryTimes': [
+          { required: true, message: 'Please enter retry times', trigger: 'change' }
         ],
         'config.dsId': [{
           required: true, message: 'Please choose data source', trigger: 'change'

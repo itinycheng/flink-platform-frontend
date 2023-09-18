@@ -228,7 +228,6 @@
                   <el-form-item
                     :label="'Dependent' + index"
                     :prop="'config.dependentItems.' + index + '.flowId'"
-                    :rules="[{ required: true, message: 'Please choose job flow' }]"
                     style="margin-bottom: 5px"
                   >
                     <el-select
@@ -258,6 +257,7 @@
                       placeholder="Please select dependent job"
                       style="width: 100%"
                       size="small"
+                      @change="forceUpdate"
                     >
                       <el-option
                         v-for="item in jobLists[index]"
@@ -281,6 +281,7 @@
                       style="width: 100%"
                       size="small"
                       multiple
+                      @change="forceUpdate"
                     >
                       <el-option
                         v-for="item in executionStatusList"
@@ -296,13 +297,13 @@
                 <el-col :span="14">
                   <el-form-item
                     :prop="'config.dependentItems.' + index + '.timeRange'"
-                    :rules="[{ required: true, message: 'Please choose time range type' }]"
                   >
                     <el-select
                       v-model="dependentItem.timeRange"
                       placeholder="Please select dependent job flow"
                       style="width: 100%"
                       size="small"
+                      @change="forceUpdate"
                     >
                       <el-option
                         v-for="item in timeRangeList"
@@ -317,12 +318,14 @@
                   <el-form-item
                     :prop="'config.dependentItems.' + index + '.lastN'"
                     label-width="0px"
-                    :rules="[
-                      { required: true, message: 'Please input last N(integer)' },
-                      { type: 'number', message: 'Value of Last N is a number' }
-                    ]"
                   >
-                    <el-input v-model.number="dependentItem.lastN" size="small" placeholder="Please input lastN (integer)" />
+                    <el-input
+                      v-model.number="dependentItem.lastN"
+                      size="small"
+                      placeholder="Please input lastN (integer)"
+                      @change="forceUpdate"
+                      @blur="forceUpdate"
+                    />
                   </el-form-item>
                 </el-col>
                 <el-col :span="2">
@@ -567,6 +570,9 @@ export default {
       if (index !== -1) {
         dependentItems.splice(index, 1)
       }
+      this.$forceUpdate()
+    },
+    forceUpdate() {
       this.$forceUpdate()
     },
     isSqlNode() {

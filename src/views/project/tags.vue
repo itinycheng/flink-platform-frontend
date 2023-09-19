@@ -1,7 +1,7 @@
 <template>
   <el-dialog title="Tag Configuration" :visible.sync="visible" width="40%">
     <el-form :model="formData">
-      <el-form-item :prop="'tag.' + index">
+      <el-form-item>
         <el-select v-model="formData.tags" multiple style="width:100%">
           <el-option
             v-for="tag in tagList"

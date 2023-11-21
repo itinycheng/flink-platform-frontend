@@ -9,6 +9,15 @@ export function getResource(id) {
   })
 }
 
+export function getWithParents(id) {
+  return request({
+    url: `/resource/getWithParents/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function getResourcePage(query) {
   return request({
     url: '/resource/page',

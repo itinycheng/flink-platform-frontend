@@ -29,7 +29,7 @@
             :value="item.name"
           />
         </el-select>
-        <el-input v-model="formData.timeout.threshold" style="width: 40%; margin-left: 2%;" />
+        <el-input v-model="formData.timeout.threshold" placeholder="Unit: s sec, m min, h hour, d day" style="width: 40%; margin-left: 2%;" />
       </el-form-item>
       <el-form-item
         label="Description"
@@ -61,8 +61,8 @@
     <div slot="footer">
       <el-button @click.stop="cancelForm()">Cancel</el-button>
       <el-button type="warning" @click.stop="getCrontab()">CronTab</el-button>
-      <el-button type="primary" @click.stop="submitForm()">Confirm</el-button>
       <el-button type="success" @click.stop="enterJobFlow()">Edit Workflow</el-button>
+      <el-button type="primary" @click.stop="submitForm()">Confirm</el-button>
     </div>
   </el-dialog>
 </template>

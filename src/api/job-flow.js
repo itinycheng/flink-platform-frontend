@@ -125,6 +125,16 @@ export async function getFlowRun(id) {
   })
 }
 
+export async function updateFlowRun(data) {
+  return request({
+    url: '/jobFlowRun/update',
+    method: 'post',
+    data
+  }).then(res => {
+    return res.data
+  })
+}
+
 export async function getFlowOrFlowRun(id, type) {
   return type !== 'instance'
     ? getFlow(id) : getFlowRun(id)

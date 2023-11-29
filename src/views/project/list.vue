@@ -169,8 +169,8 @@
       @pagination="getList"
     />
 
-    <ProjectCreateDialog ref="createDialog" />
-    <ScheduleDialog ref="scheduleDialog" />
+    <ProjectCreateDialog ref="createDialog" @refreshList="getList" />
+    <ScheduleDialog ref="scheduleDialog" @refreshList="getList" />
     <EditAlertDialog ref="editAlertDialog" />
     <EditTagDialog ref="editTagDialog" />
   </div>

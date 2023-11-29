@@ -55,7 +55,7 @@ export default {
           type: 'success'
         })
         this.closeForm()
-        this.$parent.getList()
+        this.$emit('refreshList')
       })
     },
     closeForm() {

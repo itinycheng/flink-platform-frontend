@@ -116,6 +116,7 @@ export default {
       if (this.formData.id) {
         updateFlow(this.formData).then(id => {
           this.visible = false
+          this.$emit('refreshList')
         })
       } else {
         this.$refs.formData.validate((valid) => {
@@ -124,6 +125,7 @@ export default {
           }
           createFlow(this.formData).then(id => {
             this.visible = false
+            this.$emit('refreshList')
           })
         })
       }

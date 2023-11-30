@@ -494,7 +494,8 @@ export default {
       })
     },
     initDependentJobFlowList() {
-      getFlowIdNameList().then(data => {
+      const data = { status: 'ONLINE,SCHEDULING' }
+      getFlowIdNameList(data).then(data => {
         this.jobFlowList = data
       })
     },
@@ -551,7 +552,7 @@ export default {
       })
     },
     changeDependentFlow(flowId, index) {
-      getJobList({ flowId: flowId }).then(data => {
+      getJobList({ flowId: flowId, flag: 'flow' }).then(data => {
         this.jobLists.splice(index, 1, data || [])
         this.formData.config.dependentItems[index].jobId = null
         this.$forceUpdate()

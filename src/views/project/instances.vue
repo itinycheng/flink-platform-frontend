@@ -3,6 +3,7 @@
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
         v-model="listQuery.id"
+        type="number"
         placeholder="ID"
         class="filter-item"
         @keyup.enter.native="handleFilter"

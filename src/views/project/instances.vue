@@ -2,6 +2,13 @@
   <div class="app-container">
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
+        v-model="listQuery.id"
+        type="number"
+        placeholder="ID"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
@@ -194,6 +201,7 @@ export default {
       listQuery: {
         page: 1,
         size: 20,
+        id: null,
         name: undefined,
         status: undefined,
         startTime: undefined,

@@ -296,17 +296,17 @@
               <el-row :key="'tr' + index" :gutter="10">
                 <el-col :span="14">
                   <el-form-item
-                    :prop="'config.dependentItems.' + index + '.timeRange'"
+                    :prop="'config.dependentItems.' + index + '.strategy'"
                   >
                     <el-select
-                      v-model="dependentItem.timeRange"
+                      v-model="dependentItem.strategy"
                       placeholder="Please select dependent job flow"
                       style="width: 100%"
                       size="small"
                       @change="forceUpdate"
                     >
                       <el-option
-                        v-for="item in timeRangeList"
+                        v-for="item in dependentStrategyList"
                         :key="item.name"
                         :label="item.name"
                         :value="item.name"
@@ -316,13 +316,13 @@
                 </el-col>
                 <el-col :span="8">
                   <el-form-item
-                    :prop="'config.dependentItems.' + index + '.lastN'"
+                    :prop="'config.dependentItems.' + index + '.duration'"
                     label-width="0px"
                   >
                     <el-input
-                      v-model.number="dependentItem.lastN"
+                      v-model="dependentItem.duration"
                       size="small"
-                      placeholder="Please input lastN (integer)"
+                      placeholder="Unit: s sec, m min, h hour, d day"
                       @change="forceUpdate"
                       @blur="forceUpdate"
                     />
@@ -379,7 +379,7 @@ export default {
       typeList: [],
       deployModeList: [],
       executionStatusList: [],
-      timeRangeList: [],
+      dependentStrategyList: [],
       routeUrlList: [],
       versionList: [],
       dataSourceList: [],
@@ -447,7 +447,7 @@ export default {
             this.initDependentRelationList()
             this.initDependentJobFlowList()
             this.initExecutionStatusList()
-            this.initTimeRangeList()
+            this.initDependentStrategyList()
             break
           case 'SHELL':
           default:
@@ -530,10 +530,10 @@ export default {
         this.executionStatusList = result
       })
     },
-    initTimeRangeList() {
-      var data = { className: 'TimeRange' }
+    initDependentStrategyList() {
+      var data = { className: 'DependentStrategy' }
       getStatusList(data).then((result) => {
-        this.timeRangeList = result
+        this.dependentStrategyList = result
       })
     },
     initNodeTypeList(nodeType) {

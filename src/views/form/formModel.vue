@@ -350,7 +350,8 @@
 <script>
 import CodeEditor from './CodeEditor.vue'
 import { getJobOrJobRun, createJob, updateJob, getJobList } from '@/api/job.js'
-import { getNodeTypes, getDeployModes, getRouteUrls, getVersions, getPreconditions, getDependentRelations, getStatusList } from '@/api/attr.js'
+import { getNodeTypes, getDeployModes, getVersions, getPreconditions, getDependentRelations, getStatusList } from '@/api/attr.js'
+import { getUserWorkers } from '@/api/user.js'
 import { getResourceList } from '@/api/resource.js'
 import { getDataSourceList } from '@/api/datasource'
 import { getFlowIdNameList } from '@/api/job-flow'
@@ -479,7 +480,7 @@ export default {
     },
 
     initRouteUrlList() {
-      getRouteUrls().then(result => {
+      getUserWorkers().then(result => {
         this.routeUrlList = result
       })
     },

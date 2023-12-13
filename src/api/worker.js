@@ -26,6 +26,16 @@ export function getWorkerPage(query) {
   })
 }
 
+export function getWorkerList(query) {
+  return request({
+    url: '/worker/list',
+    method: 'get',
+    params: query
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function getWorker(id) {
   return request({
     url: `/worker/get/${id}`,

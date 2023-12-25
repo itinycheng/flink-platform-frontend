@@ -90,7 +90,7 @@
         </header>
         <div id="draw-cot" />
         <SideBar ref="drawer" @addNode="addNode" />
-        <NodeMenu ref="nodeMenu" />
+        <NodeMenu ref="nodeMenu" :flow-id="id" />
         <EdgeMenu ref="edgeMenu" />
       </div>
     </section>

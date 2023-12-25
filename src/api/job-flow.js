@@ -77,10 +77,11 @@ export function copyFlow(id) {
   })
 }
 
-export function runOnceFlow(id) {
+export function runOnceFlow(id, data) {
   return request({
     url: `/jobFlow/schedule/runOnce/${id}`,
-    method: 'get'
+    method: 'post',
+    data
   }).then(res => {
     return res.data
   })

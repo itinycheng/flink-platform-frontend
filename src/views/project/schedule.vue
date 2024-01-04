@@ -49,11 +49,7 @@ export default {
     },
     async submitForm() {
       await startSchedFlow(this.row.id).then(result => {
-        this.$notify({
-          title: 'Success',
-          message: 'Scheduled Successfully, id=' + result,
-          type: 'success'
-        })
+        this.$message.success(`Scheduled Successfully, id=${result}`)
         this.closeForm()
         this.$emit('refreshList')
       })

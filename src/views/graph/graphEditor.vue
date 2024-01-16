@@ -90,7 +90,7 @@
         </header>
         <div id="draw-cot" />
         <SideBar ref="drawer" @addNode="addNode" />
-        <NodeMenu ref="nodeMenu" />
+        <NodeMenu ref="nodeMenu" :flow-id="id" />
         <EdgeMenu ref="edgeMenu" />
       </div>
     </section>
@@ -502,11 +502,7 @@ export default {
       }
 
       runOnceFlow(this.id).then((result) => {
-        this.$notify({
-          title: 'Success',
-          message: 'Flow Run Once, id=' + result,
-          type: 'success'
-        })
+        this.$message.success(`JobFlow Run Once, id=${result}`)
       })
     },
     graphToPng() {

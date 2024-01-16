@@ -181,11 +181,8 @@ import CodeEditor from '@/views/form/CodeEditor'
 import { execJob, getJobToDbTypeMap, getExecLog } from '@/api/reactive'
 import { getDataSourceList } from '@/api/datasource'
 import { getResourceList } from '@/api/resource'
-import {
-  getDeployModes,
-  getRouteUrls,
-  getVersions
-} from '@/api/attr'
+import { getDeployModes, getVersions } from '@/api/attr'
+import { getUserWorkers } from '@/api/user'
 import { getCatalogs } from '@/api/catalog'
 
 export default {
@@ -258,7 +255,7 @@ export default {
       })
     },
     initRouteUrlList() {
-      getRouteUrls().then((result) => {
+      getUserWorkers().then((result) => {
         this.routeUrlList = result
       })
     },

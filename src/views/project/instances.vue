@@ -145,6 +145,7 @@
             <el-button type="success" size="mini"> Action </el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item :command="{row, toStatus: 'KILL'}">Kill Workflow</el-dropdown-item>
+              <el-dropdown-item :command="{row, toStatus: 'KILLED'}">Set KILLED</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -162,7 +163,7 @@
 </template>
 
 <script>
-import { getFlowRunPage, killFlowRun } from '@/api/job-flow'
+import { getFlowRunPage, updateFlowRun, killFlowRun } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import { getTagList } from '@/api/tag'
 import waves from '@/directive/waves'
@@ -255,6 +256,11 @@ export default {
       if (toStatus === 'KILL') {
         killFlowRun(row.id).then(result => {
           this.getList()
+        })
+      } else if (toStatus === 'KILLED') {
+        const newStatus = { id: row.id, status: toStatus }
+        updateFlowRun(newStatus).then(result => {
+          row.status = toStatus
         })
       }
     },

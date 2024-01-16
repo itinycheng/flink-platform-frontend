@@ -2,6 +2,13 @@
   <div class="app-container">
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
+        v-model="listQuery.id"
+        type="number"
+        placeholder="ID"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
@@ -79,7 +86,7 @@
       </el-table-column>
       <el-table-column label="Name" min-width="300" align="center">
         <template slot-scope="{ row }">
-          <el-button type="text" @click="displayRowJson(row)">{{ row.name }}</el-button>
+          <el-button type="text" @click="displayRowJson(row.id)">{{ row.name }}</el-button>
         </template>
       </el-table-column>
       <el-table-column label="Job Id" min-width="120" align="center">
@@ -102,11 +109,11 @@
           <span>{{ row.version }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Config" min-width="100" align="center">
+      <!-- <el-table-column label="Config" min-width="100" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.config }}</span>
         </template>
-      </el-table-column>
+      </el-table-column> -->
       <el-table-column label="Host" min-width="120" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.host }}</span>
@@ -177,7 +184,7 @@
 </template>
 
 <script>
-import { getJobRunPage, killJobRun } from '@/api/job'
+import { getJobRunPage, killJobRun, getJobRun } from '@/api/job'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -278,9 +285,11 @@ export default {
         })
       }
     },
-    displayRowJson(row) {
-      this.jsonData = row
-      this.dialogVisible = true
+    displayRowJson(id) {
+      getJobRun(id).then(result => {
+        this.jsonData = result
+        this.dialogVisible = true
+      })
     },
     sortChange(data) {
       const { prop, order } = data

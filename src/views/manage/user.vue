@@ -118,6 +118,19 @@
             <el-form-item label="Email" prop="email">
               <el-input v-model="formData.email" />
             </el-form-item>
+            <el-form-item label="Workers" prop="workers">
+              <el-select v-model="formData.workers" multiple style="width:100%" placeholder="Please select workers">
+                <el-option
+                  v-for="worker in workerList"
+                  :key="worker.id"
+                  :label="worker.name"
+                  :value="worker.id"
+                >
+                  <span style="float: left">{{ worker.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ worker.role }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
             <!-- <el-form-item label="Status" prop="status">
               <el-input v-model="formData.status" />
             </el-form-item>
@@ -136,6 +149,7 @@
 <script>
 import { getUser, getUserPage, createUser, updateUser } from '@/api/user'
 import { getStatusList } from '@/api/attr'
+import { getWorkerList } from '@/api/worker'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 
@@ -148,6 +162,7 @@ export default {
       // edit
       dialogFormVisible: false,
       userTypeList: [],
+      workerList: [],
       formData: {},
       formRules: {
         username: [
@@ -172,6 +187,7 @@ export default {
   created() {
     this.getList()
     this.getTypes()
+    this.getWorkers()
   },
   methods: {
     getList() {
@@ -184,6 +200,11 @@ export default {
       const data = { className: 'UserType' }
       getStatusList(data).then((result) => {
         this.userTypeList = result
+      })
+    },
+    getWorkers() {
+      getWorkerList({}).then((result) => {
+        this.workerList = result
       })
     },
     handleFilter() {

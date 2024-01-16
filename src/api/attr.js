@@ -37,15 +37,6 @@ export function getStatusList(query) {
   })
 }
 
-export function getRouteUrls() {
-  return request({
-    url: '/attr/routeUrls',
-    method: 'get'
-  }).then(res => {
-    return res.data
-  })
-}
-
 export function getVersions(type) {
   return request({
     url: `/attr/versions?type=${type}`,

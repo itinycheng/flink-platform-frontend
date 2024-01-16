@@ -22,8 +22,10 @@
 
     <div class="dir-navigate">
       <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item :to="{ path: '/manage/resource' }">/</el-breadcrumb-item>
-        <el-breadcrumb-item> TODO </el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: '/manage/resource' }">HOME</el-breadcrumb-item>
+        <template v-for="parent in breadcrumb">
+          <el-breadcrumb-item :key="'id_' + parent.id" :to="{ path: '/manage/resource/' + parent.id }">{{ parent.name }}</el-breadcrumb-item>
+        </template>
       </el-breadcrumb>
     </div>
 
@@ -159,7 +161,7 @@
 </template>
 
 <script>
-import { getResource, getResourcePage, createResource, updateResource, deleteResource, deleteFile } from '@/api/resource'
+import { getResource, getWithParents, getResourcePage, createResource, updateResource, deleteResource, deleteFile } from '@/api/resource'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -171,8 +173,9 @@ export default {
   directives: { waves },
   data() {
     return {
-      // edit
+      id: this.$route.params.id,
       dialogFormVisible: false,
+      breadcrumb: [],
       // file upload
       baseUrl: process.env.VUE_APP_BASE_API,
       fileList: [],
@@ -204,6 +207,7 @@ export default {
     }
   },
   created() {
+    this.initBreadcrumb()
     this.getList()
     this.getTypes()
   },
@@ -219,6 +223,13 @@ export default {
       getStatusList(data).then((result) => {
         this.resourceTypeList = result
       })
+    },
+    initBreadcrumb() {
+      if (this.id) {
+        getWithParents(this.id).then((data) => {
+          this.breadcrumb = data
+        })
+      }
     },
     handleFilter() {
       this.listQuery.page = 1

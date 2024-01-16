@@ -13,10 +13,16 @@
 </template>
 
 <script>
-import { runOnceJob } from '@/api/job'
+import { runOnceFlow } from '@/api/job-flow'
 
 export default {
   name: 'NodeMenu',
+  props: {
+    flowId: {
+      type: String,
+      default: null
+    }
+  },
   data() {
     return {
       x: '',
@@ -34,13 +40,18 @@ export default {
       this.node = node
     },
 
-    async handleSelect(key, keyPath) {
+    async handleSelect(key) {
       switch (key) {
         case 'runOnce': {
+          if (!this.flowId) {
+            this.$message.error(`Unknown job flow, id=${this.flowId}`)
+            return
+          }
           const jobOrRunId = this.node.getData()?.id
           const jobId = this.node.id
           if (jobOrRunId && jobId) {
-            await runOnceJob(jobId).then((id) => {
+            var data = { startJobId: jobId, strategy: 'ONLY_CUR_JOB' }
+            await runOnceFlow(this.flowId, data).then((id) => {
               this.$message.success(`Job run once Successfully, id=${id}`)
             })
           }

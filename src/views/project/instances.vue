@@ -244,7 +244,7 @@ export default {
 
         setTimeout(() => {
           this.listLoading = false
-        }, 1000)
+        }, 200)
       })
     },
     handleFilter() {

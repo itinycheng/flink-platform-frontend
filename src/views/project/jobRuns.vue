@@ -270,7 +270,7 @@ export default {
         })
         setTimeout(() => {
           this.listLoading = false
-        }, 500)
+        }, 200)
       })
     },
     handleFilter() {

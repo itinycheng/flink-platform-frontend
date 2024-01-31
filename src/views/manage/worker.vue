@@ -265,6 +265,8 @@ export default {
     },
     resetForm() {
       this.formData = { }
+      this.formData.role = this.roleList[0].name
+      this.formData = {...this.formData}
     },
     submitForm() {
       if (this.formData.id) {

@@ -180,7 +180,7 @@ export default {
       // edit
       dialogFormVisible: false,
       roleList: [],
-      formData: {},
+      formData: { role: 'FOLLOWER' },
       formRules: {
         name: [
           { required: true, message: 'Please enter name', trigger: 'blur' }
@@ -190,6 +190,9 @@ export default {
         ],
         port: [
           { required: true, message: 'Please enter port', trigger: 'blur' }
+        ],
+        role: [
+          { required: true, message: 'Please select role', trigger: 'blur' }
         ]
       },
       // list
@@ -264,7 +267,7 @@ export default {
       this.resetForm()
     },
     resetForm() {
-      this.formData = { }
+      this.formData = { role: 'FOLLOWER' }
     },
     submitForm() {
       if (this.formData.id) {

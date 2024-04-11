@@ -13,6 +13,9 @@
       <el-form-item label="Crontab" prop="cronExpr" :label-width="labelWidth">
         <el-input v-model="formData.cronExpr" style="width: 90%" />
       </el-form-item>
+      <el-form-item label="Parallel Tasks" prop="parallelism" :label-width="labelWidth">
+        <el-input v-model="formData.config.parallelism" type="number" min="1" style="width: 90%" />
+      </el-form-item>
       <el-form-item label="Timeout" prop="timeout" :label-width="labelWidth">
         <el-switch v-model="formData.timeout.enable" style="width: 6%;" />
         <el-select
@@ -79,7 +82,7 @@ export default {
       labelWidth: '120px',
       timeoutStrategies: [],
       cronList: [],
-      formData: { timeout: { enable: false }},
+      formData: { timeout: { enable: false }, config: {}},
       formRules: {
         name: [
           { required: true, message: 'Please enter name', trigger: 'blur' }
@@ -92,11 +95,14 @@ export default {
       this.resetForm()
       this.getTimeoutStrategies()
       this.visible = true
-      var { id, name, cronExpr, description, timeout } = data
+      var { id, name, cronExpr, description, timeout, config } = data
       if (!timeout) {
         timeout = { enable: false }
       }
-      this.formData = { id, name, cronExpr, description, timeout }
+      if (!config) {
+        config = {}
+      }
+      this.formData = { id, name, cronExpr, description, timeout, config }
     },
 
     getTimeoutStrategies() {
@@ -149,7 +155,7 @@ export default {
         this.$refs.formData.clearValidate()
         this.$refs.formData.resetFields()
       } else {
-        this.formData = {}
+        this.formData = { timeout: { enable: false }, config: {}}
       }
     }
   }

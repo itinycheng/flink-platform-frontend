@@ -314,7 +314,7 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
-                <el-col :span="8">
+                <el-col :span="7">
                   <el-form-item
                     :prop="'config.dependentItems.' + index + '.duration'"
                     label-width="0px"
@@ -327,6 +327,9 @@
                       @blur="forceUpdate"
                     />
                   </el-form-item>
+                </el-col>
+                <el-col :span="1" style="padding: 10px 5px;">
+                  <router-link :to="'/project/flow/show/'+dependentItem.flowId"><i class="el-icon-link" /></router-link>
                 </el-col>
                 <el-col :span="2">
                   <el-button icon="el-icon-delete" size="small" circle @click="deleteDependentItem(dependentItem)" />

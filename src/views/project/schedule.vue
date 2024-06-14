@@ -12,9 +12,23 @@
     </el-form>
     <div slot="footer">
       <el-button @click="closeForm()">Cancel</el-button>
+      <el-button type="warning" @click.stop="getCrontab()">CronTab</el-button>
       <el-button type="primary" @click="submitForm()">
         Confirm
       </el-button>
+      <el-table
+        v-if="cronList && cronList.length > 0"
+        :data="cronList"
+      >
+        <el-table-column
+          label="Execution Time"
+          align="left"
+        >
+          <template slot-scope="{ row: tableRow }">
+            <span>{{ tableRow }}</span>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
   </el-dialog>
 </template>
@@ -22,6 +36,7 @@
 <script>
 import { startSchedFlow } from '@/api/job-flow.js'
 import { getStatusList } from '@/api/attr.js'
+import { parseCronExpr } from '@/api/job-flow.js'
 
 export default {
   name: 'ScheduleDialog',
@@ -30,7 +45,8 @@ export default {
       visible: false,
       labelWidth: '100px',
       listStatus: [],
-      row: {}
+      row: {},
+      cronList: []
     }
   },
   created() {
@@ -38,13 +54,19 @@ export default {
   },
   methods: {
     init(data = {}) {
-      this.visible = true
       this.row = data
+      this.cronList = []
+      this.visible = true
     },
     getStatus() {
       var data = { className: 'JobFlowStatus' }
       getStatusList(data).then((result) => {
         this.listStatus = result
+      })
+    },
+    getCrontab() {
+      parseCronExpr({ 'cron': this.row.cronExpr }).then((data) => {
+        this.cronList = data
       })
     },
     async submitForm() {

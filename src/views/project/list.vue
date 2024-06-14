@@ -75,7 +75,7 @@
       </el-table-column>
       <el-table-column label="Name" min-width="150" align="center">
         <template slot-scope="{ row }">
-          <router-link :to="'/project/flow/show/'+row.id" class="link-type">{{ row.name }}</router-link>
+          <router-link :to="(row.status === 'SCHEDULING' ? '/project/flow/show/': '/project/flow/edit/') + row.id" class="link-type">{{ row.name }}</router-link>
         </template>
       </el-table-column>
       <el-table-column label="Description" min-width="200" align="left">

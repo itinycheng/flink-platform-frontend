@@ -137,7 +137,7 @@
                 <el-upload
                   :action="baseUrl + '/resource/upload'"
                   :headers="headers"
-                  :data="{ pid: this.$route.params.id }"
+                  :data="{id: formData.id || '', pid: this.$route.params.id }"
                   :before-remove="removeFile"
                   :on-success="handleUploadSuccess"
                   :on-error="handleUploadError"
@@ -250,8 +250,8 @@ export default {
         this.$message.error(resp.desc)
       }
     },
-    handleUploadError() {
-      this.$message.error('Upload failed.')
+    handleUploadError(err) {
+      this.$message.error('Upload failed: ' + err.message)
     },
     openForm(row) {
       if (row.id) {

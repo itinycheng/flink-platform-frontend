@@ -10,6 +10,16 @@ export function getJobList(query) {
   })
 }
 
+export function getJobPage(query) {
+  return request({
+    url: `/jobInfo/page`,
+    method: 'get',
+    params: query
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function getJob(id) {
   return request({
     url: `/jobInfo/get/${id}`,

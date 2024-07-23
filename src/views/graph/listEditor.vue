@@ -48,7 +48,7 @@
       </el-button>
 
       <el-dropdown trigger="click" style="margin: 0 10px;" @command="handleCreate">
-        <el-button type="primary">
+        <el-button type="primary" icon="el-icon-edit">
           Create <i class="el-icon-arrow-down el-icon--right" />
         </el-button>
         <el-dropdown-menu slot="dropdown">
@@ -87,7 +87,7 @@
       </el-table-column>
       <el-table-column label="Description" min-width="300" align="center">
         <template slot-scope="{ row }">
-          <el-button type="text">{{ row.description }}</el-button>
+          <span>{{ row.description }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Flow Id" min-width="120" align="center">
@@ -128,6 +128,7 @@
             <el-button type="success" size="mini"> Action </el-button>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item :command="{row, toStatus: 'EDIT'}">Edit</el-dropdown-item>
+              <el-dropdown-item :command="{row, toStatus: 'RUN_ONCE'}">Run Once</el-dropdown-item>
               <el-dropdown-item :command="{row, toStatus: 'DELETE'}">Delete</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
@@ -148,11 +149,12 @@
 
 <script>
 import { getJobPage, updateJob, getJobRun } from '@/api/job'
-import { getStatusList } from '@/api/attr.js'
+import { getStatusList, getNodeClassification } from '@/api/attr.js'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import { pickerOptions } from '@/components/DatePicker/date-picker'
 import FormModel from '../form/formModel'
+import { runOnceFlow } from '@/api/job-flow'
 
 export default {
   name: 'ProjectList',
@@ -223,10 +225,16 @@ export default {
     },
     handleAction(data) {
       const { row, toStatus } = data
-      if (toStatus === 'EDIT') {
-        this.handleUpdate(row)
-      } else if (toStatus === 'DELETE') {
-        this.handleDelete(row)
+      switch (toStatus) {
+        case 'EDIT':
+          this.handleUpdate(row)
+          break
+        case 'DELETE':
+          this.handleDelete(row)
+          break
+        case 'RUN_ONCE':
+          this.handleRunOnce(row)
+          break
       }
     },
     handleCreate(data) {
@@ -245,10 +253,18 @@ export default {
       this.$refs.formModel.initFn(node)
       this.$refs.formModel.visible = true
     },
-    handleUpdate(row) {
-      row.getData = () => row
-      row.setData = (data) => Object.assign(this, data)
-      this.$refs.formModel.initFn(row)
+    async handleUpdate(row) {
+      var nodeData = {
+        id: row.id,
+        name: row.name,
+        precondition: row.precondition,
+        status: row.status,
+        type: await getNodeClassification(row.type)
+      }
+      nodeData.getData = () => nodeData
+      nodeData.setData = (data) => Object.assign(this, data)
+
+      this.$refs.formModel.initFn(nodeData)
       this.$refs.formModel.visible = true
     },
     handleDelete(row) {
@@ -265,6 +281,17 @@ export default {
             })
             this.getList()
           })
+      })
+    },
+    handleRunOnce(row) {
+      const { id, flowId } = row
+      if (!id || !flowId) {
+        this.$message.success(`Job run once failed, job_id=${id}`)
+      }
+
+      var data = { startJobId: row.id, strategy: 'ONLY_CUR_JOB' }
+      runOnceFlow(row.flowId, data).then((flowRunId) => {
+        this.$message.success(`Job run once Successfully, flow_run_id=${flowRunId}, job_id=${id}`)
       })
     },
     displayRowJson(id) {

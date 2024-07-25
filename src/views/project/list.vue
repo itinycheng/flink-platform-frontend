@@ -83,11 +83,6 @@
           <span>{{ row.description }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Type" min-width="80" align="left">
-        <template slot-scope="{ row }">
-          <span>{{ row.type }}</span>
-        </template>
-      </el-table-column>
       <el-table-column label="Crontab" min-width="100" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.cronExpr }}</span>

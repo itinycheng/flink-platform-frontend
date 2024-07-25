@@ -120,14 +120,14 @@ export default {
       this.getTimeoutStrategies()
       this.getJobFlowTypes()
       this.visible = true
-      var { id, name, cronExpr, description, timeout, config } = data
+      var { id, name, type, cronExpr, description, timeout, config } = data
       if (!timeout) {
         timeout = { enable: false }
       }
       if (!config) {
         config = {}
       }
-      this.formData = { id, name, cronExpr, description, timeout, config }
+      this.formData = { id, name, type, cronExpr, description, timeout, config }
     },
 
     getTimeoutStrategies() {

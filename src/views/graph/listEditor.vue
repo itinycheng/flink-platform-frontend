@@ -77,27 +77,37 @@
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <el-link type="primary" href="#" target="_blank">{{ row.id }}</el-link>
+          {{ row.id }}
         </template>
       </el-table-column>
-      <el-table-column label="Name" min-width="300" align="center">
+      <el-table-column label="Name" min-width="200" align="center">
         <template slot-scope="{ row }">
-          <el-button type="text">{{ row.name }}</el-button>
+          <el-button type="text" @click="handleAction({row, toStatus: 'EDIT'})">{{ row.name }}</el-button>
         </template>
       </el-table-column>
-      <el-table-column label="Description" min-width="300" align="center">
+      <el-table-column label="Description" min-width="250" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.description }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Flow Id" min-width="120" align="center">
+      <el-table-column label="Job Run" min-width="150" align="center">
+        <template slot-scope="{ row }">
+          <router-link
+            :to="{name: 'ProjectJobRuns', params: {id: row.jobRunId, flowRunId: row.flowRunId, timeRange: []}}"
+            class="link-type green-text"
+          >
+            {{ row.jobRunId }} - {{ row.jobRunStatus }}
+          </router-link>
+        </template>
+      </el-table-column>
+      <el-table-column label="Flow Id" min-width="100" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.flowId }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Type" min-width="100" align="center">
+      <el-table-column label="Type" min-width="120" align="center">
         <template slot-scope="{ row }">
-          <span>{{ row.type }}</span>
+          <span style="font-size: small;">{{ row.type }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Status" width="120" align="center">
@@ -129,7 +139,8 @@
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item :command="{row, toStatus: 'EDIT'}">Edit</el-dropdown-item>
               <el-dropdown-item :command="{row, toStatus: 'RUN_ONCE'}">Run Once</el-dropdown-item>
-              <el-dropdown-item :command="{row, toStatus: 'DELETE'}">Delete</el-dropdown-item>
+              <el-dropdown-item v-if="row.status !== 'DELETE'" :command="{row, toStatus: 'DELETE'}">Delete</el-dropdown-item>
+              <el-dropdown-item v-if="row.status === 'DELETE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -189,6 +200,7 @@ export default {
         id: undefined,
         name: undefined,
         flowId: undefined,
+        includeJobRuns: true,
         sort: '-id'
       }
     }
@@ -231,6 +243,9 @@ export default {
           break
         case 'DELETE':
           this.handleDelete(row)
+          break
+        case 'ONLINE':
+          this.handleOnline(row)
           break
         case 'RUN_ONCE':
           this.handleRunOnce(row)
@@ -283,6 +298,16 @@ export default {
           })
       })
     },
+    handleOnline(row) {
+      updateJob({ id: row.id, status: 'ONLINE' })
+        .then(result => {
+          this.$message({
+            message: 'Online successfully, job id=' + result,
+            type: 'success'
+          })
+          this.getList()
+        })
+    },
     handleRunOnce(row) {
       const { id, flowId } = row
       if (!id || !flowId) {
@@ -323,6 +348,10 @@ export default {
 </script>
 
 <style>
+.green-text {
+  color: #67C23A;
+}
+
 .filter-item {
   width: 200px;
   margin-right: 15px;

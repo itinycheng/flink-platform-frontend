@@ -17,12 +17,21 @@
             content="Edit params"
             placement="bottom"
           >
-            <i class="el-icon-notebook-2" @click="openParamDialog()" />
+            <i class="el-icon-tickets" @click="openParamDialog()" />
+          </el-tooltip>
+          <el-tooltip
+            v-if="!isLock"
+            class="item"
+            effect="dark"
+            content="Jobs"
+            placement="bottom"
+          >
+            <i class="el-icon-notebook-1" @click="showJobList()" />
           </el-tooltip>
           <el-tooltip
             class="item"
             effect="dark"
-            content="Press shift to select more"
+            content="Show all jobs of this workflow"
             placement="bottom"
           >
             <i class="el-icon-crop" />
@@ -97,6 +106,7 @@
 
     <FormModel ref="formModel" :disabled="isLock" />
     <EditParamDialog ref="editParamDialog" :disabled="isLock" />
+    <JobList ref="jobList" :disabled="isLock" @addNode="addNode" />
   </div>
 </template>
 
@@ -114,10 +124,11 @@ import nodeitem from './nodeItem.vue'
 import graphConfig from './config'
 import FormModel from '../form/formModel.vue'
 import EditParamDialog from './jobParams.vue'
+import JobList from './graphJobList.vue'
 
 export default {
   name: 'ProjectCreateDetail',
-  components: { NodeMenu, EdgeMenu, SideBar, FormModel, EditParamDialog },
+  components: { NodeMenu, EdgeMenu, SideBar, FormModel, EditParamDialog, JobList },
   data() {
     return {
       id: null,
@@ -527,6 +538,10 @@ export default {
     openParamDialog() {
       const data = { id: this.id, type: this.type }
       this.$refs.editParamDialog.init(data)
+    },
+    showJobList() {
+      const data = { id: this.id, type: this.type }
+      this.$refs.jobList.init(data)
     }
   }
 }

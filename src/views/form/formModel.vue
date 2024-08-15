@@ -603,12 +603,14 @@ export default {
           updateJob(newData).then(data => {
             this.modifyNode(data)
             this.$message.success('Job Updated, id=' + data.id)
+            this.$emit('callback')
             this.visible = false
           })
         } else {
           createJob(newData).then(data => {
             this.modifyNode(data)
             this.$message.success('Job Created, id=' + data.id)
+            this.$emit('callback')
             this.visible = false
           })
         }

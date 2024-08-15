@@ -75,7 +75,7 @@
       </el-table-column>
       <el-table-column label="Name" min-width="150" align="center">
         <template slot-scope="{ row }">
-          <router-link :to="(row.status === 'SCHEDULING' ? '/project/flow/show/': '/project/flow/edit/') + row.id" class="link-type">{{ row.name }}</router-link>
+          <router-link :to="getRoutePath(row)" class="link-type">{{ row.name }}</router-link>
         </template>
       </el-table-column>
       <el-table-column label="Description" min-width="200" align="left">
@@ -249,6 +249,11 @@ export default {
           this.listLoading = false
         }, 200)
       })
+    },
+    getRoutePath(row) {
+      return row.type === 'JOB_LIST'
+        ? '/project/flow/list/' + row.id
+        : (row.status === 'SCHEDULING' ? '/project/flow/show/' : '/project/flow/edit/') + row.id
     },
     handleFilter() {
       this.listQuery.page = 1

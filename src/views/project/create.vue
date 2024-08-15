@@ -10,30 +10,48 @@
       <el-form-item label="Project Name" prop="name" :label-width="labelWidth">
         <el-input v-model="formData.name" style="width: 90%" />
       </el-form-item>
-      <el-form-item label="Crontab" prop="cronExpr" :label-width="labelWidth">
-        <el-input v-model="formData.cronExpr" style="width: 90%" />
-      </el-form-item>
-      <el-form-item label="Parallel Tasks" prop="parallelism" :label-width="labelWidth">
-        <el-input v-model="formData.config.parallelism" type="number" min="1" style="width: 90%" />
-      </el-form-item>
-      <el-form-item label="Timeout" prop="timeout" :label-width="labelWidth">
-        <el-switch v-model="formData.timeout.enable" style="width: 6%;" />
+      <el-form-item label="Project Type" prop="type" :label-width="labelWidth">
         <el-select
-          v-model="formData.timeout.strategies"
-          style="width: 40%;margin-left: 2%;"
-          placeholder="timeout strategies"
-          multiple
-          clearable
+          v-model="formData.type"
+          style="width: 90%"
+          placeholder="workflow type"
         >
           <el-option
-            v-for="item in timeoutStrategies"
+            v-for="item in jobFlowTypes"
             :key="item.name"
             :label="item.name"
             :value="item.name"
           />
         </el-select>
-        <el-input v-model="formData.timeout.threshold" placeholder="Unit: s sec, m min, h hour, d day" style="width: 40%; margin-left: 2%;" />
       </el-form-item>
+
+      <template v-if="formData.type && formData.type === 'JOB_FLOW'">
+        <el-form-item label="Crontab" prop="cronExpr" :label-width="labelWidth">
+          <el-input v-model="formData.cronExpr" style="width: 90%" />
+        </el-form-item>
+        <el-form-item label="Parallel Tasks" prop="parallelism" :label-width="labelWidth">
+          <el-input v-model="formData.config.parallelism" type="number" min="1" style="width: 90%" />
+        </el-form-item>
+        <el-form-item label="Timeout" prop="timeout" :label-width="labelWidth">
+          <el-switch v-model="formData.timeout.enable" style="width: 6%;" />
+          <el-select
+            v-model="formData.timeout.strategies"
+            style="width: 40%;margin-left: 2%;"
+            placeholder="timeout strategies"
+            multiple
+            clearable
+          >
+            <el-option
+              v-for="item in timeoutStrategies"
+              :key="item.name"
+              :label="item.name"
+              :value="item.name"
+            />
+          </el-select>
+          <el-input v-model="formData.timeout.threshold" placeholder="Unit: s sec, m min, h hour, d day" style="width: 40%; margin-left: 2%;" />
+        </el-form-item>
+      </template>
+
       <el-form-item
         label="Description"
         prop="description"
@@ -63,8 +81,10 @@
     </el-table>
     <div slot="footer">
       <el-button @click.stop="cancelForm()">Cancel</el-button>
-      <el-button type="warning" @click.stop="getCrontab()">CronTab</el-button>
-      <el-button type="success" @click.stop="enterJobFlow()">Edit Workflow</el-button>
+      <template v-if="formData.type && formData.type === 'JOB_FLOW'">
+        <el-button type="warning" @click.stop="getCrontab()">CronTab</el-button>
+        <el-button type="success" @click.stop="enterJobFlow()">Edit Workflow</el-button>
+      </template>
       <el-button type="primary" @click.stop="submitForm()">Confirm</el-button>
     </div>
   </el-dialog>
@@ -81,11 +101,15 @@ export default {
       visible: false,
       labelWidth: '120px',
       timeoutStrategies: [],
+      jobFlowTypes: [],
       cronList: [],
       formData: { timeout: { enable: false }, config: {}},
       formRules: {
         name: [
           { required: true, message: 'Please enter name', trigger: 'blur' }
+        ],
+        type: [
+          { required: true, message: 'Please select workflow type', trigger: 'blur' }
         ]
       }
     }
@@ -94,21 +118,29 @@ export default {
     init(data = {}) {
       this.resetForm()
       this.getTimeoutStrategies()
+      this.getJobFlowTypes()
       this.visible = true
-      var { id, name, cronExpr, description, timeout, config } = data
+      var { id, name, type, cronExpr, description, timeout, config } = data
       if (!timeout) {
         timeout = { enable: false }
       }
       if (!config) {
         config = {}
       }
-      this.formData = { id, name, cronExpr, description, timeout, config }
+      this.formData = { id, name, type, cronExpr, description, timeout, config }
     },
 
     getTimeoutStrategies() {
       var data = { className: 'TimeoutStrategy' }
       getStatusList(data).then((result) => {
         this.timeoutStrategies = result
+      })
+    },
+
+    getJobFlowTypes() {
+      var data = { className: 'JobFlowType' }
+      getStatusList(data).then((result) => {
+        this.jobFlowTypes = result
       })
     },
 

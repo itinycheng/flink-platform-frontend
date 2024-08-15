@@ -71,6 +71,13 @@ export const constantRoutes = [
         meta: { title: 'Definition', icon: 'tree' }
       },
       {
+        path: 'flow/list/:id',
+        name: 'Project List',
+        component: () => import('@/views/graph/listEditor'),
+        meta: { title: 'Job List', icon: 'tree' },
+        hidden: true
+      },
+      {
         path: 'flow/:type/:id',
         name: 'Project Graph',
         component: () => import('@/views/graph/graphEditor'),

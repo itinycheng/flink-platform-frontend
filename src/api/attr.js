@@ -18,6 +18,15 @@ export function getNodeTypes(type) {
   })
 }
 
+export async function getNodeClassification(name) {
+  return await request({
+    url: `/attr/nodeClassification?jobType=${name}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function getDeployModes(type) {
   return request({
     url: `/attr/deployModes?type=${type}`,

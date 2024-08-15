@@ -224,6 +224,7 @@ export default {
       listQuery: {
         page: 1,
         size: 20,
+        id: undefined,
         name: undefined,
         status: undefined,
         flowRunId: undefined,
@@ -234,10 +235,12 @@ export default {
   },
 
   created() {
-    if (this.$route.params?.timeRange) {
-      this.listQuery.flowRunId = this.$route.params.flowRunId
-      this.listQuery.status = this.$route.params.status
-      this.timeRange = this.$route.params.timeRange
+    var params = this.$route.params
+    if (params) {
+      this.listQuery.id = params.id
+      this.listQuery.flowRunId = params.flowRunId
+      this.listQuery.status = params.status
+      this.timeRange = params.timeRange
     }
     this.getStatus()
     this.getList()

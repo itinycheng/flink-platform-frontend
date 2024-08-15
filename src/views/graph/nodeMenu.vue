@@ -7,8 +7,8 @@
     @select="handleSelect"
   >
     <el-menu-item index="edit">Edit</el-menu-item>
-    <el-menu-item index="delete">Delete</el-menu-item>
     <el-menu-item v-if="node.data && node.data.id" index="runOnce">RunOnce</el-menu-item>
+    <el-menu-item index="delete">Delete</el-menu-item>
   </el-menu>
 </template>
 

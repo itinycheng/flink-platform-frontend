@@ -10,6 +10,16 @@ export function getJobList(query) {
   })
 }
 
+export function getJobPage(query) {
+  return request({
+    url: `/jobInfo/page`,
+    method: 'get',
+    params: query
+  }).then(res => {
+    return res.data
+  })
+}
+
 export function getJob(id) {
   return request({
     url: `/jobInfo/get/${id}`,
@@ -39,9 +49,9 @@ export function updateJob(data) {
   })
 }
 
-export async function deleteJob(id) {
+export function purgeJob(id) {
   return request({
-    url: `/jobInfo/delete/${id}`,
+    url: `/jobInfo/purge/${id}`,
     method: 'get'
   }).then(res => {
     return res.data

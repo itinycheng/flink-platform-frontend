@@ -49,9 +49,9 @@ export function updateJob(data) {
   })
 }
 
-export async function deleteJob(id) {
+export function purgeJob(id) {
   return request({
-    url: `/jobInfo/delete/${id}`,
+    url: `/jobInfo/purge/${id}`,
     method: 'get'
   }).then(res => {
     return res.data

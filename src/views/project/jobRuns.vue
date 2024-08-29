@@ -240,7 +240,7 @@ export default {
       this.listQuery.id = params.id
       this.listQuery.flowRunId = params.flowRunId
       this.listQuery.status = params.status
-      this.timeRange = params.timeRange
+      this.timeRange = params.timeRange || this.timeRange
     }
     this.getStatus()
     this.getList()

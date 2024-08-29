@@ -98,7 +98,7 @@
             <el-form-item label="Tag Name" prop="name">
               <el-input v-model="formData.name" />
             </el-form-item>
-            <el-form-item label="Alert Type" prop="type">
+            <el-form-item label="Tag Type" prop="type">
               <el-select v-model="formData.type" style="width:100%" placeholder="Please select tag type">
                 <el-option
                   v-for="item in tagTypeList"

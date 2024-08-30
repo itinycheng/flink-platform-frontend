@@ -122,7 +122,7 @@ export default {
 
   methods: {
     init(data = {}) {
-      if (this.disabled) {
+      if (data.type === 'instance') {
         return
       }
 

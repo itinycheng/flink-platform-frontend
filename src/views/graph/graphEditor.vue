@@ -20,7 +20,6 @@
             <i class="el-icon-tickets" @click="openParamDialog()" />
           </el-tooltip>
           <el-tooltip
-            v-if="!isLock"
             class="item"
             effect="dark"
             content="Jobs"

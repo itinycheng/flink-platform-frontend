@@ -71,15 +71,15 @@ export const constantRoutes = [
         meta: { title: 'Definition', icon: 'tree' }
       },
       {
-        path: 'flow/list/:id',
-        name: 'Project List',
+        path: 'list/:id',
+        name: 'ProjectList',
         component: () => import('@/views/graph/listEditor'),
         meta: { title: 'Job List', icon: 'tree' },
         hidden: true
       },
       {
         path: 'flow/:type/:id',
-        name: 'Project Graph',
+        name: 'ProjectGraph',
         component: () => import('@/views/graph/graphEditor'),
         meta: { title: 'Flow', icon: 'tree' },
         hidden: true
@@ -91,7 +91,14 @@ export const constantRoutes = [
         meta: { title: 'Instances', icon: 'tree' }
       },
       {
-        path: 'jobRuns',
+        path: 'instance/:flowRunId',
+        name: 'ProjectInstanceDetail',
+        component: () => import('@/views/project/jobRuns'),
+        meta: { title: 'Job Runs', icon: 'tree' },
+        hidden: true
+      },
+      {
+        path: 'jobRun',
         name: 'ProjectJobRuns',
         component: () => import('@/views/project/jobRuns'),
         meta: { title: 'Job Runs', icon: 'tree' }

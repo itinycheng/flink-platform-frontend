@@ -79,7 +79,7 @@
         :class-name="getSortClass('id')"
       >
         <template slot-scope="{ row }">
-          <router-link :to="{name: 'ProjectJobRuns', params: {flowRunId: row.id, timeRange: timeRange}}" class="link-type">
+          <router-link :to="{name: 'ProjectInstanceDetail', params: {flowRunId: row.id, timeRange: timeRange}}" class="link-type">
             {{ row.id }}
           </router-link>
         </template>

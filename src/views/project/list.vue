@@ -252,7 +252,7 @@ export default {
     },
     getRoutePath(row) {
       return row.type === 'JOB_LIST'
-        ? '/project/flow/list/' + row.id
+        ? '/project/list/' + row.id
         : (row.status === 'SCHEDULING' ? '/project/flow/show/' : '/project/flow/edit/') + row.id
     },
     handleFilter() {

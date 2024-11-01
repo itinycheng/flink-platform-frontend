@@ -93,7 +93,7 @@
       <el-table-column label="Job Run" min-width="150" align="center">
         <template slot-scope="{ row }">
           <router-link
-            :to="{name: 'ProjectJobRuns', params: {id: row.jobRunId, flowRunId: row.flowRunId, timeRange: []}}"
+            :to="{name: 'ProjectJobRunId', params: {id: row.jobRunId, flowRunId: row.flowRunId, timeRange: []}}"
             class="link-type green-text"
           >
             {{ row.jobRunId }} - {{ row.jobRunStatus }}

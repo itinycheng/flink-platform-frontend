@@ -470,7 +470,7 @@ export default {
             message: 'Flow Updated, id=' + result,
             type: 'success'
           })
-          this.$router.push('/project/list')
+          this.$router.push('/project/definitions')
         }
       )
     },

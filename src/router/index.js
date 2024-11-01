@@ -60,15 +60,15 @@ export const constantRoutes = [
   {
     path: '/project',
     component: Layout,
-    redirect: '/project/list',
+    redirect: '/project/definitions',
     name: 'Project',
     meta: { title: 'Project', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'list',
-        name: 'List',
-        component: () => import('@/views/project/list'),
-        meta: { title: 'Definition', icon: 'tree' }
+        path: 'definitions',
+        name: 'Definitions',
+        component: () => import('@/views/project/definitions'),
+        meta: { title: 'Definitions', icon: 'tree' }
       },
       {
         path: 'list/:id',
@@ -85,23 +85,30 @@ export const constantRoutes = [
         hidden: true
       },
       {
-        path: 'instance',
-        name: 'ProjectInstance',
+        path: 'instances',
+        name: 'ProjectInstances',
         component: () => import('@/views/project/instances'),
         meta: { title: 'Instances', icon: 'tree' }
       },
       {
         path: 'instance/:flowRunId',
-        name: 'ProjectInstanceDetail',
+        name: 'ProjectInstanceId',
         component: () => import('@/views/project/jobRuns'),
         meta: { title: 'Job Runs', icon: 'tree' },
         hidden: true
       },
       {
-        path: 'jobRun',
+        path: 'jobRuns',
         name: 'ProjectJobRuns',
         component: () => import('@/views/project/jobRuns'),
         meta: { title: 'Job Runs', icon: 'tree' }
+      },
+      {
+        path: 'jobRun/:id',
+        name: 'ProjectJobRunId',
+        component: () => import('@/views/project/jobRuns'),
+        meta: { title: 'Job Runs', icon: 'tree' },
+        hidden: true
       }
     ]
   },

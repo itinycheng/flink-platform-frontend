@@ -211,7 +211,7 @@ export default {
   data() {
     return {
       // time range
-      timeRange: calcTimeRangeToNow(-1),
+      timeRange: [],
       pickerOptions: pickerOptions,
       // dialog
       dialogVisible: false,
@@ -235,12 +235,14 @@ export default {
   },
 
   created() {
-    var params = this.$route.params
-    if (params) {
-      this.listQuery.id = params.id
-      this.listQuery.flowRunId = params.flowRunId
-      this.listQuery.status = params.status
-      this.timeRange = params.timeRange || this.timeRange
+    var query = this.$route.query
+    if (query) {
+      this.listQuery.id = query.id
+      this.listQuery.flowRunId = query.flowRunId
+      this.listQuery.status = query.status
+      if (!query.id) {
+        this.timeRange = query.timeRange || calcTimeRangeToNow(-1)
+      }
     }
     this.getStatus()
     this.getList()

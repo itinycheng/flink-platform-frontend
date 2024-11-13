@@ -111,7 +111,7 @@
         </template>
 
         <!-- sql -->
-        <template v-if="formData.type === 'CLICKHOUSE_SQL'">
+        <template v-if="formData.type === 'CLICKHOUSE_SQL' || formData.type === 'MYSQL_SQL' || formData.type === 'HIVE_SQL'">
           <el-form-item label="DataSource" prop="config.dsId">
             <el-select
               v-model="formData.config.dsId"

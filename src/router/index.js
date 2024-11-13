@@ -60,33 +60,33 @@ export const constantRoutes = [
   {
     path: '/project',
     component: Layout,
-    redirect: '/project/list',
+    redirect: '/project/definitions',
     name: 'Project',
     meta: { title: 'Project', icon: 'el-icon-s-help' },
     children: [
       {
-        path: 'list',
-        name: 'List',
-        component: () => import('@/views/project/list'),
-        meta: { title: 'Definition', icon: 'tree' }
+        path: 'definitions',
+        name: 'Definitions',
+        component: () => import('@/views/project/definitions'),
+        meta: { title: 'Definitions', icon: 'tree' }
       },
       {
-        path: 'flow/list/:id',
-        name: 'Project List',
+        path: 'list/:id',
+        name: 'ProjectList',
         component: () => import('@/views/graph/listEditor'),
         meta: { title: 'Job List', icon: 'tree' },
         hidden: true
       },
       {
         path: 'flow/:type/:id',
-        name: 'Project Graph',
+        name: 'ProjectGraph',
         component: () => import('@/views/graph/graphEditor'),
         meta: { title: 'Flow', icon: 'tree' },
         hidden: true
       },
       {
-        path: 'instance',
-        name: 'ProjectInstance',
+        path: 'instances',
+        name: 'ProjectInstances',
         component: () => import('@/views/project/instances'),
         meta: { title: 'Instances', icon: 'tree' }
       },

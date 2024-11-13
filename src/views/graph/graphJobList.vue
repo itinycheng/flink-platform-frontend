@@ -1,77 +1,81 @@
 <template>
-  <el-drawer
-    title="Job List"
-    :visible.sync="visible"
-    :destroy-on-close="true"
-    :wrapper-closable="false"
-    :modal="true"
-    :modal-append-to-body="true"
-    size="40%"
-  >
-    <el-table
-      v-loading="listLoading"
-      :data="list"
-      border
-      fit
-      highlight-current-row
-      style="width: 100%"
-      @sort-change="sortChange"
+  <div>
+    <el-drawer
+      title="Job List"
+      :visible.sync="visible"
+      :destroy-on-close="true"
+      :wrapper-closable="false"
+      :modal="true"
+      :modal-append-to-body="true"
+      size="40%"
     >
-      <el-table-column
-        label="ID"
-        prop="id"
-        sortable="custom"
-        align="center"
-        width="80"
-        :class-name="getSortClass('id')"
+      <el-table
+        v-loading="listLoading"
+        :data="list"
+        border
+        fit
+        highlight-current-row
+        style="width: 100%"
+        @sort-change="sortChange"
       >
-        <template slot-scope="{ row }">
-          {{ row.id }}
-        </template>
-      </el-table-column>
-      <el-table-column label="Name" min-width="200" align="center">
-        <template slot-scope="{ row }">
-          <el-button type="text">{{ row.name }}</el-button>
-        </template>
-      </el-table-column>
-      <el-table-column label="Status" width="120" align="center">
-        <template slot-scope="{ row }">
-          <el-tag :type="row.status | statusFilter">
-            {{ row.status }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column label="Create Time" min-width="160" align="center">
-        <template slot-scope="{ row }">
-          {{ row.createTime }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        label="Actions"
-        align="center"
-        width="120"
-        class-name="small-padding fixed-width"
-      >
-        <template slot-scope="{ row }">
-          <el-dropdown trigger="click" :disabled="disabled" style="margin: 0 10px;" @command="handleAction">
-            <el-button type="success" size="mini"> Action </el-button>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item :command="{row, toStatus: 'APPEND'}">Append</el-dropdown-item>
-              <el-dropdown-item :command="{row, toStatus: 'PURGE'}">Purge</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
-        </template>
-      </el-table-column>
-    </el-table>
+        <el-table-column
+          label="ID"
+          prop="id"
+          sortable="custom"
+          align="center"
+          width="80"
+          :class-name="getSortClass('id')"
+        >
+          <template slot-scope="{ row }">
+            {{ row.id }}
+          </template>
+        </el-table-column>
+        <el-table-column label="Name" min-width="200" align="center">
+          <template slot-scope="{ row }">
+            <el-button type="text">{{ row.name }}</el-button>
+          </template>
+        </el-table-column>
+        <el-table-column label="Status" width="120" align="center">
+          <template slot-scope="{ row }">
+            <el-tag :type="row.status | statusFilter">
+              {{ row.status }}
+            </el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="Create Time" min-width="160" align="center">
+          <template slot-scope="{ row }">
+            {{ row.createTime }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="Actions"
+          align="center"
+          width="120"
+          class-name="small-padding fixed-width"
+        >
+          <template slot-scope="{ row }">
+            <el-dropdown trigger="click" :disabled="disabled" style="margin: 0 10px;" @command="handleAction">
+              <el-button type="success" size="mini"> Action </el-button>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item :command="{row, toStatus: 'APPEND'}">Append</el-dropdown-item>
+                <el-dropdown-item :command="{row, toStatus: 'SEND_TO'}">SendTo</el-dropdown-item>
+                <el-dropdown-item :command="{row, toStatus: 'PURGE'}">Purge</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </template>
+        </el-table-column>
+      </el-table>
 
-    <pagination
-      v-show="total > 0"
-      :total="total"
-      :page.sync="listQuery.page"
-      :limit.sync="listQuery.size"
-      @pagination="getList"
-    />
-  </el-drawer>
+      <pagination
+        v-show="total > 0"
+        :total="total"
+        :page.sync="listQuery.page"
+        :limit.sync="listQuery.size"
+        @pagination="getList"
+      />
+    </el-drawer>
+    <EditFlowIdOfJob ref="editFlowIdOfJob" @getList="getList" />
+  </div>
 </template>
 
 <script>
@@ -80,10 +84,11 @@ import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import graphConfig from './config'
 import { getNodeClassification } from '@/api/attr.js'
+import EditFlowIdOfJob from './editFlowIdOfJob.vue'
 
 export default {
   name: 'ProjectList',
-  components: { Pagination },
+  components: { Pagination, EditFlowIdOfJob },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -150,6 +155,9 @@ export default {
         case 'APPEND':
           this.handleAppend(row)
           break
+        case 'SEND_TO':
+          this.handleSendTo(row)
+          break
         case 'PURGE':
           this.handlePurge(row)
           break
@@ -173,6 +181,9 @@ export default {
           precondition: 'AND'
         }
       })
+    },
+    handleSendTo(row) {
+      this.$refs.editFlowIdOfJob.init(row)
     },
     handlePurge(row) {
       this.$confirm(`Purge job [${row.id}, ${row.name}] completely?`, 'Warning', {

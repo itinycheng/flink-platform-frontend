@@ -37,7 +37,7 @@
               width="180"
             >
               <template slot-scope="scope">
-                <router-link :to="{name: 'ProjectInstance', params: {status: scope.row.status, timeRange: getTimeRange()}}" class="link-type">
+                <router-link :to="{name: 'ProjectInstances', params: {status: scope.row.status, timeRange: getTimeRange()}}" class="link-type">
                   {{ scope.row.count }}
                 </router-link>
               </template>

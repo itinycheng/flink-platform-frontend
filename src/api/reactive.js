@@ -3,7 +3,7 @@ import request from '@/utils/request'
 export function getJobToDbTypeMap() {
   return request({
     url: `/reactive/jobToDbTypes`,
-    method: 'get',
+    method: 'get'
   }).then(res => {
     return res.data
   })

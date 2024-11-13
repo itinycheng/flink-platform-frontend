@@ -18,7 +18,7 @@ service.interceptors.request.use(
     // ['X-Token'] is a custom headers key
     // please modify it according to the actual situation
     var token = getToken()
-    if(token) {
+    if (token) {
       config.headers['X-Token'] = token
     }
     return config

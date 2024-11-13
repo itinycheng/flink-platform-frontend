@@ -15,8 +15,8 @@ export function removeToken() {
 }
 
 import axios from 'axios'
-const x2js = require('x2js')
-const x2jsone = new x2js() // 实例
+const X2js = require('x2js')
+const x2jsOne = new X2js() // 实例
 
 export async function validTicket(href) {
   if (getToken()) {
@@ -40,7 +40,7 @@ async function getUsername(ticket) {
   var result = false
   var url = process.env.VUE_APP_SSO_URL + '/serviceValidate?service=' + process.env.VUE_APP_SERVER_URL + '&ticket=' + ticket
   await axios.get(url).then(res => {
-    var xml = x2jsone.xml2js(res.data)
+    var xml = x2jsOne.xml2js(res.data)
     if (xml.serviceResponse.authenticationFailure) {
       window.location.href = process.env.VUE_APP_SSO_URL + '/login?service=' + process.env.VUE_APP_SERVER_URL
     }

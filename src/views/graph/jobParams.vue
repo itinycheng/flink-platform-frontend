@@ -103,7 +103,7 @@ export default {
         return
       }
 
-      this.flowId = data.id
+      this.flowId = data.flowId
       this.resetForm()
       this.initStatusList()
       this.refreshParamList()

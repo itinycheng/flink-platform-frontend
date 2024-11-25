@@ -8,8 +8,9 @@
         value-format="yyyy-MM-dd HH:mm:ss"
         :picker-options="pickerOptions"
         range-separator="-"
-        start-placeholder="Start date"
-        end-placeholder="End date"
+        start-placeholder="Start endTime"
+        end-placeholder="End endTime"
+        :default-time="['00:00:00', '23:59:59']"
         align="right"
         @change="refresh"
       />

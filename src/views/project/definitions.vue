@@ -2,6 +2,13 @@
   <div class="app-container">
     <div class="filter-container" style="margin-bottom: 10px">
       <el-input
+        v-model="listQuery.id"
+        type="number"
+        placeholder="ID"
+        class="filter-item"
+        @keyup.enter.native="handleFilter"
+      />
+      <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
@@ -15,6 +22,19 @@
       >
         <el-option
           v-for="item in statusList"
+          :key="item.name"
+          :label="item.name"
+          :value="item.name"
+        />
+      </el-select>
+      <el-select
+        v-model="listQuery.type"
+        placeholder="Type"
+        clearable
+        class="filter-item"
+      >
+        <el-option
+          v-for="item in typeList"
           :key="item.name"
           :label="item.name"
           :value="item.name"
@@ -133,7 +153,7 @@
               <el-dropdown-item :command="{row, toStatus: 'ALERT'}">Edit Alert</el-dropdown-item>
               <el-dropdown-item :command="{row, toStatus: 'TAG'}">Edit Tag</el-dropdown-item>
               <el-dropdown-item :command="{row, toStatus: 'COPY'}">Copy Workflow</el-dropdown-item>
-              <el-dropdown-item v-if="row.type === 'JOB_FLOW' && row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
+              <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'SCHEDULING'" :command="{row, toStatus: 'STOP_SCHED'}">Stop Sched</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'OFFLINE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
               <el-dropdown-item v-if="row.type === 'JOB_FLOW' && row.status === 'ONLINE'" :command="{row, toStatus: 'OFFLINE'}">Offline</el-dropdown-item>
@@ -206,6 +226,7 @@ export default {
     return {
       statusList: [],
       tagList: [],
+      typeList: [],
       tableKey: 0,
       list: null,
       total: 0,
@@ -213,7 +234,9 @@ export default {
       listQuery: {
         page: 1,
         size: 20,
+        id: null,
         name: undefined,
+        type: undefined,
         status: undefined,
         sort: '-id'
       }
@@ -223,6 +246,7 @@ export default {
   created() {
     this.getStatus()
     this.getTags()
+    this.getTypes()
     this.getList()
   },
 
@@ -230,6 +254,12 @@ export default {
     getTags() {
       getTagList().then((result) => {
         this.tagList = result
+      })
+    },
+    getTypes() {
+      var data = { className: 'JobFlowType' }
+      getStatusList(data).then((result) => {
+        this.typeList = result
       })
     },
     getStatus() {

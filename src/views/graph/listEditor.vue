@@ -57,6 +57,11 @@
           <el-dropdown-item :command="{type: 'SQL'}">SQL</el-dropdown-item>
         </el-dropdown-menu>
       </el-dropdown>
+      <el-button
+        type="primary"
+        icon="el-icon-edit"
+        @click="openParamDialog()"
+      />
     </div>
 
     <el-table
@@ -155,6 +160,7 @@
       @pagination="getList"
     />
     <FormModel ref="formModel" :disabled="false" @callback="getList" />
+    <EditParamDialog ref="editParamDialog" :disabled="false" />
   </div>
 </template>
 
@@ -167,9 +173,11 @@ import { pickerOptions } from '@/components/DatePicker/date-picker'
 import FormModel from '../form/formModel'
 import { runOnceFlow } from '@/api/job-flow'
 
+import EditParamDialog from './jobParams.vue'
+
 export default {
   name: 'ProjectList',
-  components: { Pagination, FormModel },
+  components: { Pagination, FormModel, EditParamDialog },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -267,6 +275,10 @@ export default {
       }
       this.$refs.formModel.initFn(node)
       this.$refs.formModel.visible = true
+    },
+    openParamDialog() {
+      const data = { flowId: this.listQuery.flowId, type: '' }
+      this.$refs.editParamDialog.init(data)
     },
     async handleUpdate(row) {
       var nodeData = {

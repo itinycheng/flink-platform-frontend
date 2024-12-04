@@ -38,7 +38,7 @@ export function getDeployModes(type) {
 
 export function getStatusList(query) {
   return request({
-    url: '/attr/list',
+    url: '/attr/enums',
     method: 'get',
     params: query
   }).then(res => {

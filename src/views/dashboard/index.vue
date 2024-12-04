@@ -38,7 +38,7 @@
               width="180"
             >
               <template slot-scope="scope">
-                <router-link :to="{name: 'ProjectInstances', params: {status: scope.row.status, timeRange: getTimeRange()}}" class="link-type">
+                <router-link :to="{name: 'ProjectInstances', query: {status: scope.row.status, timeRange: getTimeRange()}}" class="link-type">
                   {{ scope.row.count }}
                 </router-link>
               </template>
@@ -62,7 +62,7 @@
               width="180"
             >
               <template slot-scope="scope">
-                <router-link :to="{name: 'ProjectJobRuns', params: {status: scope.row.status, timeRange: getTimeRange()}}" class="link-type">
+                <router-link :to="{name: 'ProjectJobRuns', query: {status: scope.row.status, timeRange: getTimeRange()}}" class="link-type">
                   {{ scope.row.count }}
                 </router-link>
               </template>

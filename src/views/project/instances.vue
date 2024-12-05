@@ -214,9 +214,10 @@ export default {
   },
 
   created() {
-    if (this.$route.params?.status) {
-      this.listQuery.status = this.$route.params.status
-      this.timeRange = this.$route.params.timeRange
+    var query = this.$route.query
+    if (query) {
+      this.listQuery.status = query.status
+      this.timeRange = query.timeRange || this.timeRange
     }
     this.getStatus()
     this.getTags()

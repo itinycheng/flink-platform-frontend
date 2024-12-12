@@ -139,7 +139,7 @@
       </el-table-column>
       <el-table-column label="Stop Time" min-width="160" align="center">
         <template slot-scope="{ row }">
-          {{ row.stopTime }}
+          {{ row.endTime }}
         </template>
       </el-table-column>
       <el-table-column label="Create Time" min-width="160" align="center">

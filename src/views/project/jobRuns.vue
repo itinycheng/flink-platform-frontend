@@ -6,13 +6,13 @@
         type="number"
         placeholder="ID"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-select
         v-model="listQuery.status"
@@ -31,13 +31,13 @@
         v-model="listQuery.flowRunId"
         placeholder="Flow Run Id"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-input
         v-model="listQuery.jobId"
         placeholder="Job Id"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-date-picker
         v-model="timeRange"
@@ -55,7 +55,7 @@
         v-waves
         type="primary"
         icon="el-icon-search"
-        @click.stop="handleFilter"
+        @click.stop="handleSearch"
       >
         Search
       </el-button>
@@ -187,6 +187,7 @@
 <script>
 import { getJobRunPage, killJobRun, getJobRun } from '@/api/job'
 import { getStatusList } from '@/api/attr'
+import { rewriteUrl } from '@/utils/url.js'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import JsonViewer from 'vue-json-viewer'
@@ -222,29 +223,16 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        size: 20,
-        id: undefined,
-        name: undefined,
-        status: undefined,
-        flowRunId: undefined,
-        jobId: undefined,
-        sort: '-id'
-      }
+      listQuery: this.getDefaultQuery()
     }
   },
 
+  watch: {
+    '$route.query': 'onRouteQueryChange'
+  },
+
   created() {
-    var query = this.$route.query
-    if (query) {
-      this.listQuery.id = query.id
-      this.listQuery.flowRunId = query.flowRunId
-      this.listQuery.status = query.status
-      if (!query.id) {
-        this.timeRange = query.timeRange || calcTimeRangeToNow(-1)
-      }
-    }
+    this.initListQuery()
     this.getStatus()
     this.getList()
   },
@@ -279,9 +267,9 @@ export default {
         }, 200)
       })
     },
-    handleFilter() {
+    handleSearch() {
       this.listQuery.page = 1
-      this.getList()
+      rewriteUrl(this.$router, this.$route, this.listQuery)
     },
     handleMore(data) {
       const { row, toStatus } = data
@@ -309,11 +297,43 @@ export default {
       } else {
         this.listQuery.sort = '-id'
       }
-      this.handleFilter()
+      this.handleSearch()
     },
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
+    },
+    onRouteQueryChange() {
+      this.initListQuery()
+      this.getList()
+    },
+    initListQuery() {
+      var query = this.$route.query
+      if (query) {
+        const { timeRange, ...restQuery } = query
+        this.listQuery = {
+          ...this.getDefaultQuery(),
+          ...restQuery,
+          page: parseInt(query.page) || 1,
+          size: parseInt(query.size) || 20
+        }
+
+        if (!query.id) {
+          this.timeRange = timeRange || calcTimeRangeToNow(-1)
+        }
+      }
+    },
+    getDefaultQuery() {
+      return {
+        page: 1,
+        size: 20,
+        id: undefined,
+        name: undefined,
+        status: undefined,
+        flowRunId: undefined,
+        jobId: undefined,
+        sort: '-id'
+      }
     }
   }
 }

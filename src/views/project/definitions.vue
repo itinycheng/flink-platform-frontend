@@ -6,13 +6,13 @@
         type="number"
         placeholder="ID"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-select
         v-model="listQuery.status"
@@ -57,7 +57,7 @@
         v-waves
         type="primary"
         icon="el-icon-search"
-        @click.stop="handleFilter"
+        @click.stop="handleSearch"
       >
         Search
       </el-button>
@@ -200,6 +200,7 @@
 import { getFlowPage, updateFlow, purgeFlow, copyFlow, stopSchedFlow, runOnceFlow } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import { getTagList } from '@/api/tag'
+import { rewriteUrl } from '@/utils/url.js'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import ProjectCreateDialog from './create.vue'
@@ -231,16 +232,12 @@ export default {
       list: null,
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        size: 20,
-        id: null,
-        name: undefined,
-        type: undefined,
-        status: undefined,
-        sort: '-id'
-      }
+      listQuery: this.getDefaultQuery()
     }
+  },
+
+  watch: {
+    '$route.query': 'onRouteQueryChange'
   },
 
   created() {
@@ -285,9 +282,9 @@ export default {
         ? '/project/list/' + row.id
         : (row.status === 'SCHEDULING' ? '/project/flow/show/' : '/project/flow/edit/') + row.id
     },
-    handleFilter() {
+    handleSearch() {
       this.listQuery.page = 1
-      this.getList()
+      rewriteUrl(this.$router, this.$route, this.listQuery)
     },
     async handleMore(data) {
       const { row, toStatus } = data
@@ -353,7 +350,7 @@ export default {
       } else {
         this.listQuery.sort = '-id'
       }
-      this.handleFilter()
+      this.handleSearch()
     },
     handleCreate() {
       this.$refs.createDialog.init()
@@ -397,6 +394,32 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
+    },
+    onRouteQueryChange() {
+      this.initListQuery()
+      this.getList()
+    },
+    initListQuery() {
+      var query = this.$route.query
+      if (query) {
+        this.listQuery = {
+          ...this.getDefaultQuery(),
+          ...query,
+          page: parseInt(query.page) || 1,
+          size: parseInt(query.size) || 20
+        }
+      }
+    },
+    getDefaultQuery() {
+      return {
+        page: 1,
+        size: 20,
+        id: null,
+        name: undefined,
+        type: undefined,
+        status: undefined,
+        sort: '-id'
+      }
     }
   }
 }

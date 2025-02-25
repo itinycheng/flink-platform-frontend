@@ -6,13 +6,13 @@
         type="number"
         placeholder="ID"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-input
         v-model="listQuery.name"
         placeholder="Name"
         class="filter-item"
-        @keyup.enter.native="handleFilter"
+        @keyup.enter.native="handleSearch"
       />
       <el-select
         v-model="listQuery.status"
@@ -56,7 +56,7 @@
         v-waves
         type="primary"
         icon="el-icon-search"
-        @click.stop="handleFilter"
+        @click.stop="handleSearch"
       >
         Search
       </el-button>
@@ -167,6 +167,7 @@
 import { getFlowRunPage, updateFlowRun, killFlowRun } from '@/api/job-flow'
 import { getStatusList } from '@/api/attr'
 import { getTagList } from '@/api/tag'
+import { rewriteUrl } from '@/utils/url.js'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
 import { pickerOptions, calcTimeRangeToNow } from '@/components/DatePicker/date-picker'
@@ -191,34 +192,21 @@ export default {
   },
   data() {
     return {
-      // time range
       timeRange: calcTimeRangeToNow(-1),
       pickerOptions: pickerOptions,
-      // list
       listStatus: [],
       tagList: [],
       list: null,
       total: 0,
       listLoading: true,
-      listQuery: {
-        page: 1,
-        size: 20,
-        id: null,
-        name: undefined,
-        status: undefined,
-        startTime: undefined,
-        endTime: undefined,
-        sort: '-id'
-      }
+      listQuery: this.getDefaultQuery()
     }
   },
-
+  watch: {
+    '$route.query': 'onRouteQueryChange'
+  },
   created() {
-    var query = this.$route.query
-    if (query) {
-      this.listQuery.status = query.status
-      this.timeRange = query.timeRange || this.timeRange
-    }
+    this.initListQuery()
     this.getStatus()
     this.getTags()
     this.getList()
@@ -249,9 +237,9 @@ export default {
         }, 200)
       })
     },
-    handleFilter() {
+    handleSearch() {
       this.listQuery.page = 1
-      this.getList()
+      rewriteUrl(this.$router, this.$route, this.listQuery)
     },
     handleMore(data) {
       const { row, toStatus } = data
@@ -278,11 +266,41 @@ export default {
       } else {
         this.listQuery.sort = '-id'
       }
-      this.handleFilter()
+      this.handleSearch()
     },
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
+    },
+    onRouteQueryChange() {
+      this.initListQuery()
+      this.getList()
+    },
+    initListQuery() {
+      var query = this.$route.query
+      if (query) {
+        const { timeRange, ...restQuery } = query
+        this.listQuery = {
+          ...this.getDefaultQuery(),
+          ...restQuery,
+          page: parseInt(query.page) || 1,
+          size: parseInt(query.size) || 20
+        }
+
+        this.timeRange = timeRange || this.timeRange
+      }
+    },
+    getDefaultQuery() {
+      return {
+        page: 1,
+        size: 20,
+        id: null,
+        name: undefined,
+        status: undefined,
+        startTime: undefined,
+        endTime: undefined,
+        sort: '-id'
+      }
     }
   }
 }

@@ -237,14 +237,17 @@ export default {
   },
 
   watch: {
-    '$route.query': 'onRouteQueryChange'
+    '$route.query': {
+      handler: 'updateQueryAndGetList',
+      immediate: false
+    }
   },
 
-  created() {
-    this.getStatus()
-    this.getTags()
-    this.getTypes()
-    this.getList()
+  async created() {
+    await this.getStatus()
+    await this.getTags()
+    await this.getTypes()
+    this.updateQueryAndGetList()
   },
 
   methods: {
@@ -395,7 +398,7 @@ export default {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     },
-    onRouteQueryChange() {
+    updateQueryAndGetList() {
       this.initListQuery()
       this.getList()
     },

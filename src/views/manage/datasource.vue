@@ -95,8 +95,17 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row, $index }">
-          <el-button type="success" size="mini" @click="openForm(row)"> Edit </el-button>
-          <el-button type="danger" size="mini" @click="deleteRow(row, $index)"> Delete </el-button>
+          <el-button type="primary" size="mini" @click="openForm(row)"> Edit </el-button>
+          <el-dropdown trigger="click" style="margin: 0 10px;" @command="handleActions">
+            <el-button size="mini" type="success">
+              Actions
+            </el-button>
+            <el-dropdown-menu slot="dropdown">
+              <el-dropdown-item :command="{row, $index, action: 'TEST'}">Test</el-dropdown-item>
+              <el-dropdown-item :command="{row, $index, action: 'DELETE'}">Delete</el-dropdown-item>
+            </el-dropdown-menu>
+          </el-dropdown>
+
         </template>
       </el-table-column>
     </el-table>
@@ -144,7 +153,7 @@
 </template>
 
 <script>
-import { getDataSource, getDataSourcePage, createDataSource, updateDataSource, deleteDataSource } from '@/api/datasource'
+import { getDataSource, getDataSourcePage, createDataSource, updateDataSource, deleteDataSource, testConnection } from '@/api/datasource'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -217,6 +226,23 @@ export default {
     },
     resetForm() {
       this.formData = { }
+    },
+    handleActions(data) {
+      const { row, $index, action } = data
+      switch (action) {
+        case 'DELETE':
+          this.deleteRow(row, $index)
+          break
+        case 'TEST':
+          testConnection(row.id).then(result => {
+            if (result) {
+              this.$message.success(`Test Connection [${row.name}] Successfully`)
+            } else {
+              this.$message.error(`Test Connection [${row.name}] Failed`)
+            }
+          })
+          break
+      }
     },
     submitForm() {
       const params = JSON.parse(this.formData.params || '{}')

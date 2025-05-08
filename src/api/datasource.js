@@ -57,3 +57,12 @@ export function deleteDataSource(id) {
     return res.data
   })
 }
+
+export function testConnection(id) {
+  return request({
+    url: `/datasource/test/${id}`,
+    method: 'get'
+  }).then(res => {
+    return res.data
+  })
+}

@@ -77,6 +77,9 @@
           <el-form-item label="Retry Interval" prop="config.retryInterval">
             <el-input v-model="formData.config.retryInterval" placeholder="Unit: s sec, m min, h hour, d day" />
           </el-form-item>
+          <el-form-item label="Timeout" prop="config.timeout">
+            <el-input v-model="formData.config.timeout" placeholder="Unit: s sec, m min, h hour, d day" />
+          </el-form-item>
 
           <el-form-item label="Variables" prop="variables">
             <el-input v-model="formData.variables" placeholder="{'k1': 'v1', ...}" />
@@ -148,9 +151,6 @@
 
           <template v-if="nodeType === 'SHELL'">
             <!-- shell -->
-            <el-form-item label="Timeout" prop="config.timeout">
-              <el-input v-model="formData.config.timeout" placeholder="Unit: s sec, m min, h hour, d day" />
-            </el-form-item>
             <el-form-item label="Script" prop="subject">
               <CodeEditor
                 ref="codeEditor"

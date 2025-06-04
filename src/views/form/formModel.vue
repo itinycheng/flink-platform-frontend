@@ -422,9 +422,7 @@ export default {
         }],
         'config.relation': [{
           required: true, message: 'Please choose dependent relation', trigger: 'change'
-        }],
-        'config.timeout': [
-          { required: true, message: 'Please enter timeout', trigger: 'change' }]
+        }]
       }
     }
   },

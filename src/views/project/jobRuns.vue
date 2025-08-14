@@ -336,7 +336,7 @@ export default {
         if (query.id > 0) {
           this.timeRange = []
           delete this.listQuery.startTime
-          delete this.listQuery.startTime
+          delete this.listQuery.endTime
         }
       }
     },

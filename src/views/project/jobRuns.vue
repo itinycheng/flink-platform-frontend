@@ -248,8 +248,6 @@ export default {
     },
     getList() {
       this.listLoading = true
-      this.listQuery.startTime = this.timeRange?.[0]
-      this.listQuery.endTime = this.timeRange?.[1]
       getJobRunPage(this.listQuery).then((data) => {
         this.total = data.total
         this.list = data.records.map(item => {
@@ -271,12 +269,14 @@ export default {
     },
     handleSearch() {
       this.listQuery.page = 1
+      this.listQuery.startTime = this.timeRange?.[0]
+      this.listQuery.endTime = this.timeRange?.[1]
       rewriteUrl(this.$router, this.$route, this.listQuery)
     },
     handleMore(data) {
       const { row, toStatus } = data
       if (toStatus === 'KILL') {
-        killJobRun(row.id).then(result => {
+        killJobRun(row.id).then(() => {
           this.getList()
         })
       }
@@ -310,18 +310,33 @@ export default {
       this.getList()
     },
     initListQuery() {
-      var query = this.$route.query
-      if (query) {
-        const { timeRange, ...restQuery } = query
+      const query = this.$route.query;
+      if (!Object.keys(query || {}).length) {
+        this.timeRange = calcTimeRangeToNow(-1)
+        this.listQuery = {
+          ...this.getDefaultQuery(),
+          startTime: this.timeRange?.[0],
+          endTime: this.timeRange?.[1]
+        }
+      } else {
+        let {timeRange, ...restQuery} = query;
+        if (!this.timeRange.length) {
+          this.timeRange = timeRange
+        }
+
         this.listQuery = {
           ...this.getDefaultQuery(),
           ...restQuery,
+          startTime: this.timeRange?.[0],
+          endTime: this.timeRange?.[1],
           page: parseInt(query.page) || 1,
           size: parseInt(query.size) || 20
         }
 
-        if (!query.id) {
-          this.timeRange = timeRange || calcTimeRangeToNow(-1)
+        if (query.id > 0) {
+          this.timeRange = []
+          delete this.listQuery.startTime
+          delete this.listQuery.endTime
         }
       }
     },

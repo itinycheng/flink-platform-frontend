@@ -47,7 +47,9 @@
                 :value="item.id"
               >
                 <span style="float: left">{{ item.name }}</span>
-                <span style="float: right; color: #8492a6; font-size: 13px">{{ item.ip }}</span>
+                <span style="float: right; color: #8492a6; font-size: 13px">
+                  {{ item.ip }} - {{ item.role }} - <span :style="{ color: item.active ? '#67C23A' : '#F56C6C' }">{{ item.active ? 'active' : 'inactive' }}</span>
+                </span>
               </el-option>
             </el-select>
           </el-form-item>

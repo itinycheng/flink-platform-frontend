@@ -310,7 +310,7 @@ export default {
       this.getList()
     },
     initListQuery() {
-      const query = this.$route.query;
+      const query = this.$route.query
       if (!Object.keys(query || {}).length) {
         this.timeRange = calcTimeRangeToNow(-1)
         this.listQuery = {
@@ -319,7 +319,7 @@ export default {
           endTime: this.timeRange?.[1]
         }
       } else {
-        let {timeRange, ...restQuery} = query;
+        const { timeRange, ...restQuery } = query
         if (!this.timeRange.length) {
           this.timeRange = timeRange
         }

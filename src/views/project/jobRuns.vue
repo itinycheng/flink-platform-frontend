@@ -241,8 +241,7 @@ export default {
 
   methods: {
     getStatus() {
-      var data = { className: 'ExecutionStatus' }
-      getStatusList(data).then((result) => {
+      getStatusList({ className: 'ExecutionStatus' }).then((result) => {
         this.listStatus = result
       })
     },

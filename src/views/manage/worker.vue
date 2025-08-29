@@ -112,8 +112,8 @@
               Actions
             </el-button>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item v-if="row.role !== 'INACTIVE'" :command="{row, toRole: 'INACTIVE'}">Delete</el-dropdown-item>
-              <el-dropdown-item v-if="row.role === 'INACTIVE'" :command="{row, toRole: 'PURGE'}">Purge</el-dropdown-item>
+              <el-dropdown-item v-if="row.role !== 'DELETED'" :command="{row, toRole: 'DELETED'}">Delete</el-dropdown-item>
+              <el-dropdown-item v-if="row.role === 'DELETED'" :command="{row, toRole: 'PURGE'}">Purge</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>
@@ -230,9 +230,9 @@ export default {
     },
     handleMore(data) {
       const { row, toRole } = data
-      if (toRole === 'INACTIVE') {
+      if (toRole === 'DELETED') {
         const newStatus = { id: row.id, role: toRole }
-        updateWorker(newStatus).then(result => {
+        updateWorker(newStatus).then(() => {
           this.getList()
         })
       } else if (toRole === 'PURGE') {

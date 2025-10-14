@@ -47,7 +47,9 @@
                 :value="item.id"
               >
                 <span style="float: left">{{ item.name }}</span>
-                <span style="float: right; color: #8492a6; font-size: 13px">{{ item.ip }}</span>
+                <span style="float: right; color: #8492a6; font-size: 13px">
+                  {{ item.ip }} - {{ item.role }} - <span :style="{ color: item.active ? '#67C23A' : '#F56C6C' }">{{ item.active ? 'active' : 'inactive' }}</span>
+                </span>
               </el-option>
             </el-select>
           </el-form-item>
@@ -87,16 +89,6 @@
 
           <template v-if="nodeType === 'FLINK'">
             <!-- flink -->
-            <el-form-item v-if="formData.execMode === 'STREAMING'" label="Wait Termination" prop="config.waitForTermination">
-              <el-select v-model="formData.config.waitForTermination" style="width:100%">
-                <el-option
-                  v-for="item in waitForEndList"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                />
-              </el-select>
-            </el-form-item>
             <template v-if="formData.type === 'FLINK_SQL'">
               <el-form-item label="Catalogs" prop="catalogs">
                 <el-select v-model="formData.config.catalogs" multiple style="width:100%">
@@ -377,7 +369,6 @@ export default {
       nodeType: '',
       direction: 'rtl',
       execModeList: [],
-      waitForEndList: [true, false],
       catalogList: [],
       extJarList: [],
       typeList: [],

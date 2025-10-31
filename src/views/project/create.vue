@@ -25,10 +25,13 @@
         </el-select>
       </el-form-item>
 
-      <template v-if="formData.type && formData.type === 'JOB_FLOW'">
+      <template v-if="formData.type === 'JOB_FLOW'">
         <el-form-item label="Crontab" prop="cronExpr" :label-width="labelWidth">
           <el-input v-model="formData.cronExpr" style="width: 90%" />
         </el-form-item>
+      </template>
+
+      <template v-if="formData.type === 'JOB_FLOW' || formData.type === 'SUB_FLOW'">
         <el-form-item label="Parallel Tasks" prop="parallelism" :label-width="labelWidth">
           <el-input v-model="formData.config.parallelism" type="number" min="1" style="width: 90%" />
         </el-form-item>

@@ -78,6 +78,7 @@ export default {
         case 'SQL':
         case 'CONDITION':
         case 'DEPENDENT':
+        case 'SUB_FLOW':
           config = {
             x: x,
             y: y,
@@ -167,5 +168,11 @@ export default {
   width: 100%;
   height: 60px;
   background: url("../../assets/dependent.png") no-repeat center center;
+}
+
+.listBar-cot .icon-subflow {
+  width: 100%;
+  height: 60px;
+  background: url("../../assets/subflow.png") no-repeat center center;
 }
 </style>

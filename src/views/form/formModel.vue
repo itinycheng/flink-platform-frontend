@@ -330,6 +330,29 @@
             </template>
           </template>
 
+          <template v-if="nodeType === 'SUB_FLOW'">
+            <el-form-item label="Job Flow" prop="config.flowId">
+              <el-select
+                v-model="formData.config.flowId"
+                filterable
+                remote
+                reserve-keyword
+                style="width: 95%; padding-right: 2px;"
+                placeholder="Please enter job flow name to search"
+              >
+                <el-option
+                  v-for="item in jobFlowList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                />
+              </el-select>
+              <router-link v-if="formData.config.flowId" :to="'/project/flow/edit/' + formData.config.flowId">
+                <i class="el-icon-link" />
+              </router-link>
+            </el-form-item>
+          </template>
+
           <el-form-item label-width="10%" style="text-align: right;">
             <el-button type="warning" plain @click="resetForm()">Reset Form</el-button>
             <el-button v-if="isSqlNode()" type="success" plain @click="formatSql()">Format SQL</el-button>
@@ -355,7 +378,7 @@ import { getCatalogs } from '@/api/catalog'
 export default {
   name: 'FormModel',
   components: { CodeEditor },
-  filters: { },
+  filters: {},
   props: {
     disabled: {
       type: Boolean,
@@ -413,6 +436,9 @@ export default {
         }],
         'config.relation': [{
           required: true, message: 'Please choose dependent relation', trigger: 'change'
+        }],
+        'config.flowId': [{
+          required: true, message: 'Please choose a workflow', trigger: 'change'
         }]
       }
     }
@@ -438,9 +464,12 @@ export default {
             break
           case 'DEPENDENT':
             this.initDependentRelationList()
-            this.initDependentJobFlowList()
+            this.initJobFlowList()
             this.initExecutionStatusList()
             this.initDependentStrategyList()
+            break
+          case 'SUB_FLOW':
+            this.initJobFlowList()
             break
           case 'SHELL':
           default:
@@ -486,7 +515,7 @@ export default {
         this.dependentRelationList = result
       })
     },
-    initDependentJobFlowList() {
+    initJobFlowList() {
       const data = { status: 'ONLINE,SCHEDULING' }
       getFlowIdNameList(data).then(data => {
         this.jobFlowList = data
@@ -633,7 +662,7 @@ export default {
 </script>
 
 <style lang="scss">
-.el-drawer.rtl{
+.el-drawer.rtl {
   overflow-x: hidden;
   overflow-y: auto;
 }

@@ -464,12 +464,12 @@ export default {
             break
           case 'DEPENDENT':
             this.initDependentRelationList()
-            this.initJobFlowList()
+            this.initJobFlowList({ status: ['ONLINE', 'SCHEDULING'] })
             this.initExecutionStatusList()
             this.initDependentStrategyList()
             break
           case 'SUB_FLOW':
-            this.initJobFlowList()
+            this.initJobFlowList({ type: 'SUB_FLOW', status: ['ONLINE', 'SCHEDULING'] })
             break
           case 'SHELL':
           default:
@@ -515,9 +515,8 @@ export default {
         this.dependentRelationList = result
       })
     },
-    initJobFlowList() {
-      const data = { status: 'ONLINE,SCHEDULING' }
-      getFlowIdNameList(data).then(data => {
+    initJobFlowList(param = {}) {
+      getFlowIdNameList(param).then(data => {
         this.jobFlowList = data
       })
     },

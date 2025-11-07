@@ -1,45 +1,45 @@
 <template>
-    <div class="node " :class="status">
-        <img :src="imgCot.logo" alt="">
-        <span class="label">{{itemDetail.label}}</span>
-        <span class="status">
+  <div class="node " :class="status">
+    <img :src="imgCot.logo" alt="">
+    <span class="label">{{ itemDetail.label }}</span>
+    <span class="status">
       <img :src="imgCot[status]" alt="">
     </span>
-    </div>
+  </div>
 </template>
 
 <script>
 
-  export default {
-    name: 'onlyOut',
+export default {
+  name: 'OnlyOut',
 
-    inject: ['getGraph', 'getNode'],
-    data() {
-      return {
-        status: 'logo',
-        itemDetail: {},
-        imgCot: {
-          logo: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*evDjT5vjkX0AAAAAAAAAAAAAARQnAQ',
-          success:
+  inject: ['getGraph', 'getNode'],
+  data() {
+    return {
+      status: 'logo',
+      itemDetail: {},
+      imgCot: {
+        logo: 'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*evDjT5vjkX0AAAAAAAAAAAAAARQnAQ',
+        success:
           'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*6l60T6h8TTQAAAAAAAAAAAAAARQnAQ',
-          failed:
+        failed:
           'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*SEISQ6My-HoAAAAAAAAAAAAAARQnAQ',
-          running:
+        running:
           'https://gw.alipayobjects.com/mdn/rms_43231b/afts/img/A*t8fURKfgSOgAAAAAAAAAAAAAARQnAQ'
-        }
       }
-    },
-    mounted() {
-      const self = this
-      const node = this.getNode()
-      this.itemDetail = node.getData();
-
-      // 监听数据改变事件
-      node.on('change:data', ({current}) => {
-        self.status = current.status
-      })
     }
+  },
+  mounted() {
+    const self = this
+    const node = this.getNode()
+    this.itemDetail = node.getData()
+
+    // 监听数据改变事件
+    node.on('change:data', ({ current }) => {
+      self.status = current.status
+    })
   }
+}
 </script>
 <style xml:lang="scss" scoped>
     .node {

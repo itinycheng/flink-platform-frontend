@@ -37,15 +37,16 @@ export async function validTicket(href) {
 }
 
 async function getUsername(ticket) {
-  var result = false
-  var url = process.env.VUE_APP_SSO_URL + '/serviceValidate?service=' + process.env.VUE_APP_SERVER_URL + '&ticket=' + ticket
+  let result = false
+  const url = process.env.VUE_APP_SSO_URL + '/serviceValidate?service=' +
+    process.env.VUE_APP_SERVER_URL + '&ticket=' + ticket
   await axios.get(url).then(res => {
-    var xml = x2jsOne.xml2js(res.data)
+    const xml = x2jsOne.xml2js(res.data)
     if (xml.serviceResponse.authenticationFailure) {
       window.location.href = process.env.VUE_APP_SSO_URL + '/login?service=' + process.env.VUE_APP_SERVER_URL
     }
     if (xml.serviceResponse.authenticationSuccess) {
-      var username = xml.serviceResponse.authenticationSuccess.user.__text
+      const username = xml.serviceResponse.authenticationSuccess.user.__text
       setToken(username)
       result = true
     }

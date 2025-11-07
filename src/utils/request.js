@@ -1,4 +1,5 @@
 import axios from 'axios'
+import Qs from 'qs'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
@@ -7,7 +8,10 @@ import { getToken } from '@/utils/auth'
 const service = axios.create({
   baseURL: process.env.VUE_APP_BASE_API, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 0 // request timeout
+  timeout: 0, // request timeout
+  paramsSerializer: params => {
+    return Qs.stringify(params, { arrayFormat: 'repeat' })
+  }
 })
 
 // request interceptor

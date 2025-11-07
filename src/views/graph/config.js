@@ -3,6 +3,7 @@ import shellImg from '@/assets/shell.png'
 import sqlImg from '@/assets/sql.png'
 import conditionImg from '@/assets/condition.png'
 import dependentImg from '@/assets/dependent.png'
+import subFlowImg from '@/assets/subflow.png'
 import operation from '@/assets/operation.png'
 import statusRunning from '@/assets/running.png'
 import statusFailed from '@/assets/failed.png'
@@ -43,6 +44,13 @@ const graphConfig = {
       name: 'dependent',
       type: 'DEPENDENT',
       icon: dependentImg,
+      status: 'default'
+    },
+    'SUB_FLOW': {
+      id: null,
+      name: 'subflow',
+      type: 'SUB_FLOW',
+      icon: subFlowImg,
       status: 'default'
     }
   },

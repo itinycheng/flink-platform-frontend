@@ -535,7 +535,7 @@ export default {
       this.graph.addNode(Object.assign({}, option, p))
     },
     openParamDialog() {
-      const data = { flowId: this.id, type: this.type }
+      const data = { flowId: this.id }
       this.$refs.editParamDialog.init(data)
     },
     showJobList() {

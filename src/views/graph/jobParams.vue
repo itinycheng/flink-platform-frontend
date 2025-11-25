@@ -2,7 +2,7 @@
   <el-dialog title="Edit Parameter" :visible.sync="visible">
 
     <el-table
-      :data="tableData"
+      :data="tableRows"
       style="width: 100%; margin-bottom: 10px;"
       max-height="350"
     >
@@ -10,73 +10,56 @@
         fixed
         prop="paramName"
         label="ParamName"
-        width="150"
+        width="180"
       />
       <el-table-column
         prop="paramValue"
         label="ParamValue"
-        width="120"
       />
       <el-table-column
-        prop="type"
-        label="Type"
-        width="100"
-      />
-      <el-table-column
-        prop="status"
-        label="Status"
-        width="100"
-      />
-      <el-table-column
-        prop="createTime"
-        label="CreateTime"
-        width="150"
-      />
-      <el-table-column
-        prop="updateTime"
-        label="UpdateTime"
+        prop="scope"
+        label="Scope"
         width="150"
       />
       <el-table-column
         fixed="right"
         label="Operations"
-        width="100"
+        width="150"
       >
         <template slot-scope="scope">
-          <el-button type="text" size="small" :disabled="disabled" @click="showEditParam(scope.$index, tableData)">Edit</el-button>
-          <el-button type="text" size="small" :disabled="disabled" @click="deleteRow(scope.$index, tableData)">Disable</el-button>
+          <el-button type="text" size="small" :disabled="disabled" @click="displayParamInForm(scope.$index)">Edit</el-button>
+          <el-button type="text" size="small" :disabled="disabled" @click="deleteParam(scope.$index)">Delete</el-button>
         </template>
       </el-table-column>
     </el-table>
 
-    <el-form :inline="true" :model="formData" :disabled="disabled" :rules="formRules">
-      <el-form-item label="Name">
+    <el-form ref="ruleForm" :inline="true" :model="formData" :disabled="disabled" :rules="formRules">
+      <el-form-item label="Name" prop="paramName">
         <el-input v-model="formData.paramName" placeholder="param name" />
       </el-form-item>
-      <el-form-item label="Value">
+      <el-form-item label="Value" prop="paramValue">
         <el-input v-model="formData.paramValue" placeholder="param value" />
       </el-form-item>
-      <el-form-item label="Status">
-        <el-select v-model="formData.status" placeholder="status">
+      <el-form-item label="Scope" prop="scope">
+        <el-select v-model="formData.scope" placeholder="scope" style="width: 140px">
           <el-option
-            v-for="item in statusList"
-            :key="item.name"
-            :label="item.name"
-            :value="item.name"
+            v-for="item in scopeList"
+            :key="item"
+            :label="item"
+            :value="item"
           />
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" plain @click="addParam">Add</el-button>
-        <el-button type="primary" plain @click="updateParam">Update</el-button>
+        <el-button type="primary" plain @click="upsertCaches">Upsert</el-button>
+        <el-button type="primary" plain @click="upsertParams">Confirm</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
 </template>
 
 <script>
-import { updateParam, createParam, getParamList } from '@/api/job-param.js'
-import { getStatusList } from '@/api/attr'
+import { updateFlow, getFlow } from '@/api/job-flow.js'
 
 export default {
   name: 'EditParamDialog',
@@ -90,94 +73,91 @@ export default {
     return {
       visible: false,
       flowId: null,
-      statusList: [],
+      scopeList: ['JOB_FLOW'],
       formData: {},
-      tableData: [],
-      formRules: {}
+      tableRows: [],
+      formRules: {
+        paramName: [
+          { required: true, message: 'Please input param name', trigger: 'blur' }
+        ],
+        paramValue: [
+          { required: true, message: 'Please select param value', trigger: 'blur' }
+        ],
+        scope: [
+          { required: true, message: 'Please select value scope', trigger: 'change' }
+        ]
+      }
     }
   },
 
   methods: {
     init(data = {}) {
-      if (data.type === 'instance') {
-        return
-      }
-
       this.flowId = data.flowId
       this.resetForm()
-      this.initStatusList()
-      this.refreshParamList()
+      this.fillTable()
       this.visible = true
     },
 
-    initStatusList() {
-      var data = { className: 'Status' }
-      getStatusList(data).then((result) => {
-        this.statusList = result
+    fillTable() {
+      if (!this.flowId) {
+        return
+      }
+
+      getFlow(this.flowId)
+        .then(res => {
+          this.tableRows = Object.entries(res?.params || {})
+            .map(([k, v]) => ({
+              paramName: k,
+              paramValue: v,
+              scope: 'JOB_FLOW'
+            }))
+        })
+    },
+
+    upsertCaches() {
+      this.$refs.ruleForm.validate((valid) => {
+        if (!valid) {
+          return
+        }
+
+        const rows = this.tableRows
+        const idx = rows.findIndex(item => item.paramName === this.formData.paramName)
+        if (idx > -1) {
+          rows.splice(idx, 1, { ...this.formData })
+        } else {
+          rows.push({ ...this.formData })
+        }
+        this.resetForm()
       })
     },
 
-    refreshParamList() {
-      var data = { flowId: this.flowId }
-      getParamList(data).then(res => {
-        this.tableData = res
-      })
-    },
-
-    addParam() {
-      createParam({
-        flowId: this.flowId,
-        type: 'JOB_FLOW',
-        ...this.formData
-      }).then(res => {
-        this.formData = {}
-        this.refreshParamList()
-      })
-    },
-
-    updateParam() {
-      if (!this.formData.id) {
+    upsertParams() {
+      if (!this.flowId) {
         this.$message({
           message: 'Flow Id not found',
           type: 'error'
         })
         return
       }
-      updateParam({
-        flowId: this.flowId,
-        ...this.formData
-      }).then(res => {
-        this.formData = {}
-        this.refreshParamList()
+
+      const params = Object.fromEntries(this.tableRows.map(row => [row.paramName, row.paramValue]))
+      updateFlow({ id: this.flowId, params }).then(() => {
+        this.resetForm()
+        this.visible = false
       })
     },
 
-    showEditParam(index, rows) {
-      var row = rows[index]
+    displayParamInForm(index) {
+      const row = this.tableRows[index]
       this.formData = {
-        id: row.id,
         paramName: row.paramName,
         paramValue: row.paramValue,
-        status: row.status
+        scope: row.scope
       }
     },
 
-    deleteRow(index, rows) {
-      var row = rows[index]
-      updateParam({ id: row.id, status: 'DELETED' })
-        .then(result => {
-          this.$message({
-            message: 'Delete successfully, id=' + result,
-            type: 'success'
-          })
-          // rows.splice(index, 1)
-          this.refreshParamList()
-        })
-    },
-
-    cancelForm() {
-      this.visible = false
-      this.resetForm()
+    deleteParam(index) {
+      this.tableRows.splice(index, 1)
     },
 
     resetForm() {

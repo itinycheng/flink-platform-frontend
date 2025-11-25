@@ -222,7 +222,7 @@ export default {
 
   methods: {
     getStatus() {
-      var data = { className: 'JobStatus' }
+      const data = { className: 'JobStatus' }
       getStatusList(data).then((result) => {
         this.statusList = result
       })
@@ -261,7 +261,7 @@ export default {
       }
     },
     handleCreate(data) {
-      var node = {
+      const node = {
         id: null,
         name: '',
         flowId: this.listQuery.flowId,
@@ -277,11 +277,11 @@ export default {
       this.$refs.formModel.visible = true
     },
     openParamDialog() {
-      const data = { flowId: this.listQuery.flowId, type: '' }
+      const data = { flowId: this.listQuery.flowId }
       this.$refs.editParamDialog.init(data)
     },
     async handleUpdate(row) {
-      var nodeData = {
+      const nodeData = {
         id: row.id,
         name: row.name,
         precondition: row.precondition,
@@ -326,7 +326,7 @@ export default {
         this.$message.success(`Job run once failed, job_id=${id}`)
       }
 
-      var data = { startJobId: row.id, strategy: 'ONLY_CUR_JOB' }
+      const data = { startJobId: row.id, strategy: 'ONLY_CUR_JOB' }
       runOnceFlow(row.flowId, data).then((flowRunId) => {
         this.$message.success(`Job run once Successfully, flow_run_id=${flowRunId}, job_id=${id}`)
       })

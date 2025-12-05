@@ -153,7 +153,7 @@
               <el-dropdown-item :command="{row, toStatus: 'ALERT'}">Edit Alert</el-dropdown-item>
               <el-dropdown-item :command="{row, toStatus: 'TAG'}">Edit Tag</el-dropdown-item>
               <el-dropdown-item :command="{row, toStatus: 'COPY'}">Copy Workflow</el-dropdown-item>
-              <el-dropdown-item v-if="row.type === 'JOB_FLOW' && row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
+              <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'SCHEDULING'}">Scheduling</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'SCHEDULING'" :command="{row, toStatus: 'STOP_SCHED'}">Stop Sched</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'OFFLINE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'OFFLINE'}">Offline</el-dropdown-item>

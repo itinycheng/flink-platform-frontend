@@ -469,7 +469,7 @@ export default {
             this.initDependentStrategyList()
             break
           case 'SUB_FLOW':
-            this.initJobFlowList({ type: 'SUB_FLOW', status: ['ONLINE', 'SCHEDULING'] })
+            this.initJobFlowList({ type: ['SUB_FLOW', 'JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
             break
           case 'SHELL':
           default:
@@ -522,7 +522,7 @@ export default {
     },
     initDependentJobLists(config) {
       const dependentItems = config.dependentItems || []
-      for (var i = 0; i < dependentItems.length; i++) {
+      for (let i = 0; i < dependentItems.length; i++) {
         getJobList({ flowId: dependentItems[i].flowId }).then(data => {
           this.jobLists.splice(i, 1, data || [])
         })
@@ -546,13 +546,13 @@ export default {
       }
     },
     initExecutionStatusList() {
-      var data = { className: 'ExecutionStatus' }
+      const data = { className: 'ExecutionStatus' }
       getStatusList(data).then((result) => {
         this.executionStatusList = result
       })
     },
     initDependentStrategyList() {
-      var data = { className: 'DependentStrategy' }
+      const data = { className: 'DependentStrategy' }
       getStatusList(data).then((result) => {
         this.dependentStrategyList = result
       })
@@ -587,8 +587,8 @@ export default {
       this.$forceUpdate()
     },
     deleteDependentItem(dependentItem) {
-      var dependentItems = this.formData.config.dependentItems
-      var index = dependentItems.indexOf(dependentItem)
+      const dependentItems = this.formData.config.dependentItems
+      const index = dependentItems.indexOf(dependentItem)
       if (index !== -1) {
         dependentItems.splice(index, 1)
       }

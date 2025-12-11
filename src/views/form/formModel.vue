@@ -469,7 +469,7 @@ export default {
             this.initDependentStrategyList()
             break
           case 'SUB_FLOW':
-            this.initJobFlowList({ type: ['SUB_FLOW', 'JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
+            this.initJobFlowList({ type: ['JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
             break
           case 'SHELL':
           default:

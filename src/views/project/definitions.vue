@@ -122,7 +122,7 @@
       </el-table-column>
       <el-table-column label="Notify" width="120" align="center">
         <template slot-scope="{ row }">
-          {{ row.alerts? row.alerts.map(item => item.alertId) : '' }}
+          {{ row.alerts ? row.alerts.map(item => item.alertId) : '' }}
         </template>
       </el-table-column>
       <el-table-column label="Update Time" min-width="130" align="center">
@@ -157,7 +157,7 @@
               <el-dropdown-item v-if="row.status === 'SCHEDULING'" :command="{row, toStatus: 'STOP_SCHED'}">Stop Sched</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'OFFLINE'" :command="{row, toStatus: 'ONLINE'}">Online</el-dropdown-item>
               <el-dropdown-item v-if="row.status === 'ONLINE'" :command="{row, toStatus: 'OFFLINE'}">Offline</el-dropdown-item>
-              <el-dropdown-item v-if="row.workflow && (row.status === 'ONLINE' || row.status === 'SCHEDULING')" :command="{row, toStatus: 'RUN_ONCE'}">Run Once</el-dropdown-item>
+              <el-dropdown-item v-if="row.type === 'JOB_FLOW' && (row.status === 'ONLINE' || row.status === 'SCHEDULING')" :command="{row, toStatus: 'RUN_ONCE'}">Run Once</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
           <el-button

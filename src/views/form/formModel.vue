@@ -351,6 +351,31 @@
                 <i class="el-icon-link" />
               </router-link>
             </el-form-item>
+            <el-form-item label="Inherit Param" prop="config.inheritParamMode">
+              <el-select
+                v-model="formData.config.inheritParamMode"
+                style="width:100%"
+                placeholder="Please choose inherit param mode"
+              >
+                <el-option
+                  v-for="item in inheritParamModeList"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.name"
+                />
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="formData.config.inheritParamMode === 'CUSTOM'" label="Param Names" prop="config.paramNames">
+              <el-select
+                v-model="formData.config.paramNames"
+                multiple
+                filterable
+                allow-create
+                default-first-option
+                style="width:100%"
+                placeholder="Please input param names that can be inherited"
+              />
+            </el-form-item>
           </template>
 
           <el-form-item label-width="10%" style="text-align: right;">
@@ -405,6 +430,7 @@ export default {
       dependentRelationList: [],
       jobLists: [],
       jobFlowList: [],
+      inheritParamModeList: [],
       formData: { config: {}},
       rules: {
         name: [
@@ -439,6 +465,9 @@ export default {
         }],
         'config.flowId': [{
           required: true, message: 'Please choose a workflow', trigger: 'change'
+        }],
+        'config.inheritParamMode': [{
+          required: true, message: 'Please choose inherit param mode', trigger: 'change'
         }]
       }
     }
@@ -469,7 +498,8 @@ export default {
             this.initDependentStrategyList()
             break
           case 'SUB_FLOW':
-            this.initJobFlowList({ type: ['SUB_FLOW', 'JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
+            this.initJobFlowList({ type: ['JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
+            this.initInheritParamModeList()
             break
           case 'SHELL':
           default:
@@ -499,7 +529,12 @@ export default {
         this.dataSourceList = data
       })
     },
-
+    initInheritParamModeList() {
+      const data = { className: 'InheritParamMode' }
+      getStatusList(data).then((result) => {
+        this.inheritParamModeList = result
+      })
+    },
     initRouteUrlList() {
       getUserWorkers().then(result => {
         this.routeUrlList = result

@@ -224,6 +224,7 @@
                   >
                     <el-select
                       v-model="dependentItem.flowId"
+                      filterable
                       placeholder="Please select dependent job flow"
                       style="width: 100%"
                       size="small"
@@ -335,8 +336,6 @@
               <el-select
                 v-model="formData.config.flowId"
                 filterable
-                remote
-                reserve-keyword
                 style="width: 95%; padding-right: 2px;"
                 placeholder="Please enter job flow name to search"
               >

@@ -3,7 +3,7 @@
 
     <el-table
       :data="tableRows"
-      style="width: 100%; margin-bottom: 10px;"
+      style="margin-bottom: 10px;"
       max-height="350"
     >
       <el-table-column
@@ -41,18 +41,10 @@
         <el-input v-model="formData.paramValue" placeholder="param value" />
       </el-form-item>
       <el-form-item label="Scope" prop="scope">
-        <el-select v-model="formData.scope" placeholder="scope" style="width: 140px">
-          <el-option
-            v-for="item in scopeList"
-            :key="item"
-            :label="item"
-            :value="item"
-          />
-        </el-select>
+        <el-input value="JOB_FLOW" disabled style="width: 140px" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" plain @click="upsertCaches">Upsert</el-button>
-        <el-button type="primary" plain @click="upsertParams">Confirm</el-button>
+        <el-button type="primary" plain @click="upsertParams">Upsert</el-button>
       </el-form-item>
     </el-form>
   </el-dialog>
@@ -73,7 +65,6 @@ export default {
     return {
       visible: false,
       flowId: null,
-      scopeList: ['JOB_FLOW'],
       formData: {},
       tableRows: [],
       formRules: {
@@ -82,9 +73,6 @@ export default {
         ],
         paramValue: [
           { required: true, message: 'Please select param value', trigger: 'blur' }
-        ],
-        scope: [
-          { required: true, message: 'Please select value scope', trigger: 'change' }
         ]
       }
     }
@@ -108,27 +96,9 @@ export default {
           this.tableRows = Object.entries(res?.params || {})
             .map(([k, v]) => ({
               paramName: k,
-              paramValue: v,
-              scope: 'JOB_FLOW'
+              paramValue: v
             }))
         })
-    },
-
-    upsertCaches() {
-      this.$refs.ruleForm.validate((valid) => {
-        if (!valid) {
-          return
-        }
-
-        const rows = this.tableRows
-        const idx = rows.findIndex(item => item.paramName === this.formData.paramName)
-        if (idx > -1) {
-          rows.splice(idx, 1, { ...this.formData })
-        } else {
-          rows.push({ ...this.formData })
-        }
-        this.resetForm()
-      })
     },
 
     upsertParams() {
@@ -139,11 +109,18 @@ export default {
         })
         return
       }
+      this.$refs.ruleForm.validate((valid) => {
+        if (!valid) {
+          return
+        }
 
-      const params = Object.fromEntries(this.tableRows.map(row => [row.paramName, row.paramValue]))
-      updateFlow({ id: this.flowId, params }).then(() => {
-        this.resetForm()
-        this.visible = false
+        // step 1: update cache.
+        const rows = this.tableRows
+        const idx = rows.findIndex(item => item.paramName === this.formData.paramName)
+        idx > -1 ? rows.splice(idx, 1, { ...this.formData }) : rows.push({ ...this.formData })
+
+        // step 2: persist the params in cache to the backend.
+        this.saveParams()
       })
     },
 
@@ -151,13 +128,21 @@ export default {
       const row = this.tableRows[index]
       this.formData = {
         paramName: row.paramName,
-        paramValue: row.paramValue,
-        scope: row.scope
+        paramValue: row.paramValue
       }
     },
 
     deleteParam(index) {
       this.tableRows.splice(index, 1)
+      this.saveParams()
+    },
+
+    saveParams() {
+      const params = Object.fromEntries(this.tableRows.map(row => [row.paramName, row.paramValue]))
+      updateFlow({ id: this.flowId, params }).then(() => {
+        this.resetForm()
+        this.$message.success('Job params changed, id=' + this.flowId)
+      })
     },
 
     resetForm() {

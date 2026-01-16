@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getEdgeStates(sourceJobId) {
+export function getEdgeStatusList() {
   return request({
-    url: `/attr/edgeStates?jobId=${sourceJobId}`,
+    url: `/attr/edgeStates`,
     method: 'get'
   }).then(res => {
     return res.data

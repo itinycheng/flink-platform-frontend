@@ -350,6 +350,20 @@
                 <i class="el-icon-link" />
               </router-link>
             </el-form-item>
+            <el-form-item label="Expected Failure" prop="config.expectedFailureCorrectedTo">
+              <el-select
+                v-model="formData.config.expectedFailureCorrectedTo"
+                style="width:100%"
+                placeholder="Please change EXPECTED_FAILURE to an alternative"
+              >
+                <el-option
+                  v-for="item in edgeStatusList"
+                  :key="item"
+                  :label="item"
+                  :value="item"
+                />
+              </el-select>
+            </el-form-item>
             <el-form-item label="Inherit Param" prop="config.inheritParamMode">
               <el-select
                 v-model="formData.config.inheritParamMode"
@@ -392,7 +406,7 @@
 <script>
 import CodeEditor from './CodeEditor.vue'
 import { getJobOrJobRun, createJob, updateJob, getJobList } from '@/api/job.js'
-import { getNodeTypes, getDeployModes, getVersions, getPreconditions, getDependentRelations, getStatusList } from '@/api/attr.js'
+import { getNodeTypes, getDeployModes, getVersions, getPreconditions, getDependentRelations, getStatusList, getEdgeStatusList } from '@/api/attr.js'
 import { getUserWorkers } from '@/api/user.js'
 import { getResourceList } from '@/api/resource.js'
 import { getDataSourceList } from '@/api/datasource'
@@ -430,6 +444,7 @@ export default {
       jobLists: [],
       jobFlowList: [],
       inheritParamModeList: [],
+      edgeStatusList: [],
       formData: { config: {}},
       rules: {
         name: [
@@ -467,6 +482,9 @@ export default {
         }],
         'config.inheritParamMode': [{
           required: true, message: 'Please choose inherit param mode', trigger: 'change'
+        }],
+        'config.expectedFailureCorrectedTo': [{
+          required: true, message: 'Please choose a status', trigger: 'change'
         }]
       }
     }
@@ -499,6 +517,7 @@ export default {
           case 'SUB_FLOW':
             this.initJobFlowList({ type: ['JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
             this.initInheritParamModeList()
+            this.initEdgeStatusList()
             break
           case 'SHELL':
           default:
@@ -532,6 +551,11 @@ export default {
       const data = { className: 'InheritParamMode' }
       getStatusList(data).then((result) => {
         this.inheritParamModeList = result
+      })
+    },
+    initEdgeStatusList() {
+      getEdgeStatusList().then(result => {
+        this.edgeStatusList = result
       })
     },
     initRouteUrlList() {

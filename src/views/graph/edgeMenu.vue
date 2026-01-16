@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { getEdgeStates } from '@/api/attr.js'
+import { getEdgeStatusList } from '@/api/attr.js'
 
 export default {
   name: 'EdgeMenu',
@@ -31,13 +31,11 @@ export default {
       this.x = parseInt(x) + ''
       this.y = y + ''
       this.edge = edge
-      this.menuList = this.getExecStatus()
+      this.getExecStatus()
     },
 
     getExecStatus() {
-      let id = this.edge.getSourceNode().getData()?.id
-      id = !id ? '' : id
-      getEdgeStates(id).then(result => {
+      getEdgeStatusList().then(result => {
         this.menuList = [...result, 'DELETE']
       })
     },

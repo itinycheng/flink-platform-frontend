@@ -364,21 +364,21 @@
                 />
               </el-select>
             </el-form-item>
-            <el-form-item label="Inherit Param" prop="config.inheritParamMode">
+            <el-form-item label="Param Transfer" prop="config.paramTransferMode">
               <el-select
-                v-model="formData.config.inheritParamMode"
+                v-model="formData.config.paramTransferMode"
                 style="width:100%"
-                placeholder="Please choose inherit param mode"
+                placeholder="Please choose param transfer mode"
               >
                 <el-option
-                  v-for="item in inheritParamModeList"
+                  v-for="item in paramTransferModeList"
                   :key="item.name"
                   :label="item.name"
                   :value="item.name"
                 />
               </el-select>
             </el-form-item>
-            <el-form-item v-if="formData.config.inheritParamMode === 'CUSTOM'" label="Param Names" prop="config.paramNames">
+            <el-form-item v-if="formData.config.paramTransferMode === 'CUSTOM'" label="Param Names" prop="config.paramNames">
               <el-select
                 v-model="formData.config.paramNames"
                 multiple
@@ -386,7 +386,7 @@
                 allow-create
                 default-first-option
                 style="width:100%"
-                placeholder="Please input param names that can be inherited"
+                placeholder="Please input param names that can be transferred"
               />
             </el-form-item>
           </template>
@@ -443,7 +443,7 @@ export default {
       dependentRelationList: [],
       jobLists: [],
       jobFlowList: [],
-      inheritParamModeList: [],
+      paramTransferModeList: [],
       edgeStatusList: [],
       formData: { config: {}},
       rules: {
@@ -480,8 +480,8 @@ export default {
         'config.flowId': [{
           required: true, message: 'Please choose a workflow', trigger: 'change'
         }],
-        'config.inheritParamMode': [{
-          required: true, message: 'Please choose inherit param mode', trigger: 'change'
+        'config.paramTransferMode': [{
+          required: true, message: 'Please choose param transfer mode', trigger: 'change'
         }],
         'config.expectedFailureCorrectedTo': [{
           required: true, message: 'Please choose a status', trigger: 'change'
@@ -516,7 +516,7 @@ export default {
             break
           case 'SUB_FLOW':
             this.initJobFlowList({ type: ['JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
-            this.initInheritParamModeList()
+            this.initParamTransferModeList()
             this.initEdgeStatusList()
             break
           case 'SHELL':
@@ -547,10 +547,10 @@ export default {
         this.dataSourceList = data
       })
     },
-    initInheritParamModeList() {
-      const data = { className: 'InheritParamMode' }
+    initParamTransferModeList() {
+      const data = { className: 'ParamTransferMode' }
       getStatusList(data).then((result) => {
-        this.inheritParamModeList = result
+        this.paramTransferModeList = result
       })
     },
     initEdgeStatusList() {

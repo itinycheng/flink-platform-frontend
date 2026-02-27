@@ -109,7 +109,7 @@
               <el-input v-model="formData.paramName" />
             </el-form-item>
             <el-form-item label="Param Value" prop="paramValue">
-              <el-input v-model="formData.paramValue" />
+              <el-input v-model="formData.paramValue" type="textarea" />
             </el-form-item>
             <el-form-item label="Description" prop="description">
               <el-input v-model="formData.description" type="textarea" />

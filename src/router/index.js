@@ -182,6 +182,12 @@ export const constantRoutes = [
         name: 'Tag Manage',
         component: () => import('@/views/manage/tag'),
         meta: { title: 'Tag Manage', icon: 'tree' }
+      },
+      {
+        path: 'config',
+        name: 'Config Manage',
+        component: () => import('@/views/manage/config'),
+        meta: { title: 'Config Manage', icon: 'tree' }
       }
     ]
   },

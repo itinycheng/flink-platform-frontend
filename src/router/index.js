@@ -188,6 +188,12 @@ export const constantRoutes = [
         name: 'Config Manage',
         component: () => import('@/views/manage/config'),
         meta: { title: 'Config Manage', icon: 'tree' }
+      },
+      {
+        path: 'workspace',
+        name: 'Workspace Manage',
+        component: () => import('@/views/manage/workspace'),
+        meta: { title: 'Workspace Manage', icon: 'tree', superAdminOnly: true }
       }
     ]
   },

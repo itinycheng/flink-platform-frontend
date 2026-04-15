@@ -5,6 +5,29 @@
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
+      <el-dropdown class="workspace-switcher" trigger="click" @command="handleSwitchWorkspace">
+        <span class="workspace-label">
+          {{ currentWorkspace ? currentWorkspace.name : '暂无 Workspace' }}
+          <i class="el-icon-caret-bottom" />
+        </span>
+        <el-dropdown-menu slot="dropdown">
+          <el-dropdown-item
+            v-if="workspaceList.length === 0"
+            disabled
+          >
+            暂无 Workspace
+          </el-dropdown-item>
+          <el-dropdown-item
+            v-for="ws in workspaceList"
+            :key="ws.id"
+            :command="ws.id"
+            :class="{ 'workspace-active': currentWorkspace && currentWorkspace.id === ws.id }"
+          >
+            {{ ws.name }}
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </el-dropdown>
+
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
@@ -44,12 +67,20 @@ export default {
   computed: {
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'workspaceList',
+      'currentWorkspace'
     ])
   },
   methods: {
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
+    },
+    handleSwitchWorkspace(id) {
+      this.$store.dispatch('workspace/switchWorkspace', id)
+      if (this.$route.path !== '/dashboard') {
+        this.$router.push('/dashboard')
+      }
     },
     async logout() {
       await this.$store.dispatch('user/logout')
@@ -88,27 +119,31 @@ export default {
     float: right;
     height: 100%;
     line-height: 50px;
+    display: flex;
+    align-items: center;
 
     &:focus {
       outline: none;
     }
 
-    .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
-      height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
+    .workspace-switcher {
+      margin-right: 20px;
+      cursor: pointer;
 
-      &.hover-effect {
-        cursor: pointer;
-        transition: background .3s;
+      .workspace-label {
+        font-size: 14px;
+        color: #5a5e66;
 
-        &:hover {
-          background: rgba(0, 0, 0, .025)
+        .el-icon-caret-bottom {
+          font-size: 12px;
+          margin-left: 4px;
         }
       }
+    }
+
+    .workspace-active {
+      color: #409EFF;
+      font-weight: bold;
     }
 
     .avatar-container {

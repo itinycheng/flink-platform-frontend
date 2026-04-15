@@ -83,6 +83,7 @@
       >
         <template slot-scope="{ row }">
           <el-button type="success" size="mini" @click="openForm(row)"> Edit </el-button>
+          <el-button size="mini" @click="openRolesDialog(row)">Workspace 权限</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -143,11 +144,34 @@
         </el-col>
       </el-row>
     </el-dialog>
+
+    <el-dialog title="Workspace 权限" :visible.sync="rolesDialogVisible" width="600px">
+      <div v-for="(row, index) in workspaceRoleRows" :key="index" style="display:flex; margin-bottom:10px; gap:10px;">
+        <el-select v-model="row.workspaceId" placeholder="Select Workspace" style="flex:1">
+          <el-option
+            v-for="ws in allWorkspaceList"
+            :key="ws.id"
+            :label="ws.name"
+            :value="ws.id"
+          />
+        </el-select>
+        <el-select v-model="row.role" placeholder="Select Role" style="flex:1">
+          <el-option v-for="r in roleOptions" :key="r" :label="r" :value="r" />
+        </el-select>
+        <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeRoleRow(index)" />
+      </div>
+      <el-button type="text" icon="el-icon-plus" @click="addRoleRow">Add Row</el-button>
+      <div slot="footer">
+        <el-button @click="rolesDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="saveRoles">Save</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { getUser, getUserPage, createUser, updateUser } from '@/api/user'
+import { getWorkspaceList } from '@/api/workspace'
 import { getStatusList } from '@/api/attr'
 import { getWorkerList } from '@/api/worker'
 import waves from '@/directive/waves'
@@ -172,6 +196,12 @@ export default {
           { required: true, message: 'Please enter password', trigger: 'blur' }
         ]
       },
+      // workspace roles dialog
+      rolesDialogVisible: false,
+      rolesUserId: null,
+      workspaceRoleRows: [],
+      allWorkspaceList: [],
+      roleOptions: ['ADMIN', 'DEVELOPER', 'OPERATOR', 'VIEWER'],
       // list
       list: null,
       total: 0,
@@ -188,6 +218,7 @@ export default {
     this.getList()
     this.getTypes()
     this.getWorkers()
+    this.getAllWorkspaces()
   },
   methods: {
     getList() {
@@ -258,7 +289,46 @@ export default {
     getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
-    }
+    },
+    getAllWorkspaces() {
+      getWorkspaceList().then(list => {
+        this.allWorkspaceList = list || []
+      })
+    },
+    openRolesDialog(row) {
+      this.rolesUserId = row.id
+      const workspaces = (row.roles && row.roles.workspaces) ? row.roles.workspaces : {}
+      this.workspaceRoleRows = Object.entries(workspaces).map(([id, role]) => ({
+        workspaceId: Number(id),
+        role
+      }))
+      this.rolesDialogVisible = true
+    },
+    addRoleRow() {
+      this.workspaceRoleRows.push({ workspaceId: null, role: null })
+    },
+    removeRoleRow(index) {
+      this.workspaceRoleRows.splice(index, 1)
+    },
+    saveRoles() {
+      const workspaces = {}
+      this.workspaceRoleRows.forEach(row => {
+        if (row.workspaceId && row.role) {
+          workspaces[row.workspaceId] = row.role
+        }
+      })
+      getUser(this.rolesUserId).then(user => {
+        const updated = {
+          ...user,
+          roles: { ...(user.roles || {}), workspaces }
+        }
+        updateUser(updated).then(() => {
+          this.$message({ message: 'Workspace roles updated', type: 'success' })
+          this.rolesDialogVisible = false
+          this.getList()
+        })
+      })
+    },
   }
 }
 </script>

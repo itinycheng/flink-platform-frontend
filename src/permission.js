@@ -31,9 +31,12 @@ router.beforeEach(async(to, from, next) => {
         next()
       } else {
         try {
+          // restore workspace id from localStorage before getInfo (handles page refresh)
+          store.dispatch('workspace/restoreFromStorage')
           // get user info
           await store.dispatch('user/getInfo')
-
+          // fetch full workspace list (replaces the partial id with full workspace object)
+          await store.dispatch('workspace/fetchWorkspaceList')
           next()
         } catch (error) {
           // remove token and go to login page to re-login

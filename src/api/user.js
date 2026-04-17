@@ -40,6 +40,14 @@ export function updateUser(data) {
   })
 }
 
+export function updateRoles(data) {
+  return request({
+    url: '/user/update/roles',
+    method: 'post',
+    data
+  })
+}
+
 export function getUserPage(query) {
   return request({
     url: '/user/page',

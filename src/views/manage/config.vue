@@ -117,10 +117,10 @@
         <el-col :span="22">
           <el-form :model="formData" :rules="formRules" label-width="120px">
             <el-form-item label="Name" prop="name">
-              <el-input v-model="formData.name"/>
+              <el-input v-model="formData.name" />
             </el-form-item>
             <el-form-item label="Description" prop="description">
-              <el-input v-model="formData.description" type="textarea"/>
+              <el-input v-model="formData.description" type="textarea" />
             </el-form-item>
             <el-form-item label="Type" prop="type">
               <el-select v-model="formData.type" style="width:100%" placeholder="Please select config type">
@@ -133,7 +133,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="Version" prop="version">
-              <el-input v-model="formData.version"/>
+              <el-input v-model="formData.version" />
             </el-form-item>
             <el-form-item label="Status" prop="status">
               <el-select v-model="formData.status" style="width:100%" placeholder="Please select config status">
@@ -146,7 +146,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="Config" prop="config">
-              <el-input v-model="formData.config" type="textarea"/>
+              <el-input v-model="formData.config" type="textarea" />
             </el-form-item>
             <el-form-item style="text-align: right;">
               <el-button @click.stop="closeForm">Cancel</el-button>
@@ -160,29 +160,28 @@
 </template>
 
 <script>
-import {getConfig, getConfigPage, createConfig, updateConfig, deleteConfig, purgeConfig} from '@/api/config'
-import {getStatusList} from '@/api/attr'
+import { getConfig, getConfigPage, createConfig, updateConfig, deleteConfig, purgeConfig } from '@/api/config'
+import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
-import {purgeFlow} from "@/api/job-flow";
 
 export default {
   name: 'ConfigList',
-  components: {Pagination},
-  directives: {waves},
+  components: { Pagination },
+  directives: { waves },
   data() {
     return {
       // edit
       dialogFormVisible: false,
       configTypeList: [],
       statusList: [],
-      formData: {config: {}},
+      formData: { config: {}},
       formRules: {
         name: [
-          {required: true, message: 'Please enter name', trigger: 'blur'}
+          { required: true, message: 'Please enter name', trigger: 'blur' }
         ],
         type: [
-          {required: true, message: 'Please select type', trigger: 'blur'}
+          { required: true, message: 'Please select type', trigger: 'blur' }
         ]
       },
       // list
@@ -210,13 +209,13 @@ export default {
       })
     },
     getTypes() {
-      const data = {className: 'JobFlowType'}
+      const data = { className: 'JobFlowType' }
       getStatusList(data).then((result) => {
         this.configTypeList = result
       })
     },
     getCommonStatus() {
-      const data = {className: 'Status'}
+      const data = { className: 'Status' }
       getStatusList(data).then((result) => {
         this.statusList = result
       })
@@ -228,7 +227,7 @@ export default {
     openForm(row) {
       if (row.id) {
         getConfig(row.id).then((data) => {
-          const content = data.config;
+          const content = data.config
           if (content && typeof content === 'object') {
             data.config = JSON.stringify(content)
           }
@@ -244,10 +243,10 @@ export default {
       this.resetForm()
     },
     resetForm() {
-      this.formData = {config: {}}
+      this.formData = { config: {}}
     },
     submitForm() {
-      const content = this.formData.config;
+      const content = this.formData.config
       if (content) {
         try {
           this.formData.config = JSON.parse(content)
@@ -276,13 +275,13 @@ export default {
         type: 'warning'
       }).then(() => {
         deleteConfig(row.id)
-        .then(result => {
-          this.$message({
-            message: `Delete [${row.name}] Successfully`,
-            type: 'success'
+          .then(result => {
+            this.$message({
+              message: `Delete [${row.name}] Successfully`,
+              type: 'success'
+            })
+            this.list.splice(index, 1)
           })
-          this.list.splice(index, 1)
-        })
       })
     },
     purgeRow(row, index) {
@@ -292,17 +291,17 @@ export default {
         type: 'warning'
       }).then(() => {
         purgeConfig(row.id)
-        .then(result => {
-          this.$message({
-            message: 'Purge forever successfully, id=' + result,
-            type: 'success'
+          .then(result => {
+            this.$message({
+              message: 'Purge forever successfully, id=' + result,
+              type: 'success'
+            })
+            this.list.splice(index, 1)
           })
-          this.list.splice(index, 1)
-        })
       })
     },
     sortChange(data) {
-      const {prop, order} = data
+      const { prop, order } = data
       if (prop === 'id') {
         this.sortByID(order)
       }
@@ -315,7 +314,7 @@ export default {
       }
       this.handleFilter()
     },
-    getSortClass: function (key) {
+    getSortClass: function(key) {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     }

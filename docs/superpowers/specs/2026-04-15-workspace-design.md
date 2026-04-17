@@ -46,7 +46,7 @@ Stored as a JSON field on the `user` table:
 | `src/utils/workspace.js` | localStorage helpers: `getWorkspaceId`, `setWorkspaceId`, `removeWorkspaceId` |
 | `src/store/modules/workspace.js` | Vuex module managing current workspace state |
 | `src/api/workspace.js` | API calls for workspace CRUD and list |
-| `src/views/manage/workspace.vue` | Workspace management page (SUPER_ADMIN only) |
+| `src/views/manage/workspace.vue` | Workspace management page (all logged-in users) |
 
 ### Modified Files
 
@@ -148,7 +148,7 @@ Follows the same layout as existing manage pages (`config.vue`, `user.vue`):
 - Table columns: name / description / status / createTime / actions (edit, delete)
 - "新建" button top-right
 - Create/edit via `el-dialog` form
-- Visible only to SUPER_ADMIN (sidebar menu item conditionally rendered based on `store.getters.globalRole === 'SUPER_ADMIN'`)
+- Visible to all logged-in users
 
 ### User Management Extension
 
@@ -179,7 +179,7 @@ Login success
 User clicks workspace in Navbar dropdown
   → dispatch('workspace/switchWorkspace', id)
   → Update Vuex state + localStorage
-  → Navigate to /project/list
+  → Navigate to /dashboard
   → All subsequent API requests carry new X-Workspace-Id
 ```
 
@@ -196,5 +196,5 @@ Every request
 
 - **No workspace available**: Switcher shows "暂无 workspace"; `X-Workspace-Id` header not injected
 - **Stored workspace no longer accessible**: Falls back to first available workspace
-- **SUPER_ADMIN**: Has access to all workspaces; workspace management menu is visible
+- **SUPER_ADMIN**: Has access to all workspaces
 - **Logout**: `removeWorkspaceId()` clears localStorage selection; workspace Vuex state reset (`SET_WORKSPACE_LIST([])`, `SET_CURRENT_WORKSPACE(null)`)

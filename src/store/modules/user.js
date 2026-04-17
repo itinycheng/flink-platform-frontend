@@ -8,8 +8,7 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: '',
-    globalRole: null
+    avatar: ''
   }
 }
 
@@ -27,9 +26,6 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
-  },
-  SET_GLOBAL_ROLE: (state, role) => {
-    state.globalRole = role
   }
 }
 
@@ -60,13 +56,10 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar, roles } = data
+        const { name, avatar } = data
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
-        if (roles && roles.global) {
-          commit('SET_GLOBAL_ROLE', roles.global)
-        }
         resolve(data)
       }).catch(error => {
         reject(error)

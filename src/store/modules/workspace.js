@@ -19,7 +19,6 @@ const mutations = {
   },
   SET_CURRENT_WORKSPACE: (state, workspace) => {
     state.currentWorkspace = workspace
-    state.workspaceId = workspace ? workspace.id : null
   },
   SET_WORKSPACE_ID: (state, id) => {
     state.workspaceId = id
@@ -27,7 +26,7 @@ const mutations = {
 }
 
 const actions = {
-  fetchWorkspaceList({ commit }) {
+  fetchWorkspaceList({ commit, state }) {
     return getWorkspaceList().then(list => {
       commit('SET_WORKSPACE_LIST', list || [])
 
@@ -36,9 +35,8 @@ const actions = {
         return
       }
 
-      // restore from localStorage or pick first
-      const savedId = getWorkspaceId()
-      const saved = savedId && list.find(w => w.id === savedId)
+      // use state.workspaceId (already restored by restoreFromStorage or setFromLogin)
+      const saved = state.workspaceId && list.find(w => w.id === state.workspaceId)
       const workspace = saved || list[0]
 
       commit('SET_CURRENT_WORKSPACE', workspace)
@@ -53,7 +51,9 @@ const actions = {
     setWorkspaceId(id)
   },
 
-  // called right after login — backend returns a default workspaceId with the token
+  // called right after login — backend returns a default workspaceId with the token.
+  // intentionally sets only workspaceId (not currentWorkspace) because the workspace
+  // list hasn't been fetched yet; fetchWorkspaceList will resolve the full object.
   setFromLogin({ commit }, workspaceId) {
     commit('SET_WORKSPACE_ID', workspaceId)
     setWorkspaceId(workspaceId)

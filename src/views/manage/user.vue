@@ -50,11 +50,6 @@
           <span>{{ row.password }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="Type" width="120" align="center">
-        <template slot-scope="{ row }">
-          {{ row.type }}
-        </template>
-      </el-table-column>
       <el-table-column label="Email" min-width="180" align="center">
         <template slot-scope="{ row }">
           {{ row.email }}
@@ -82,8 +77,8 @@
         class-name="small-padding fixed-width"
       >
         <template slot-scope="{ row }">
-          <el-button type="success" size="mini" @click="openForm(row)"> Edit </el-button>
-          <el-button size="mini" @click="openRolesDialog(row)">Workspace 权限</el-button>
+          <el-button type="success" size="mini" @click="openForm(row)"> Edit</el-button>
+          <el-button size="mini" @click="openRolesDialog(row)"> Auth</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -96,7 +91,7 @@
       @pagination="getList"
     />
 
-    <el-dialog title="Edit User" :visible.sync="dialogFormVisible">
+    <el-dialog title="Edit User" :visible.sync="userDialogVisible">
       <el-row :gutter="20">
         <el-col :span="22">
           <el-form :model="formData" :rules="formRules" label-width="120px">
@@ -105,16 +100,6 @@
             </el-form-item>
             <el-form-item label="Password" prop="password">
               <el-input v-model="formData.password" />
-            </el-form-item>
-            <el-form-item label="Type" prop="type">
-              <el-select v-model="formData.type" style="width:100%" placeholder="Please select type">
-                <el-option
-                  v-for="item in userTypeList"
-                  :key="item.name"
-                  :label="item.name"
-                  :value="item.name"
-                />
-              </el-select>
             </el-form-item>
             <el-form-item label="Email" prop="email">
               <el-input v-model="formData.email" />
@@ -145,20 +130,19 @@
       </el-row>
     </el-dialog>
 
-    <el-dialog title="Workspace 权限" :visible.sync="rolesDialogVisible" width="600px">
+    <el-dialog title="Workspace Roles" :visible.sync="rolesDialogVisible" width="600px">
       <div v-for="(row, index) in workspaceRoleRows" :key="index" style="display:flex; margin-bottom:10px; gap:10px;">
         <el-select v-model="row.workspaceId" placeholder="Select Workspace" style="flex:1">
           <el-option
-            v-for="ws in allWorkspaceList"
+            v-for="ws in workspaceList"
             :key="ws.id"
             :label="ws.name"
             :value="ws.id"
           />
         </el-select>
         <el-select v-model="row.role" placeholder="Select Role" style="flex:1">
-          <el-option v-for="r in roleOptions" :key="r" :label="r" :value="r" />
+          <el-option v-for="r in roleOptions" :key="r || 'null'" :label="r || '(Empty)'" :value="r" />
         </el-select>
-        <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeRoleRow(index)" />
       </div>
       <el-button type="text" icon="el-icon-plus" @click="addRoleRow">Add Row</el-button>
       <div slot="footer">
@@ -170,9 +154,8 @@
 </template>
 
 <script>
-import { getUser, getUserPage, createUser, updateUser } from '@/api/user'
+import { getUser, getUserPage, createUser, updateUser, updateRoles } from '@/api/user'
 import { getWorkspaceList } from '@/api/workspace'
-import { getStatusList } from '@/api/attr'
 import { getWorkerList } from '@/api/worker'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
@@ -183,9 +166,8 @@ export default {
   directives: { waves },
   data() {
     return {
-      // edit
-      dialogFormVisible: false,
-      userTypeList: [],
+      // user edit
+      userDialogVisible: false,
       workerList: [],
       formData: {},
       formRules: {
@@ -200,8 +182,8 @@ export default {
       rolesDialogVisible: false,
       rolesUserId: null,
       workspaceRoleRows: [],
-      allWorkspaceList: [],
-      roleOptions: ['ADMIN', 'DEVELOPER', 'OPERATOR', 'VIEWER'],
+      workspaceList: [],
+      roleOptions: [null, 'ADMIN', 'DEVELOPER', 'OPERATOR', 'VIEWER'],
       // list
       list: null,
       total: 0,
@@ -216,21 +198,14 @@ export default {
   },
   created() {
     this.getList()
-    this.getTypes()
     this.getWorkers()
-    this.getAllWorkspaces()
+    this.getWorkspaces()
   },
   methods: {
     getList() {
       getUserPage(this.listQuery).then((data) => {
         this.list = data.records
         this.total = data.total
-      })
-    },
-    getTypes() {
-      const data = { className: 'UserType' }
-      getStatusList(data).then((result) => {
-        this.userTypeList = result
       })
     },
     getWorkers() {
@@ -250,23 +225,23 @@ export default {
       } else {
         this.resetForm()
       }
-      this.dialogFormVisible = true
+      this.userDialogVisible = true
     },
     closeForm() {
-      this.dialogFormVisible = false
+      this.userDialogVisible = false
       this.resetForm()
     },
     resetForm() {
-      this.formData = { }
+      this.formData = {}
     },
     submitForm() {
       if (this.formData.id) {
-        updateUser(this.formData).then(id => {
+        updateUser(this.formData).then(() => {
           this.closeForm()
           this.getList()
         })
       } else {
-        createUser(this.formData).then(id => {
+        createUser(this.formData).then(() => {
           this.closeForm()
           this.getList()
         })
@@ -290,45 +265,35 @@ export default {
       const sort = this.listQuery.sort
       return sort === `+${key}` ? 'ascending' : 'descending'
     },
-    getAllWorkspaces() {
+    getWorkspaces() {
       getWorkspaceList().then(list => {
-        this.allWorkspaceList = list || []
+        this.workspaceList = list || []
       })
     },
+
     openRolesDialog(row) {
       this.rolesUserId = row.id
-      const workspaces = (row.roles && row.roles.workspaces) ? row.roles.workspaces : {}
-      this.workspaceRoleRows = Object.entries(workspaces).map(([id, role]) => ({
-        workspaceId: Number(id),
-        role
-      }))
+      const workspaces = row.roles?.workspaces ?? {}
+      this.workspaceRoleRows = Object.entries(workspaces)
+        .map(([id, role]) => ({ workspaceId: Number(id), role }))
       this.rolesDialogVisible = true
     },
     addRoleRow() {
       this.workspaceRoleRows.push({ workspaceId: null, role: null })
     },
-    removeRoleRow(index) {
-      this.workspaceRoleRows.splice(index, 1)
-    },
     saveRoles() {
       const workspaces = {}
       this.workspaceRoleRows.forEach(row => {
-        if (row.workspaceId && row.role) {
+        if (row.workspaceId !== null) {
           workspaces[row.workspaceId] = row.role
         }
       })
-      getUser(this.rolesUserId).then(user => {
-        const updated = {
-          ...user,
-          roles: { ...(user.roles || {}), workspaces }
-        }
-        updateUser(updated).then(() => {
-          this.$message({ message: 'Workspace roles updated', type: 'success' })
-          this.rolesDialogVisible = false
-          this.getList()
-        })
+      updateRoles({ id: this.rolesUserId, roles: { workspaces }}).then(() => {
+        this.$message({ message: 'Workspace roles updated', type: 'success' })
+        this.rolesDialogVisible = false
+        this.getList()
       })
-    },
+    }
   }
 }
 </script>

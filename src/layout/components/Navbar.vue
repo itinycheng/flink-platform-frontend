@@ -11,11 +11,8 @@
           <i class="el-icon-caret-bottom" />
         </span>
         <el-dropdown-menu slot="dropdown">
-          <el-dropdown-item
-            v-if="workspaceList.length === 0"
-            disabled
-          >
-            暂无 Workspace
+          <el-dropdown-item v-if="workspaceList.length === 0" disabled>
+            No Workspace
           </el-dropdown-item>
           <el-dropdown-item
             v-for="ws in workspaceList"
@@ -96,7 +93,7 @@ export default {
   overflow: hidden;
   position: relative;
   background: #fff;
-  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  box-shadow: 0 1px 4px rgba(0, 21, 41, .08);
 
   .hamburger-container {
     line-height: 46px;
@@ -104,7 +101,7 @@ export default {
     float: left;
     cursor: pointer;
     transition: background .3s;
-    -webkit-tap-highlight-color:transparent;
+    -webkit-tap-highlight-color: transparent;
 
     &:hover {
       background: rgba(0, 0, 0, .025)
@@ -141,7 +138,7 @@ export default {
       }
     }
 
-    .workspace-active {
+    ::v-deep .workspace-active {
       color: #409EFF;
       font-weight: bold;
     }

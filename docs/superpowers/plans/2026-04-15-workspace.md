@@ -510,7 +510,7 @@ export default {
     },
     handleSwitchWorkspace(id) {
       this.$store.dispatch('workspace/switchWorkspace', id)
-      this.$router.push('/project/definitions')
+      this.$router.push('/dashboard')
     },
     async logout() {
       await this.$store.dispatch('user/logout')
@@ -835,7 +835,7 @@ git commit -m "feat: add workspace management page"
 
 ---
 
-## Task 8: Add workspace route + SUPER_ADMIN sidebar filter
+## Task 8: Add workspace route
 
 **Files:**
 - Modify: `src/router/index.js`
@@ -850,7 +850,7 @@ Inside the `/manage` children array, after the `config` route, add:
         path: 'workspace',
         name: 'Workspace Manage',
         component: () => import('@/views/manage/workspace'),
-        meta: { title: 'Workspace Manage', icon: 'tree', superAdminOnly: true }
+        meta: { title: 'Workspace Manage', icon: 'tree' }
       }
 ```
 
@@ -891,7 +891,7 @@ Add `globalRole` to `mapGetters` and update `routes`:
 
 ```bash
 git add src/router/index.js src/layout/components/Sidebar/index.vue
-git commit -m "feat: add workspace route with SUPER_ADMIN-only sidebar visibility"
+git commit -m "feat: add workspace route and sidebar SUPER_ADMIN filter"
 ```
 
 ---

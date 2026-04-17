@@ -28,26 +28,15 @@ export default {
   components: { SidebarItem, Logo },
   computed: {
     ...mapGetters([
-      'sidebar',
-      'globalRole'
+      'sidebar'
     ]),
     routes() {
-      return this.$router.options.routes.map(route => {
-        if (!route.children) return route
-        return {
-          ...route,
-          children: route.children.filter(child => {
-            if (child.meta && child.meta.superAdminOnly) {
-              return this.globalRole === 'SUPER_ADMIN'
-            }
-            return true
-          })
-        }
-      })
+      return this.$router.options.routes
     },
     activeMenu() {
       const route = this.$route
       const { meta, path } = route
+      // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {
         return meta.activeMenu
       }

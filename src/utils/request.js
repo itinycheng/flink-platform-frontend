@@ -79,6 +79,13 @@ service.interceptors.response.use(
     }
   },
   error => {
+    // HTTP 401 — token expired or invalid, clear state and redirect to login
+    if (error.response && error.response.status === 401) {
+      store.dispatch('user/resetToken').then(() => {
+        location.href = '/#/login'
+      })
+      return Promise.reject(error)
+    }
     console.log('err' + error) // for debug
     Message({
       message: error.message,

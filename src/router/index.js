@@ -44,6 +44,12 @@ export const constantRoutes = [
   },
 
   {
+    path: '/no-workspace',
+    component: () => import('@/views/no-workspace/index'),
+    hidden: true
+  },
+
+  {
     path: '/',
     component: Layout,
     redirect: '/dashboard',

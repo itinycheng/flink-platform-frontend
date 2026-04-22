@@ -8,7 +8,7 @@ import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/login'] // no redirect whitelist
+const whiteList = ['/login', '/no-workspace'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
   // start progress bar
@@ -16,6 +16,27 @@ router.beforeEach(async(to, from, next) => {
 
   // set page title
   document.title = getPageTitle(to.meta.title)
+
+  // Handle SSO callback: ticket (CAS) or code+state (OIDC) arrive as query params
+  // outside the hash because the IdP redirects to the plain frontend URL.
+  const urlParams = new URLSearchParams(window.location.search)
+  const ticket = urlParams.get('ticket')
+  const code = urlParams.get('code')
+  const state = urlParams.get('state')
+
+  if (ticket || code) {
+    try {
+      await store.dispatch('user/ssoCallback', { ticket, code, state })
+      // Strip SSO params so a page refresh doesn't re-trigger the exchange
+      window.history.replaceState(null, '', window.location.pathname + window.location.hash)
+      next({ path: '/', replace: true })
+    } catch (e) {
+      Message.error('SSO login failed')
+      next('/login')
+    }
+    NProgress.done()
+    return
+  }
 
   // determine whether the user has logged in
   const hasToken = getToken()
@@ -37,12 +58,18 @@ router.beforeEach(async(to, from, next) => {
           await store.dispatch('user/getInfo')
           // fetch full workspace list (replaces the partial id with full workspace object)
           await store.dispatch('workspace/fetchWorkspaceList')
+          // no workspace assigned yet → warn user
+          if (!store.getters.currentWorkspace) {
+            next('/no-workspace')
+            NProgress.done()
+            return
+          }
           next()
         } catch (error) {
           // remove token and go to login page to re-login
           await store.dispatch('user/resetToken')
           Message.error(error || 'Has Error')
-          next(`/login?redirect=${to.path}`)
+          next(`/login?redirect=${to.path}&error=true`)
           NProgress.done()
         }
       }

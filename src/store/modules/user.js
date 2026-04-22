@@ -1,8 +1,7 @@
 // src/store/modules/user.js
-import { login, logout, getInfo } from '@/api/user'
+import { login, getLogoutUrl, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { getWorkspaceId } from '@/utils/workspace'
-import { resetRouter } from '@/router'
 
 const getDefaultState = () => {
   return {
@@ -47,6 +46,24 @@ const actions = {
     })
   },
 
+  // SSO callback — exchange ticket (CAS) or code+state (OIDC) for a token
+  ssoCallback({ commit, dispatch }, { ticket, code, state }) {
+    const payload = ticket ? { ticket } : { code, state }
+    return new Promise((resolve, reject) => {
+      login(payload).then(response => {
+        const { data } = response
+        commit('SET_TOKEN', data.token)
+        setToken(data.token)
+        if (data.workspaceId) {
+          dispatch('workspace/setFromLogin', data.workspaceId, { root: true })
+        }
+        resolve()
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
       getInfo(state.token).then(response => {
@@ -67,18 +84,10 @@ const actions = {
     })
   },
 
-  logout({ commit, state, dispatch }) {
-    return new Promise((resolve, reject) => {
-      logout(state.token).then(() => {
-        removeToken()
-        resetRouter()
-        commit('RESET_STATE')
-        dispatch('workspace/resetWorkspace', null, { root: true })
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
+  logout({ state }) {
+    const token = state.token
+    removeToken()
+    window.location.href = getLogoutUrl(token)
   },
 
   resetToken({ commit, dispatch }) {

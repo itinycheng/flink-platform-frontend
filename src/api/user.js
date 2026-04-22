@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getLoginConfig() {
+  return request({
+    url: '/login/config',
+    method: 'get'
+  })
+}
+
 export function login(data) {
   return request({
     url: '/login',
@@ -16,12 +23,8 @@ export function getInfo(token) {
   })
 }
 
-export function logout(token) {
-  return request({
-    url: '/logout',
-    method: 'post',
-    data: { 'token': token }
-  })
+export function getLogoutUrl(token) {
+  return `${process.env.VUE_APP_BASE_API}/logout?token=${token}`
 }
 
 export function createUser(data) {

@@ -25,8 +25,9 @@ service.interceptors.request.use(
       // please modify it according to the actual situation
       config.headers['X-Token'] = getToken()
     }
-    if (store.getters.workspaceId) {
-      config.headers['X-Workspace-Id'] = store.getters.workspaceId
+    const workspaceId = store.getters.currentWorkspace?.id
+    if (workspaceId) {
+      config.headers['X-Workspace-Id'] = workspaceId
     }
     return config
   },

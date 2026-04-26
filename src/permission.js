@@ -3,89 +3,73 @@ import store from './store'
 import { Message } from 'element-ui'
 import NProgress from 'nprogress' // progress bar
 import 'nprogress/nprogress.css' // progress bar style
-import { getToken } from '@/utils/auth' // get token from cookie
 import getPageTitle from '@/utils/get-page-title'
 
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-const whiteList = ['/login', '/no-workspace'] // no redirect whitelist
+const whiteList = ['/login', '/no-workspace']
+
+async function loadUserSession(to, next) {
+  try {
+    await store.dispatch('user/getInfo')
+    await store.dispatch('workspace/fetchWorkspaceList')
+    if (!store.getters.currentWorkspace) {
+      next('/no-workspace')
+      return true
+    }
+    next()
+  } catch (error) {
+    await store.dispatch('user/resetToken')
+    Message.error(error || 'Has Error')
+    next(`/login?redirect=${to.path}`)
+  }
+  return true
+}
+
+async function doSsoCallback(to, next) {
+  const ticket = new URLSearchParams(window.location.search).get('ticket')
+  if (!ticket || store.getters.token) {
+    return false
+  }
+
+  try {
+    await store.dispatch('user/authenticate', { ticket })
+    window.history.replaceState(null, '',
+      window.location.pathname + window.location.hash)
+    next({ path: '/', replace: true })
+  } catch (e) {
+    Message.error('SSO login failed')
+    next('/login')
+  }
+  return true
+}
 
 router.beforeEach(async(to, from, next) => {
-  // start progress bar
   NProgress.start()
-
-  // set page title
   document.title = getPageTitle(to.meta.title)
-
-  // Handle SSO callback: ticket (CAS) or code+state (OIDC) arrive as query params
-  // outside the hash because the IdP redirects to the plain frontend URL.
-  const urlParams = new URLSearchParams(window.location.search)
-  const ticket = urlParams.get('ticket')
-  const code = urlParams.get('code')
-  const state = urlParams.get('state')
-
-  if (ticket || code) {
-    try {
-      await store.dispatch('user/ssoCallback', { ticket, code, state })
-      // Strip SSO params so a page refresh doesn't re-trigger the exchange
-      window.history.replaceState(null, '', window.location.pathname + window.location.hash)
-      next({ path: '/', replace: true })
-    } catch (e) {
-      Message.error('SSO login failed')
-      next('/login')
-    }
-    NProgress.done()
+  // do callback from SSO login
+  if (await doSsoCallback(to, next)) {
     return
   }
 
-  // determine whether the user has logged in
-  const hasToken = getToken()
-
-  if (hasToken) {
+  if (store.getters.token) {
     if (to.path === '/login') {
-      // if is logged in, redirect to the home page
       next({ path: '/' })
-      NProgress.done()
-    } else {
-      const hasGetUserInfo = store.getters.name
-      if (hasGetUserInfo) {
-        next()
-      } else {
-        try {
-          // restore workspace id from localStorage before getInfo (handles page refresh)
-          store.dispatch('workspace/restoreFromStorage')
-          // get user info
-          await store.dispatch('user/getInfo')
-          // fetch full workspace list (replaces the partial id with full workspace object)
-          await store.dispatch('workspace/fetchWorkspaceList')
-          // no workspace assigned yet → warn user
-          if (!store.getters.currentWorkspace) {
-            next('/no-workspace')
-            NProgress.done()
-            return
-          }
-          next()
-        } catch (error) {
-          // remove token and go to login page to re-login
-          await store.dispatch('user/resetToken')
-          Message.error(error || 'Has Error')
-          next(`/login?redirect=${to.path}&error=true`)
-          NProgress.done()
-        }
-      }
+      return
+    }
+
+    if (!store.getters.name) {
+      await loadUserSession(to, next)
+      return
     }
   } else {
-    /* has no token*/
-
-    if (whiteList.indexOf(to.path) !== -1) {
-      // in the free login whitelist, go directly
-      next()
-    } else {
-      // other pages that do not have permission to access are redirected to the login page.
+    if (!whiteList.includes(to.path)) {
       next(`/login?redirect=${to.path}`)
-      NProgress.done()
+      return
     }
   }
+
+  next()
 })
 
 router.afterEach(() => {

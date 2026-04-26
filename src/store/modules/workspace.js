@@ -1,9 +1,7 @@
-// src/store/modules/workspace.js
 import { getWorkspaceList } from '@/api/workspace'
 import { getWorkspaceId, setWorkspaceId, removeWorkspaceId } from '@/utils/workspace'
 
 const getDefaultState = () => ({
-  workspaceId: null,
   workspaceList: [],
   currentWorkspace: null
 })
@@ -19,14 +17,11 @@ const mutations = {
   },
   SET_CURRENT_WORKSPACE: (state, workspace) => {
     state.currentWorkspace = workspace
-  },
-  SET_WORKSPACE_ID: (state, id) => {
-    state.workspaceId = id
   }
 }
 
 const actions = {
-  fetchWorkspaceList({ commit, state }) {
+  fetchWorkspaceList({ commit }) {
     return getWorkspaceList().then(list => {
       commit('SET_WORKSPACE_LIST', list || [])
 
@@ -35,8 +30,8 @@ const actions = {
         return
       }
 
-      // use state.workspaceId (already restored by restoreFromStorage or setFromLogin)
-      const saved = state.workspaceId && list.find(w => w.id === state.workspaceId)
+      const savedId = getWorkspaceId()
+      const saved = savedId && list.find(w => w.id === savedId)
       const workspace = saved || list[0]
 
       commit('SET_CURRENT_WORKSPACE', workspace)
@@ -51,21 +46,8 @@ const actions = {
     setWorkspaceId(id)
   },
 
-  // called right after login — backend returns a default workspaceId with the token.
-  // intentionally sets only workspaceId (not currentWorkspace) because the workspace
-  // list hasn't been fetched yet; fetchWorkspaceList will resolve the full object.
-  setFromLogin({ commit }, workspaceId) {
-    commit('SET_WORKSPACE_ID', workspaceId)
+  setWorkspaceHint(_, workspaceId) {
     setWorkspaceId(workspaceId)
-  },
-
-  // restore only the id from localStorage (synchronous, used before getInfo on page refresh)
-  restoreFromStorage({ commit, state }) {
-    if (state.workspaceId) return
-    const savedId = getWorkspaceId()
-    if (savedId) {
-      commit('SET_WORKSPACE_ID', savedId)
-    }
   },
 
   resetWorkspace({ commit }) {

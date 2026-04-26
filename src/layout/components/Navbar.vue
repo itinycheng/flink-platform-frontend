@@ -75,9 +75,7 @@ export default {
     },
     handleSwitchWorkspace(id) {
       this.$store.dispatch('workspace/switchWorkspace', id)
-      if (this.$route.path !== '/dashboard') {
-        this.$router.push('/dashboard')
-      }
+      window.location.reload()
     },
     logout() {
       this.$store.dispatch('user/logout')

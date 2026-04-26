@@ -82,14 +82,6 @@ export default {
       redirect: undefined
     }
   },
-  created() {
-    getLoginConfig().then(res => {
-      const config = res.data || {}
-      if (config.ssoLoginUrl) {
-        window.location.href = config.ssoLoginUrl
-      }
-    }).catch(() => {})
-  },
   watch: {
     $route: {
       handler: function(route) {
@@ -97,6 +89,14 @@ export default {
       },
       immediate: true
     }
+  },
+  created() {
+    getLoginConfig().then(data => {
+      const { ssoLoginUrl } = data || {}
+      if (ssoLoginUrl) {
+        window.location.href = ssoLoginUrl
+      }
+    }).catch(() => {})
   },
   methods: {
     showPwd() {
@@ -113,7 +113,10 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
+          this.$store.dispatch('user/authenticate', {
+            username: this.loginForm.username.trim(),
+            password: this.loginForm.password
+          }).then(() => {
             this.$router.push({ path: this.redirect || '/' })
             this.loading = false
           }).catch(() => {

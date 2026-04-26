@@ -4,7 +4,7 @@ export function getLoginConfig() {
   return request({
     url: '/login/config',
     method: 'get'
-  })
+  }).then(res => res.data)
 }
 
 export function login(data) {
@@ -12,7 +12,7 @@ export function login(data) {
     url: '/login',
     method: 'post',
     data
-  })
+  }).then(res => res.data)
 }
 
 export function getInfo(token) {
@@ -20,11 +20,15 @@ export function getInfo(token) {
     url: '/user/info',
     method: 'get',
     params: { token }
-  })
+  }).then(res => res.data)
 }
 
-export function getLogoutUrl(token) {
-  return `${process.env.VUE_APP_BASE_API}/logout?token=${token}`
+export function logout(token) {
+  return request({
+    url: '/logout',
+    method: 'post',
+    data: { 'token': token }
+  }).then(res => res.data)
 }
 
 export function createUser(data) {
@@ -32,7 +36,7 @@ export function createUser(data) {
     url: '/user/create',
     method: 'post',
     data
-  })
+  }).then(res => res.data)
 }
 
 export function updateUser(data) {
@@ -40,7 +44,7 @@ export function updateUser(data) {
     url: '/user/update',
     method: 'post',
     data
-  })
+  }).then(res => res.data)
 }
 
 export function updateRoles(data) {
@@ -48,7 +52,7 @@ export function updateRoles(data) {
     url: '/user/update/roles',
     method: 'post',
     data
-  })
+  }).then(res => res.data)
 }
 
 export function getUserPage(query) {

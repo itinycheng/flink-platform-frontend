@@ -1,5 +1,4 @@
-// src/store/modules/user.js
-import { login, getLogoutUrl, getInfo } from '@/api/user'
+import { login, logout, getInfo } from '@/api/user'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { getWorkspaceId } from '@/utils/workspace'
 
@@ -29,33 +28,14 @@ const mutations = {
 }
 
 const actions = {
-  login({ commit, dispatch }, userInfo) {
-    const { username, password } = userInfo
+  authenticate({ commit, dispatch }, credentials) {
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password, workspaceId: getWorkspaceId() }).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        if (data.workspaceId) {
-          dispatch('workspace/setFromLogin', data.workspaceId, { root: true })
-        }
-        resolve()
-      }).catch(error => {
-        reject(error)
-      })
-    })
-  },
-
-  // SSO callback — exchange ticket (CAS) or code+state (OIDC) for a token
-  ssoCallback({ commit, dispatch }, { ticket, code, state }) {
-    const payload = ticket ? { ticket } : { code, state }
-    return new Promise((resolve, reject) => {
-      login(payload).then(response => {
-        const { data } = response
-        commit('SET_TOKEN', data.token)
-        setToken(data.token)
-        if (data.workspaceId) {
-          dispatch('workspace/setFromLogin', data.workspaceId, { root: true })
+      login({ workspaceId: getWorkspaceId(), ...credentials }).then(data => {
+        const { token, workspaceId } = data
+        commit('SET_TOKEN', token)
+        setToken(token)
+        if (workspaceId) {
+          dispatch('workspace/setWorkspaceHint', workspaceId, { root: true })
         }
         resolve()
       }).catch(error => {
@@ -66,15 +46,12 @@ const actions = {
 
   getInfo({ commit, state }) {
     return new Promise((resolve, reject) => {
-      getInfo(state.token).then(response => {
-        const { data } = response
-
+      getInfo(state.token).then(data => {
         if (!data) {
           return reject('Verification failed, please Login again.')
         }
 
         const { name, avatar } = data
-
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         resolve(data)
@@ -84,10 +61,18 @@ const actions = {
     })
   },
 
-  logout({ state }) {
-    const token = state.token
-    removeToken()
-    window.location.href = getLogoutUrl(token)
+  logout({ commit, state }) {
+    logout(state.token)
+      .then(data => {
+        removeToken()
+        commit('RESET_STATE')
+        const { redirectUrl } = data || {}
+        window.location.href = redirectUrl || '/#/login'
+      }).catch(() => {
+        removeToken()
+        commit('RESET_STATE')
+        window.location.href = '/#/login'
+      })
   },
 
   resetToken({ commit, dispatch }) {

@@ -271,12 +271,12 @@ export default {
     },
     submitForm() {
       if (this.formData.id) {
-        updateWorker(this.formData).then(id => {
+        updateWorker(this.formData).then(() => {
           this.closeForm()
           this.getList()
         })
       } else {
-        createWorker(this.formData).then(id => {
+        createWorker(this.formData).then(() => {
           this.closeForm()
           this.getList()
         })

@@ -5,7 +5,7 @@ export function createWorker(data) {
     url: '/worker/create',
     method: 'post',
     data
-  })
+  }).then(res => res.data)
 }
 
 export function updateWorker(data) {
@@ -13,7 +13,7 @@ export function updateWorker(data) {
     url: '/worker/update',
     method: 'post',
     data
-  })
+  }).then(res => res.data)
 }
 
 export function getWorkerPage(query) {
@@ -30,7 +30,7 @@ export function getWorkerList(query) {
   return request({
     url: '/worker/list',
     method: 'get',
-    params: query
+    params: query || {}
   }).then(res => {
     return res.data
   })

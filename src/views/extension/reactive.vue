@@ -182,7 +182,7 @@ import { execJob, getJobToDbTypeMap, getExecLog } from '@/api/reactive'
 import { getDataSourceList } from '@/api/datasource'
 import { getResourceList } from '@/api/resource'
 import { getDeployModes, getVersions } from '@/api/attr'
-import { getUserWorkers } from '@/api/user'
+import { getWorkspaceWorkers } from '@/api/workspace'
 import { getCatalogs } from '@/api/catalog'
 
 export default {
@@ -255,7 +255,7 @@ export default {
       })
     },
     initRouteUrlList() {
-      getUserWorkers().then((result) => {
+      getWorkspaceWorkers().then((result) => {
         this.routeUrlList = result
       })
     },

@@ -1,5 +1,12 @@
 import request from '@/utils/request'
 
+export function getWorkspace(id) {
+  return request({
+    url: `/workspace/get/${id}`,
+    method: 'get'
+  }).then(res => res.data)
+}
+
 export function getWorkspaceList() {
   return request({
     url: '/workspace/list',
@@ -34,6 +41,13 @@ export function updateWorkspace(data) {
 export function deleteWorkspace(id) {
   return request({
     url: `/workspace/delete/${id}`,
+    method: 'get'
+  }).then(res => res.data)
+}
+
+export function getWorkspaceWorkers() {
+  return request({
+    url: '/workspace/workers',
     method: 'get'
   }).then(res => res.data)
 }

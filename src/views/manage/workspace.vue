@@ -89,6 +89,19 @@
                 />
               </el-select>
             </el-form-item>
+            <el-form-item label="Workers" prop="config.workers">
+              <el-select v-model="formData.config.workers" multiple style="width:100%" placeholder="Please select workers">
+                <el-option
+                  v-for="worker in workerList"
+                  :key="worker.id"
+                  :label="worker.name"
+                  :value="worker.id"
+                >
+                  <span style="float: left">{{ worker.name }}</span>
+                  <span style="float: right; color: #8492a6; font-size: 13px">{{ worker.role }}</span>
+                </el-option>
+              </el-select>
+            </el-form-item>
             <el-form-item style="text-align: right;">
               <el-button @click.stop="closeForm">Cancel</el-button>
               <el-button type="primary" @click.stop="submitForm">Confirm</el-button>
@@ -101,10 +114,11 @@
 </template>
 
 <script>
-import { getWorkspacePage, createWorkspace, updateWorkspace, deleteWorkspace } from '@/api/workspace'
+import { getWorkspace, getWorkspacePage, createWorkspace, updateWorkspace, deleteWorkspace } from '@/api/workspace'
 import { getStatusList } from '@/api/attr'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
+import { getWorkerList } from '@/api/worker'
 
 export default {
   name: 'WorkspaceList',
@@ -114,7 +128,8 @@ export default {
     return {
       dialogFormVisible: false,
       statusList: [],
-      formData: {},
+      workerList: [],
+      formData: { config: {}},
       formRules: {
         name: [{ required: true, message: 'Please enter name', trigger: 'blur' }]
       },
@@ -132,6 +147,7 @@ export default {
   created() {
     this.getList()
     this.getCommonStatus()
+    this.getWorkers()
   },
   methods: {
     getList() {
@@ -145,17 +161,28 @@ export default {
         this.statusList = result
       })
     },
+    getWorkers() {
+      getWorkerList({}).then((result) => {
+        this.workerList = result
+      })
+    },
     handleFilter() {
       this.listQuery.page = 1
       this.getList()
     },
     openForm(row) {
-      this.formData = row && row.id ? { ...row } : {}
+      if (row && row.id) {
+        getWorkspace(row.id).then((data) => {
+          this.formData = { config: {}, ...data }
+        })
+      } else {
+        this.formData = { config: {}}
+      }
       this.dialogFormVisible = true
     },
     closeForm() {
       this.dialogFormVisible = false
-      this.formData = {}
+      this.formData = { config: {}}
     },
     submitForm() {
       if (this.formData.id) {

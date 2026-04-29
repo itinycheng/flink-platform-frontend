@@ -407,7 +407,7 @@
 import CodeEditor from './CodeEditor.vue'
 import { getJobOrJobRun, createJob, updateJob, getJobList } from '@/api/job.js'
 import { getNodeTypes, getDeployModes, getVersions, getPreconditions, getDependentRelations, getStatusList, getEdgeStatusList } from '@/api/attr.js'
-import { getUserWorkers } from '@/api/user.js'
+import { getWorkspaceWorkers } from '@/api/workspace'
 import { getResourceList } from '@/api/resource.js'
 import { getDataSourceList } from '@/api/datasource'
 import { getFlowIdNameList } from '@/api/job-flow'
@@ -559,7 +559,7 @@ export default {
       })
     },
     initRouteUrlList() {
-      getUserWorkers().then(result => {
+      getWorkspaceWorkers().then(result => {
         this.routeUrlList = result
       })
     },

@@ -1,6 +1,6 @@
 <template>
   <div class="reactive-container">
-    <div class="form-container" style="padding: 20px 0px">
+    <div class="form-container" style="padding: 20px 0">
       <el-form
         ref="formData"
         :model="formData"

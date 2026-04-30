@@ -48,7 +48,7 @@ export default {
     },
 
     submitForm() {
-      updateJob(this.formData).then(res => {
+      updateJob(this.formData).then(() => {
         this.cancelForm()
         this.$emit('getList')
       })

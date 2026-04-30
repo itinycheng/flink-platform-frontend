@@ -73,12 +73,3 @@ export function getUser(id) {
     return res.data
   })
 }
-
-export function getUserWorkers() {
-  return request({
-    url: '/user/workers',
-    method: 'get'
-  }).then(res => {
-    return res.data
-  })
-}

@@ -134,7 +134,7 @@ export default {
 
     .x6-edge-selected path:nth-child(2) {
         stroke: #1890ff;
-        stroke-width: 1.5px !important;
+        stroke-width: 2px !important;
     }
 
     @keyframes running-line {

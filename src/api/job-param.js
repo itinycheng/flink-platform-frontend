@@ -19,16 +19,6 @@ export function getParamPage(query) {
   })
 }
 
-export function getParamList(query) {
-  return request({
-    url: '/jobParam/list',
-    method: 'get',
-    params: query
-  }).then(res => {
-    return res.data
-  })
-}
-
 export function createParam(data) {
   return request({
     url: '/jobParam/create',

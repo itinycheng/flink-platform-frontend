@@ -7,7 +7,7 @@
     <div class="right-menu">
       <el-dropdown class="workspace-switcher" trigger="click" @command="handleSwitchWorkspace">
         <span class="workspace-label">
-          {{ currentWorkspace ? currentWorkspace.name : '暂无 Workspace' }}
+          {{ currentWorkspace ? currentWorkspace.name : 'No Workspace' }}
           <i class="el-icon-caret-bottom" />
         </span>
         <el-dropdown-menu slot="dropdown">

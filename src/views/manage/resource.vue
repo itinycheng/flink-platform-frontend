@@ -136,7 +136,7 @@
               <el-form-item label="File" prop="type">
                 <el-upload
                   :action="baseUrl + '/resource/upload'"
-                  :headers="headers"
+                  :headers="buildHeaders()"
                   :data="{id: formData.id || '', pid: this.$route.params.id }"
                   :before-remove="removeFile"
                   :on-success="handleUploadSuccess"
@@ -179,9 +179,6 @@ export default {
       // file upload
       baseUrl: process.env.VUE_APP_BASE_API,
       fileList: [],
-      headers: {
-        'X-Token': getToken()
-      },
       // default
       resourceTypeList: [],
       formData: {},
@@ -212,6 +209,17 @@ export default {
     this.getTypes()
   },
   methods: {
+    // el-upload bypasses our axios instance, so inject the same auth +
+    // workspace headers here. Called by :headers="buildHeaders()" so every
+    // upload picks up the current token / workspace.
+    buildHeaders() {
+      const h = { 'X-Token': getToken() }
+      const workspace = this.$store.getters.currentWorkspace
+      if (workspace && workspace.id) {
+        h['X-Workspace-Id'] = workspace.id
+      }
+      return h
+    },
     getList() {
       getResourcePage(this.listQuery).then((data) => {
         this.list = data.records

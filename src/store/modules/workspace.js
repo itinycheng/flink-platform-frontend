@@ -27,6 +27,7 @@ const actions = {
 
       if (!list || list.length === 0) {
         commit('SET_CURRENT_WORKSPACE', null)
+        removeWorkspaceId()
         return
       }
 

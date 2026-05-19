@@ -120,9 +120,9 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Notify" width="120" align="center">
+      <el-table-column label="Creator" width="130" align="center">
         <template slot-scope="{ row }">
-          {{ row.alerts ? row.alerts.map(item => item.alertId) : '' }}
+          <span>{{ row.username }}</span>
         </template>
       </el-table-column>
       <el-table-column label="Update Time" min-width="130" align="center">

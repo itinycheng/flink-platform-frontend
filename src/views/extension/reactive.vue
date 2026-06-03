@@ -296,7 +296,7 @@ export default {
       })
     },
     getExtJarList() {
-      getResourceList({ type: 'JAR' }).then((data) => {
+      getResourceList({ type: 'FILE', ext: 'jar' }).then((data) => {
         this.extJarList = data
       })
     },

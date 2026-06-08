@@ -104,23 +104,16 @@
             <el-form-item label="Email" prop="email">
               <el-input v-model="formData.email" />
             </el-form-item>
-            <el-form-item label="Workers" prop="workers">
-              <el-select v-model="formData.workers" multiple style="width:100%" placeholder="Please select workers">
+            <el-form-item label="Status" prop="status">
+              <el-select v-model="formData.status" style="width:100%" placeholder="Please select user status">
                 <el-option
-                  v-for="worker in workerList"
-                  :key="worker.id"
-                  :label="worker.name"
-                  :value="worker.id"
-                >
-                  <span style="float: left">{{ worker.name }}</span>
-                  <span style="float: right; color: #8492a6; font-size: 13px">{{ worker.role }}</span>
-                </el-option>
+                  v-for="item in statusList"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.name"
+                />
               </el-select>
             </el-form-item>
-            <!-- <el-form-item label="Status" prop="status">
-              <el-input v-model="formData.status" />
-            </el-form-item>
-            -->
             <el-form-item style="text-align: right;">
               <el-button @click.stop="closeForm">Cancel</el-button>
               <el-button type="primary" @click.stop="submitForm">Confirm</el-button>
@@ -156,9 +149,9 @@
 <script>
 import { getUser, getUserPage, createUser, updateUser, updateRoles } from '@/api/user'
 import { getWorkspaceList } from '@/api/workspace'
-import { getWorkerList } from '@/api/worker'
 import waves from '@/directive/waves'
 import Pagination from '@/components/Pagination'
+import { getStatusList } from '@/api/attr'
 
 export default {
   name: 'UserList',
@@ -168,7 +161,7 @@ export default {
     return {
       // user edit
       userDialogVisible: false,
-      workerList: [],
+      statusList: [],
       formData: {},
       formRules: {
         username: [
@@ -198,7 +191,7 @@ export default {
   },
   created() {
     this.getList()
-    this.getWorkers()
+    this.getStatusList()
     this.getWorkspaces()
   },
   methods: {
@@ -208,9 +201,10 @@ export default {
         this.total = data.total
       })
     },
-    getWorkers() {
-      getWorkerList({}).then((result) => {
-        this.workerList = result
+    getStatusList() {
+      const data = { className: 'UserStatus' }
+      getStatusList(data).then((result) => {
+        this.statusList = result
       })
     },
     handleFilter() {

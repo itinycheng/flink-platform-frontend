@@ -92,9 +92,20 @@ export default {
   },
   created() {
     getLoginConfig().then(data => {
-      const { ssoLoginUrl } = data || {}
-      if (ssoLoginUrl) {
-        window.location.href = ssoLoginUrl
+      const { authType, ssoLoginUrl } = data || {}
+      if (!ssoLoginUrl) {
+        return
+      }
+
+      let target = ssoLoginUrl
+      if (this.$route.query?.ssoFailed === '1') {
+        const reAuthParam = { cas: 'renew=true', oidc: 'prompt=login' }[authType]
+        const sep = ssoLoginUrl.includes('?') ? '&' : '?'
+        target = reAuthParam ? ssoLoginUrl + sep + reAuthParam : null
+      }
+
+      if (target) {
+        window.location.href = target
       }
     }).catch(() => {})
   },

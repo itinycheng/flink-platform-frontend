@@ -27,19 +27,30 @@ async function loadUserSession(to, next) {
 }
 
 async function doSsoCallback(to, next) {
-  const ticket = new URLSearchParams(window.location.search).get('ticket')
-  if (!ticket || store.getters.token) {
+  if (store.getters.token) {
     return false
   }
 
+  const params = new URLSearchParams(window.location.search)
+  const ticket = params.get('ticket')
+  const code = params.get('code')
+  if (!ticket && !code) {
+    return false
+  }
+
+  const credentials = ticket
+    ? { ticket }
+    : { code, state: params.get('state') }
+
+  window.history.replaceState(null, '',
+    window.location.pathname + window.location.hash)
+
   try {
-    await store.dispatch('user/authenticate', { ticket })
-    window.history.replaceState(null, '',
-      window.location.pathname + window.location.hash)
+    await store.dispatch('user/authenticate', credentials)
     next({ path: '/', replace: true })
   } catch (e) {
     Message.error('SSO login failed')
-    next('/login')
+    next({ path: '/login', query: { ssoFailed: '1' }})
   }
   return true
 }

@@ -193,6 +193,7 @@
     <ScheduleDialog ref="scheduleDialog" @refreshList="getList" />
     <EditAlertDialog ref="editAlertDialog" />
     <EditTagDialog ref="editTagDialog" />
+    <RunOnceDialog ref="runOnceDialog" />
   </div>
 </template>
 
@@ -207,10 +208,11 @@ import ProjectCreateDialog from './create.vue'
 import ScheduleDialog from './schedule.vue'
 import EditAlertDialog from './alerts.vue'
 import EditTagDialog from './tags.vue'
+import RunOnceDialog from '@/components/RunOnceDialog/index.vue'
 
 export default {
   name: 'ProjectList',
-  components: { Pagination, ProjectCreateDialog, ScheduleDialog, EditAlertDialog, EditTagDialog },
+  components: { Pagination, ProjectCreateDialog, ScheduleDialog, EditAlertDialog, EditTagDialog, RunOnceDialog },
   directives: { waves },
   filters: {
     statusFilter(status) {
@@ -328,12 +330,15 @@ export default {
           this.getList()
         })
       } else if (toStatus === 'RUN_ONCE') {
-        runOnceFlow(row.id).then(result => {
-          this.$message({
-            message: 'Run once Successfully, id=' + result,
-            type: 'success'
+        this.$refs.runOnceDialog.open(scheduleTime => {
+          const data = scheduleTime ? { scheduleTime } : undefined
+          runOnceFlow(row.id, data).then(result => {
+            this.$message({
+              message: 'Run once Successfully, id=' + result,
+              type: 'success'
+            })
           })
-        })
+        }, row.name)
       } else {
         const newStatus = { id: row.id, status: toStatus }
         updateFlow(newStatus).then(result => {

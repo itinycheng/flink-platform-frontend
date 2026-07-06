@@ -7,8 +7,9 @@
     :direction="direction"
     :modal="true"
     :modal-append-to-body="true"
-    size="40%"
+    :size="drawerSize"
   >
+    <div class="drawer-resizer" @mousedown="startResize" />
     <el-row :gutter="20">
       <el-col :span="22">
         <el-form ref="formData" :model="formData" :disabled="disabled" :rules="rules" label-width="150px">
@@ -391,7 +392,7 @@
             </el-form-item>
           </template>
 
-          <el-form-item label-width="10%" style="text-align: right;">
+          <el-form-item label-width="10%" style="text-align: right; margin-bottom: 10px">
             <el-button type="warning" plain @click="resetForm()">Reset Form</el-button>
             <el-button v-if="isSqlNode()" type="success" plain @click="formatSql()">Format SQL</el-button>
             <el-button v-if="nodeType === 'DEPENDENT'" type="success" plain @click="addDependentItem()">Add Dependent</el-button>
@@ -429,6 +430,7 @@ export default {
       node: {},
       nodeType: '',
       direction: 'rtl',
+      drawerSize: '40%',
       execModeList: [],
       catalogList: [],
       extJarList: [],
@@ -662,6 +664,15 @@ export default {
     changeTextarea(sql) {
       this.$set(this.formData, 'subject', sql)
     },
+    startResize() {
+      const resize = (e) => { this.drawerSize = window.innerWidth - e.clientX + 'px' }
+      document.body.style.userSelect = 'none'
+      document.addEventListener('mousemove', resize)
+      document.addEventListener('mouseup', () => {
+        document.removeEventListener('mousemove', resize)
+        document.body.style.userSelect = ''
+      }, { once: true })
+    },
     formatSql() {
       this.$refs.codeEditor.format()
     },
@@ -722,5 +733,19 @@ export default {
 .el-drawer.rtl {
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.drawer-resizer {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+  z-index: 10;
+
+  &:hover {
+    background: rgba(64, 158, 255, 0.3);
+  }
 }
 </style>

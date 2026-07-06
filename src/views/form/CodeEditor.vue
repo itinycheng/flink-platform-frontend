@@ -102,8 +102,9 @@ export default {
 .CodeMirror {
   color: black;
   direction: ltr;
-  line-height: 22px;
-  min-height: 200px !important;
+  line-height: 20px;
+  height: auto !important;
+  min-height: 250px !important;
 }
 
 .CodeMirror-hints{
@@ -111,6 +112,8 @@ export default {
 }
 
 .code-area{
-    border:1px solid #eee
+  border: 1px solid #eee;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
 }
 </style>

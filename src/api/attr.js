@@ -55,15 +55,6 @@ export function getVersions(type) {
   })
 }
 
-export function getPreconditions() {
-  return request({
-    url: `/attr/preconditions`,
-    method: 'get'
-  }).then(res => {
-    return res.data
-  })
-}
-
 export function getDependentRelations() {
   return request({
     url: `/attr/dependentRelations`,

@@ -178,7 +178,7 @@ export default {
           status: job.status,
           type: nodeType,
           jType: 'job',
-          precondition: 'AND'
+          precondition: 'ALL_MATCHED'
         }
       })
     },

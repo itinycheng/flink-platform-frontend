@@ -191,9 +191,9 @@
               >
                 <el-option
                   v-for="item in preconditionList"
-                  :key="item"
-                  :label="item"
-                  :value="item"
+                  :key="item.name"
+                  :label="item.name"
+                  :value="item.name"
                 />
               </el-select>
             </el-form-item>
@@ -407,7 +407,7 @@
 <script>
 import CodeEditor from './CodeEditor.vue'
 import { getJobOrJobRun, createJob, updateJob, getJobList } from '@/api/job.js'
-import { getNodeTypes, getDeployModes, getVersions, getPreconditions, getDependentRelations, getStatusList, getEdgeStatusList } from '@/api/attr.js'
+import { getNodeTypes, getDeployModes, getVersions, getDependentRelations, getStatusList, getEdgeStatusList } from '@/api/attr.js'
 import { getWorkspaceWorkers } from '@/api/workspace'
 import { getResourceList } from '@/api/resource.js'
 import { getDataSourceList } from '@/api/datasource'
@@ -566,7 +566,8 @@ export default {
       })
     },
     initPreconditionList() {
-      getPreconditions().then(result => {
+      const data = { className: 'ExecutionCondition' }
+      getStatusList(data).then((result) => {
         this.preconditionList = result
       })
     },
@@ -704,7 +705,7 @@ export default {
     },
     modifyNode(resData) {
       const data = this.node.getData()
-      let precondition = 'AND'
+      let precondition = 'ALL_MATCHED'
       if (resData?.type === 'CONDITION') {
         precondition = resData.config.condition
       }

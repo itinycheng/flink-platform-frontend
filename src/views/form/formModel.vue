@@ -666,7 +666,10 @@ export default {
       this.$set(this.formData, 'subject', sql)
     },
     startResize() {
-      const resize = (e) => { this.drawerSize = window.innerWidth - e.clientX + 'px' }
+      const resize = (e) => {
+        this.drawerSize = window.innerWidth - e.clientX + 'px'
+        this.$nextTick(() => this.$refs.codeEditor && this.$refs.codeEditor.refresh())
+      }
       document.body.style.userSelect = 'none'
       document.addEventListener('mousemove', resize)
       document.addEventListener('mouseup', () => {

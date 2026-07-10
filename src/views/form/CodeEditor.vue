@@ -78,6 +78,9 @@ export default {
     setVal(text) {
       this.sqlData.setValue(text)
     },
+    refresh() {
+      this.sqlData.refresh()
+    },
     format() {
       const language = this.getLangFormatOption()
       const newText = format(this.sqlData.getValue(), { language })

@@ -120,7 +120,7 @@
           </el-tag>
         </template>
       </el-table-column>
-      <el-table-column label="Creator" width="130" align="center">
+      <el-table-column label="Owner" width="130" align="center">
         <template slot-scope="{ row }">
           <span>{{ row.username }}</span>
         </template>

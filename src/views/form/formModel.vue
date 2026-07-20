@@ -351,20 +351,6 @@
                 <i class="el-icon-link" />
               </router-link>
             </el-form-item>
-            <el-form-item label="Expected Failure" prop="config.expectedFailureCorrectedTo">
-              <el-select
-                v-model="formData.config.expectedFailureCorrectedTo"
-                style="width:100%"
-                placeholder="Please change EXPECTED_FAILURE to an alternative"
-              >
-                <el-option
-                  v-for="item in edgeStatusList"
-                  :key="item"
-                  :label="item"
-                  :value="item"
-                />
-              </el-select>
-            </el-form-item>
             <el-form-item label="Param Transfer" prop="config.paramTransferMode">
               <el-select
                 v-model="formData.config.paramTransferMode"
@@ -407,7 +393,7 @@
 <script>
 import CodeEditor from './CodeEditor.vue'
 import { getJobOrJobRun, createJob, updateJob, getJobList } from '@/api/job.js'
-import { getNodeTypes, getDeployModes, getVersions, getDependentRelations, getStatusList, getEdgeStatusList } from '@/api/attr.js'
+import { getNodeTypes, getDeployModes, getVersions, getDependentRelations, getStatusList } from '@/api/attr.js'
 import { getWorkspaceWorkers } from '@/api/workspace'
 import { getResourceList } from '@/api/resource.js'
 import { getDataSourceList } from '@/api/datasource'
@@ -446,7 +432,6 @@ export default {
       jobLists: [],
       jobFlowList: [],
       paramTransferModeList: [],
-      edgeStatusList: [],
       formData: { config: {}},
       rules: {
         name: [
@@ -484,9 +469,6 @@ export default {
         }],
         'config.paramTransferMode': [{
           required: true, message: 'Please choose param transfer mode', trigger: 'change'
-        }],
-        'config.expectedFailureCorrectedTo': [{
-          required: true, message: 'Please choose a status', trigger: 'change'
         }]
       }
     }
@@ -519,7 +501,6 @@ export default {
           case 'SUB_FLOW':
             this.initJobFlowList({ type: ['JOB_FLOW'], status: ['ONLINE', 'SCHEDULING'] })
             this.initParamTransferModeList()
-            this.initEdgeStatusList()
             break
           case 'SHELL':
           default:
@@ -553,11 +534,6 @@ export default {
       const data = { className: 'ParamTransferMode' }
       getStatusList(data).then((result) => {
         this.paramTransferModeList = result
-      })
-    },
-    initEdgeStatusList() {
-      getEdgeStatusList().then(result => {
-        this.edgeStatusList = result
       })
     },
     initRouteUrlList() {
